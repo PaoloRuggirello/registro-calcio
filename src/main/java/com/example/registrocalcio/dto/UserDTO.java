@@ -1,11 +1,16 @@
 package com.example.registrocalcio.dto;
 
+import com.example.registrocalcio.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class UserDTO {
     private String username;
     private String name;
     private String surname;
     private String password;
     private String role;
+    private String email;
 
     public UserDTO() {
     }
@@ -16,6 +21,10 @@ public class UserDTO {
         this.surname = surname;
         this.password = password;
         this.role = role;
+    }
+
+    public UserDTO(User user) {
+        setFields(user);
     }
 
     public String getUsername() {
@@ -56,6 +65,33 @@ public class UserDTO {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setFields(User user) {
+        this.name = user.getName();
+        this.surname = user.getSurname();
+        this.username = user.getUsername();
+        this.role = user.getRole().toString();
+        this.email = user.getEmail();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("username", username)
+                .append("name", name)
+                .append("surname", surname)
+                .append("password", password)
+                .append("role", role)
+                .toString();
     }
 
 }

@@ -1,6 +1,8 @@
 package com.example.registrocalcio.model;
 
+import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.other.Role;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,9 +38,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
-    @Column(columnDefinition = "varchar(20) default 'USER'", nullable = false)
+    @Column(columnDefinition = "varchar(20) default 'USER'")
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
     @OneToMany(mappedBy = "creator")
     List<Event> events;
@@ -46,9 +48,19 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user")
     List<User_Event> playedMatches;
 
+
+
     public User() {
+
     }
 
+    public User(UserDTO toRegister) {
+        this.username = toRegister.getUsername();
+        this.name = toRegister.getName();
+        this.surname = toRegister.getSurname();
+        this.email = toRegister.getEmail();
+        this.password = toRegister.getPassword();
+    }
 
     public Long getId() {
         return id;
@@ -96,5 +108,26 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("username", username)
+                .append("name", name)
+                .append("surname", surname)
+                .append("email", email)
+                .append("password", password)
+                .append("role", role)
+                .toString();
     }
 }
