@@ -18,11 +18,17 @@ public class UserHandler {
     @Autowired
     UserRepository userRepository;
 
-    public Optional<User> checkPresentUser(UserDTO toAuthenticate){
+    /**
+     *
+      * @param toAuthenticate - the user to authenticate
+     * @return an empty user if the given user doesn't exist in db or has been passed wrong credentials, otherwise return the user
+     */
+    public Optional<User> checkPresentUser(UserDTO toAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         Optional<User> userOptional = userRepository.findByUsername(toAuthenticate.getUsername());
         if(userOptional.isPresent()){
             User user = userOptional.get();
-            //TODO: manage password encyption
+            //TODO: enable password hashing
+//            if(PasswordHash.validatePassword(toAuthenticate.getPassword(), user.getPassword()))
             if(user.getPassword().equals(toAuthenticate.getPassword()))
                 return userOptional;
         }
@@ -30,8 +36,8 @@ public class UserHandler {
     }
 
     public String passwordEncryption(String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        //TODO: Password encryption
-        password = PasswordHash.createHash(password);
+        //TODO: Enable password encryption
+//        password = PasswordHash.createHash(password);
         return password;
     }
 

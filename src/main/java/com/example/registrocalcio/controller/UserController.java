@@ -24,9 +24,10 @@ public class UserController {
     private UserHandler userHandler;
 
     @PostMapping("/authenticate")
-    public UserDTO authenticate(@RequestBody UserDTO toAuthenticate){
+    public UserDTO authenticate(@RequestBody UserDTO toAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         System.out.println(toAuthenticate);
         Optional<User> checkedUser = userHandler.checkPresentUser(toAuthenticate);
+        System.out.println(checkedUser);
         return checkedUser.map(UserDTO::new).orElse(null);
     }
 
