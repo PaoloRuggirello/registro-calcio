@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
@@ -29,14 +31,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public UserDTO registerUser(@RequestBody UserDTO toRegister){
-        System.out.println(toRegister);
-        userHandler.setAvailableUsername(toRegister);
-        toRegister.setPassword(userHandler.passwordEncryption(toRegister.getPassword()));
-        userHandler.saveUser(new User(toRegister));
-        toRegister.setPassword(null);
-        toRegister.setRole(Role.USER.toString());
-        return toRegister;
+    public UserDTO registerUser(@RequestBody UserDTO toRegister) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        return userHandler.createUserAndSave(toRegister);
     }
 
 
