@@ -1,7 +1,7 @@
 package com.example.registrocalcio.model;
 
-import com.example.registrocalcio.other.Category;
-
+import com.example.registrocalcio.dto.EventDTO;
+import com.example.registrocalcio.enumPackage.Category;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -41,5 +41,51 @@ public class Event implements Serializable {
 
 
     public Event() {
+    }
+
+    public Event(EventDTO eventDTO, User creator){
+        this.category = Category.CALCIO_A_5.getCategoryFromString(eventDTO.getCategory());
+        this.date = eventDTO.getDate().toInstant();
+        this.creator = creator;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public void setDate(Instant date) {
+        this.date = date;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public List<User_Event> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<User_Event> players) {
+        this.players = players;
     }
 }

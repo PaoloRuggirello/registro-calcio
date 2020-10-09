@@ -1,8 +1,6 @@
 package com.example.registrocalcio.dto;
 
 import com.example.registrocalcio.model.User;
-import com.example.registrocalcio.other.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class UserDTO {
@@ -10,7 +8,7 @@ public class UserDTO {
     private String name;
     private String surname;
     private String password;
-    private String role = Role.USER.toString();
+    private String role;
     private String email;
 
     public UserDTO() {

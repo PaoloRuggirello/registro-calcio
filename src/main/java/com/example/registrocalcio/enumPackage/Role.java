@@ -1,4 +1,4 @@
-package com.example.registrocalcio.other;
+package com.example.registrocalcio.enumPackage;
 
 public enum Role {
     SUPER_ADMIN,

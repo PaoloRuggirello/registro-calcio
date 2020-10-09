@@ -1,14 +1,13 @@
 package com.example.registrocalcio.model;
 
 import com.example.registrocalcio.dto.UserDTO;
-import com.example.registrocalcio.other.Role;
+import com.example.registrocalcio.enumPackage.Role;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
