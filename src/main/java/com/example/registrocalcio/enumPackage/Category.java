@@ -20,13 +20,13 @@ public enum Category {
         }
     }
 
-    public Category getCategoryFromString(String categoryString){
+    public static Category getCategoryFromString(String categoryString){
         if(categoryString.equals(CALCIO_A_5.toString()))
             return CALCIO_A_5;
         else if(categoryString.equals(CALCIO_A_7.toString()))
             return CALCIO_A_7;
         else if(categoryString.equals(CALCIO_A_11.toString()))
             return CALCIO_A_11;
-        else throw new IllegalArgumentException("String to Category conversion -> The given String doesn't exist");
+        else throw new IllegalArgumentException("CATEGORY_NOT_FOUND");
     }
 }

@@ -2,13 +2,17 @@ package com.example.registrocalcio.handler;
 
 
 import com.example.registrocalcio.dto.UserDTO;
+import com.example.registrocalcio.enumPackage.FootballRegisterException;
+import com.example.registrocalcio.enumPackage.Role;
 import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.other.PasswordHash;
 import com.example.registrocalcio.other.Utils;
 import com.example.registrocalcio.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -129,5 +133,19 @@ public class UserHandler {
             username += numberOfHomonyms;
         toSetUsername.setUsername(username);
         return toSetUsername;
+    }
+
+    public boolean hasUserPermissions(Role permissionLevel, String username) {
+        Optional<String> roleOptional = userRepository.findRoleByUsername(username);
+        if(roleOptional.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.USER_NOT_FOUND.toString());
+        String role = roleOptional.get();
+        if(role.equals(Role.SUPER_ADMIN.toString()))
+            return true;
+        if(role.equals(Role.ADMIN.toString()) && (permissionLevel == Role.ADMIN || permissionLevel == Role.USER))
+            return true;
+        if(role.equals(Role.USER.toString()) && permissionLevel == Role.USER)
+            return true;
+        return false;
     }
 }

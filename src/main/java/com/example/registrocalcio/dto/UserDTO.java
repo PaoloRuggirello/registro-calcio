@@ -1,8 +1,10 @@
 package com.example.registrocalcio.dto;
 
 import com.example.registrocalcio.model.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
     private String username;
     private String name;

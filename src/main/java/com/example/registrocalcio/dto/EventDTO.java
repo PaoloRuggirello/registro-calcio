@@ -1,10 +1,12 @@
 package com.example.registrocalcio.dto;
 
 import com.example.registrocalcio.model.Event;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDTO {
 
     private Long id;
@@ -17,6 +19,7 @@ public class EventDTO {
 
     public EventDTO(Event event){
         this.id = event.getId();
+        this.date = Date.from(event.getDate());
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
     }

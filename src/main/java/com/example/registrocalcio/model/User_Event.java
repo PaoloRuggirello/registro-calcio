@@ -1,5 +1,6 @@
 package com.example.registrocalcio.model;
 
+import com.example.registrocalcio.enumPackage.Team;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
@@ -23,6 +24,8 @@ public class User_Event implements Serializable {
 
     @Column(columnDefinition = "boolean default false")
     private Boolean played = false;
+
+    private Team team;
 
     @CreationTimestamp
     private Instant registrationTime;

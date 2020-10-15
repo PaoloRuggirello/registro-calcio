@@ -2,6 +2,8 @@ package com.example.registrocalcio.model;
 
 import com.example.registrocalcio.dto.EventDTO;
 import com.example.registrocalcio.enumPackage.Category;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -87,5 +89,16 @@ public class Event implements Serializable {
 
     public void setPlayers(List<User_Event> players) {
         this.players = players;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("category", category)
+                .append("date", date)
+                .append("creator", creator)
+                .append("players", players)
+                .toString();
     }
 }
