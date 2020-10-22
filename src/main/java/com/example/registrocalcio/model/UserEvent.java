@@ -7,15 +7,18 @@ import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
-public class User_Event implements Serializable {
+public class UserEvent implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -32,13 +35,13 @@ public class User_Event implements Serializable {
     @CreationTimestamp
     private Instant registrationTime;
 
-    public User_Event() {
+    public UserEvent() {
     }
-    public User_Event(User user, Event event, UserEventDTO userEventDTO){
+    public UserEvent(User user, Event event, UserEventDTO userEventDTO){
         this.user = user;
         this.event = event;
         this.played = !ObjectUtils.isEmpty(userEventDTO.getPlayed()) && userEventDTO.getPlayed();
-        this.team = Team.getTeamFromString(userEventDTO.getTeam());
+        this.team = (!ObjectUtils.isEmpty(userEventDTO.getTeam())) ? Team.getTeamFromString(userEventDTO.getTeam()) : null;
     }
 
 
