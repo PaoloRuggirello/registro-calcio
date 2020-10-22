@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EventHandler {
@@ -35,6 +36,13 @@ public class EventHandler {
         return validateCreator(event.getCreator()) && validateEventCategory(event.getCategory()) && validateDate(event.getDate());
     }
 
+    public Event findEventByIdSafe(Long id){
+        Optional<Event> eventOptional = eventRepository.findById(id);
+        if(eventOptional.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.EVENT_NOT_FOUND.toString());
+        return eventOptional.get();
+    }
+
     private boolean validateCreator(UserDTO creator){
         return !ObjectUtils.isEmpty(creator) && !StringUtils.isBlank(creator.getUsername());
     }
@@ -42,12 +50,13 @@ public class EventHandler {
         return !StringUtils.isBlank(category) && !ObjectUtils.isEmpty(Category.getCategoryFromString(category));
     }
     private boolean validateDate(Date date){
-        return !ObjectUtils.isEmpty(date);
+        Date today = new Date();
+        System.out.println("Today : " + today);
+        return !ObjectUtils.isEmpty(date) && today.before(date);
     }
 
     private boolean isAloneInDay(EventDTO event) throws SQLIntegrityConstraintViolationException {
         boolean isEventAlone = true;
-
         Date date = event.getDate();
         LocalDateTime startDay = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC")).atStartOfDay();
         LocalDateTime nextDay = startDay.plusDays(1);

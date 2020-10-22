@@ -1,9 +1,15 @@
 package com.example.registrocalcio.controller;
 
 import com.example.registrocalcio.dto.UserDTO;
+import com.example.registrocalcio.dto.UserEventDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
+import com.example.registrocalcio.enumPackage.Role;
+import com.example.registrocalcio.handler.EventHandler;
 import com.example.registrocalcio.handler.UserHandler;
+import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
+import com.example.registrocalcio.model.UserEvent;
+import com.example.registrocalcio.repository.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,6 +30,10 @@ public class UserController {
 
     @Autowired
     private UserHandler userHandler;
+    @Autowired
+    private EventHandler eventHandler;
+    @Autowired
+    private UserEventRepository userEventRepository;
 
     @PostMapping("/authenticate")
     public UserDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -42,6 +52,15 @@ public class UserController {
         if(userHandler.checkIfPresentByEmail(userToRegister.getEmail()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.EMAIL_ALREADY_EXIST.toString());
         return userHandler.createUserAndSave(userToRegister);
+    }
+
+    @PostMapping("/bindWithEvent")
+    public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind){
+        User user = userHandler.findUserByUsernameSafe(toBind.getPlayerUsername());
+        userHandler.hasUserPermissions(Role.USER, user.getRole());
+        Event event = eventHandler.findEventByIdSafe(toBind.getEventId());
+        UserEvent bound = new UserEvent(user, event, toBind);
+        return new UserEventDTO(userEventRepository.save(bound));
     }
 
 

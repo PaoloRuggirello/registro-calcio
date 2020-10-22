@@ -36,11 +36,10 @@ public class EventController {
     @PostMapping("/create")
     public EventDTO createEvent(@RequestBody EventDTO eventToCreate) throws SQLIntegrityConstraintViolationException {
         System.out.println(eventToCreate);
-        if(!userHandler.hasUserPermissions(Role.ADMIN, eventToCreate.getCreator().getUsername()))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
+        User creator = userHandler.findUserByUsernameSafe(eventToCreate.getCreator().getSurname());
+        userHandler.hasUserPermissions(Role.ADMIN, creator.getRole());
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
-        User creator = userHandler.findUserByUsername(eventToCreate.getCreator().getUsername()).orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString()));
         Event event = new Event(eventToCreate, creator);
         System.out.println("New event : " + event);
         return new EventDTO(eventRepository.save(event));

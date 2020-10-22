@@ -27,13 +27,21 @@ public class UserHandler {
 
 
 
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+    public User findUserByUsernameSafe(String username){
+        Optional<User> userOptional = findUserByUsername(username);
+        if(userOptional.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.USER_NOT_FOUND.toString());
+        return userOptional.get();
+    }
+
 
     /**
      * Create a user from UserDTO, save the user and remove password form userDTO to send it back
@@ -43,7 +51,7 @@ public class UserHandler {
     public UserDTO createUserAndSave(UserDTO userToSave) throws InvalidKeySpecException, NoSuchAlgorithmException {
         setAvailableUsername(userToSave);
         userToSave.setPassword(passwordEncryption(userToSave.getPassword()));
-        saveUser(new User(userToSave));
+        save(new User(userToSave));
         userToSave.setPassword(null);
         return userToSave;
     }
@@ -135,17 +143,11 @@ public class UserHandler {
         return toSetUsername;
     }
 
-    public boolean hasUserPermissions(Role permissionLevel, String username) {
-        Optional<String> roleOptional = userRepository.findRoleByUsername(username);
-        if(roleOptional.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.USER_NOT_FOUND.toString());
-        String role = roleOptional.get();
-        if(role.equals(Role.SUPER_ADMIN.toString()))
+
+    public boolean hasUserPermissions(Role permissionLevel, Role userRole) {
+        String role = userRole.toString();
+        if((role.equals(Role.ADMIN.toString()) || (permissionLevel == Role.USER && role.equals(Role.USER.toString()))))
             return true;
-        if(role.equals(Role.ADMIN.toString()) && (permissionLevel == Role.ADMIN || permissionLevel == Role.USER))
-            return true;
-        if(role.equals(Role.USER.toString()) && permissionLevel == Role.USER)
-            return true;
-        return false;
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
     }
 }

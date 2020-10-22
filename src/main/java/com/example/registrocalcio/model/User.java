@@ -45,7 +45,7 @@ public class User implements Serializable {
     List<Event> events;
 
     @OneToMany(mappedBy = "user")
-    List<User_Event> playedMatches;
+    List<UserEvent> playedMatches;
 
 
 

@@ -38,7 +38,7 @@ public class Event implements Serializable {
     private User creator;
 
     @OneToMany(mappedBy = "event")
-    private List<User_Event> players;
+    private List<UserEvent> players;
 
 
 
@@ -83,11 +83,11 @@ public class Event implements Serializable {
         this.creator = creator;
     }
 
-    public List<User_Event> getPlayers() {
+    public List<UserEvent> getPlayers() {
         return players;
     }
 
-    public void setPlayers(List<User_Event> players) {
+    public void setPlayers(List<UserEvent> players) {
         this.players = players;
     }
 
