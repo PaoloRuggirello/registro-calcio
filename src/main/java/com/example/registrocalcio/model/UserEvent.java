@@ -1,7 +1,9 @@
 package com.example.registrocalcio.model;
 
+import com.example.registrocalcio.dto.UserEventDTO;
 import com.example.registrocalcio.enumPackage.Team;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +34,13 @@ public class User_Event implements Serializable {
 
     public User_Event() {
     }
+    public User_Event(User user, Event event, UserEventDTO userEventDTO){
+        this.user = user;
+        this.event = event;
+        this.played = !ObjectUtils.isEmpty(userEventDTO.getPlayed()) && userEventDTO.getPlayed();
+        this.team = Team.getTeamFromString(userEventDTO.getTeam());
+    }
+
 
     public Long getId() {
         return id;
@@ -55,5 +64,29 @@ public class User_Event implements Serializable {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public Boolean getPlayed() {
+        return played;
+    }
+
+    public void setPlayed(Boolean played) {
+        this.played = played;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public Instant getRegistrationTime() {
+        return registrationTime;
+    }
+
+    public void setRegistrationTime(Instant registrationTime) {
+        this.registrationTime = registrationTime;
     }
 }
