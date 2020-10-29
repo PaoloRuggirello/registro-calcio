@@ -5,6 +5,7 @@ import com.example.registrocalcio.dto.UserEventDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
 import com.example.registrocalcio.enumPackage.Role;
 import com.example.registrocalcio.handler.EventHandler;
+import com.example.registrocalcio.handler.UserEventHandler;
 import com.example.registrocalcio.handler.UserHandler;
 import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
@@ -21,6 +22,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
@@ -33,7 +39,7 @@ public class UserController {
     @Autowired
     private EventHandler eventHandler;
     @Autowired
-    private UserEventRepository userEventRepository;
+    private UserEventHandler userEventHandler;
 
     @PostMapping("/authenticate")
     public UserDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -56,11 +62,13 @@ public class UserController {
 
     @PostMapping("/bindWithEvent")
     public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind){
-        User user = userHandler.findUserByUsernameSafe(toBind.getPlayerUsername());
+        User user = userHandler.findUserByUsernameCheckOptional(toBind.getPlayerUsername());
         userHandler.hasUserPermissions(Role.USER, user.getRole());
-        Event event = eventHandler.findEventByIdSafe(toBind.getEventId());
+        Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
+        if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event, toBind);
-        return new UserEventDTO(userEventRepository.save(bound));
+        return new UserEventDTO(userEventHandler.save(bound));
     }
 
 

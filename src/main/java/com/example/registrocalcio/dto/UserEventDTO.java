@@ -1,6 +1,5 @@
 package com.example.registrocalcio.dto;
 
-import com.example.registrocalcio.enumPackage.Team;
 import com.example.registrocalcio.model.UserEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.util.ObjectUtils;

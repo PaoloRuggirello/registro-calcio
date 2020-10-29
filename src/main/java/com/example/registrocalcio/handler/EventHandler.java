@@ -36,7 +36,7 @@ public class EventHandler {
         return validateCreator(event.getCreator()) && validateEventCategory(event.getCategory()) && validateDate(event.getDate());
     }
 
-    public Event findEventByIdSafe(Long id){
+    public Event findEventByIdCheckOptional(Long id){
         Optional<Event> eventOptional = eventRepository.findById(id);
         if(eventOptional.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.EVENT_NOT_FOUND.toString());

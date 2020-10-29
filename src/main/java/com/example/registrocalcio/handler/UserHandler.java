@@ -4,7 +4,9 @@ package com.example.registrocalcio.handler;
 import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
 import com.example.registrocalcio.enumPackage.Role;
+import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
+import com.example.registrocalcio.model.UserEvent;
 import com.example.registrocalcio.other.PasswordHash;
 import com.example.registrocalcio.other.Utils;
 import com.example.registrocalcio.repository.UserRepository;
@@ -35,7 +37,7 @@ public class UserHandler {
         return userRepository.findByUsername(username);
     }
 
-    public User findUserByUsernameSafe(String username){
+    public User findUserByUsernameCheckOptional(String username){
         Optional<User> userOptional = findUserByUsername(username);
         if(userOptional.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.USER_NOT_FOUND.toString());
@@ -150,4 +152,6 @@ public class UserHandler {
             return true;
         throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
     }
+
+
 }
