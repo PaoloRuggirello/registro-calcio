@@ -7,6 +7,12 @@ import com.example.registrocalcio.repository.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,9 +25,20 @@ public class UserEventHandler {
         return userEventRepository.save(userEvent);
     }
 
-    public boolean isAlreadyRegistered(User user, Event event) {
-        Optional<UserEvent> userEvent = userEventRepository.findByUserAndAndEvent(user, event);
-        return userEvent.isPresent();
+    public boolean isAlreadyRegistered(User user, Event toRegister) {
+        List<UserEvent> userEventList = userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(user); //Get all the events not played yet (ActiveEvent)
+        Event mostRecentEvent = toRegister;
+        if(userEventList.size() == 0)
+            return false; //User haven't any registration
+        else {
+            for(UserEvent temp : userEventList) {
+                if(temp.getEvent().getDate().isBefore(toRegister.getDate()))
+                    mostRecentEvent = temp.getEvent();
+            }
+        }
+        Instant now = new Date().toInstant().atZone(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS).toInstant();
+        Instant nowPlus48Hours = now.plus(2, ChronoUnit.DAYS);
+        return !mostRecentEvent.getDate().isBefore(nowPlus48Hours) || !mostRecentEvent.getDate().isAfter(now);
     }
 
 

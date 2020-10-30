@@ -33,7 +33,7 @@ public class EventHandler {
         return isAloneInDay(event);
     }
     public boolean areFieldsValid(EventDTO event){
-        return validateCreator(event.getCreator()) && validateEventCategory(event.getCategory()) && validateDate(event.getDate());
+        return validateEventCategory(event.getCategory()) && validateDate(event.getDate());
     }
 
     public Event findEventByIdCheckOptional(Long id){
@@ -43,9 +43,6 @@ public class EventHandler {
         return eventOptional.get();
     }
 
-    private boolean validateCreator(UserDTO creator){
-        return !ObjectUtils.isEmpty(creator) && !StringUtils.isBlank(creator.getUsername());
-    }
     private boolean validateEventCategory(String category){
         return !StringUtils.isBlank(category) && !ObjectUtils.isEmpty(Category.getCategoryFromString(category));
     }
@@ -55,7 +52,7 @@ public class EventHandler {
         return !ObjectUtils.isEmpty(date) && today.before(date);
     }
 
-    private boolean isAloneInDay(EventDTO event) throws SQLIntegrityConstraintViolationException {
+    private boolean isAloneInDay(EventDTO event) {
         boolean isEventAlone = true;
         Date date = event.getDate();
         LocalDateTime startDay = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC")).atStartOfDay();

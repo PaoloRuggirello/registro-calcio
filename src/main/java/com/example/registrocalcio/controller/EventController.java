@@ -21,7 +21,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/event")
 public class EventController {
 
     @Autowired
@@ -41,7 +41,6 @@ public class EventController {
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
         Event event = new Event(eventToCreate, creator);
-        System.out.println("New event : " + event);
         return new EventDTO(eventRepository.save(event));
     }
 

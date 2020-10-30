@@ -3,14 +3,12 @@ package com.example.registrocalcio.controller;
 import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.dto.UserEventDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
-import com.example.registrocalcio.enumPackage.Role;
 import com.example.registrocalcio.handler.EventHandler;
 import com.example.registrocalcio.handler.UserEventHandler;
 import com.example.registrocalcio.handler.UserHandler;
 import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.model.UserEvent;
-import com.example.registrocalcio.repository.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,16 +20,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -63,7 +58,6 @@ public class UserController {
     @PostMapping("/bindWithEvent")
     public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind){
         User user = userHandler.findUserByUsernameCheckOptional(toBind.getPlayerUsername());
-        userHandler.hasUserPermissions(Role.USER, user.getRole());
         Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
         if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
