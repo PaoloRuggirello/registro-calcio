@@ -9,10 +9,11 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDTO {
 
-    private Long id;
-    private String category;
-    private Date date;
-    private UserDTO creator;
+    public Long id;
+    public String category;
+    public Date date;
+    public UserDTO creator;
+    public Boolean played;
 
     public EventDTO() {
     }
@@ -22,6 +23,7 @@ public class EventDTO {
         this.date = Date.from(event.getDate());
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
+        this.played = event.getPlayed();
     }
 
     public Long getId() {
@@ -56,6 +58,13 @@ public class EventDTO {
         this.date = date;
     }
 
+    public Boolean getPlayed() {
+        return played;
+    }
+
+    public void setPlayed(Boolean played) {
+        this.played = played;
+    }
 
     @Override
     public String toString() {

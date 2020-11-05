@@ -27,9 +27,6 @@ public class UserEvent implements Serializable {
     @ManyToOne
     private Event event;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean played = false;
-
     private Team team;
 
     @CreationTimestamp
@@ -40,7 +37,6 @@ public class UserEvent implements Serializable {
     public UserEvent(User user, Event event, UserEventDTO userEventDTO){
         this.user = user;
         this.event = event;
-        this.played = !ObjectUtils.isEmpty(userEventDTO.getPlayed()) && userEventDTO.getPlayed();
         this.team = (!ObjectUtils.isEmpty(userEventDTO.getTeam())) ? Team.getTeamFromString(userEventDTO.getTeam()) : null;
     }
 
@@ -67,14 +63,6 @@ public class UserEvent implements Serializable {
 
     public void setEvent(Event event) {
         this.event = event;
-    }
-
-    public Boolean getPlayed() {
-        return played;
-    }
-
-    public void setPlayed(Boolean played) {
-        this.played = played;
     }
 
     public Team getTeam() {

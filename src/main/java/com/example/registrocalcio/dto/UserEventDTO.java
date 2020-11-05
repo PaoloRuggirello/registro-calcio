@@ -9,7 +9,6 @@ public class UserEventDTO {
 
     private Long eventId;
     private String playerUsername;
-    private Boolean played;
     private String team;
 
     public UserEventDTO() {
@@ -18,7 +17,6 @@ public class UserEventDTO {
     public UserEventDTO(UserEvent userEvent) {
         this.playerUsername = userEvent.getUser().getUsername();
         this.eventId = userEvent.getId();
-        this.played = userEvent.getPlayed();
         this.team = (!ObjectUtils.isEmpty(userEvent.getTeam())) ? userEvent.getTeam().toString() : null;
     }
 
@@ -36,14 +34,6 @@ public class UserEventDTO {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
-    }
-
-    public Boolean getPlayed() {
-        return played;
-    }
-
-    public void setPlayed(Boolean played) {
-        this.played = played;
     }
 
     public String getTeam() {

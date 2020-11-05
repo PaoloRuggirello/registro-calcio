@@ -3,6 +3,7 @@ package com.example.registrocalcio.model;
 import com.example.registrocalcio.dto.EventDTO;
 import com.example.registrocalcio.enumPackage.Category;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +33,6 @@ public class Event implements Serializable {
     @Column(nullable = false)
     private Instant date;
 
-
     @ManyToOne
     @JoinColumn(name = "creator", nullable = false)
     private User creator;
@@ -40,15 +40,18 @@ public class Event implements Serializable {
     @OneToMany(mappedBy = "event")
     private List<UserEvent> players;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean played = false;
 
 
     public Event() {
     }
 
     public Event(EventDTO eventDTO, User creator){
-        this.category = Category.CALCIO_A_5.getCategoryFromString(eventDTO.getCategory());
+        this.category = Category.getCategoryFromString(eventDTO.getCategory());
         this.date = eventDTO.getDate().toInstant();
         this.creator = creator;
+        this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
 
     public Long getId() {
@@ -89,6 +92,14 @@ public class Event implements Serializable {
 
     public void setPlayers(List<UserEvent> players) {
         this.players = players;
+    }
+
+    public Boolean getPlayed() {
+        return played;
+    }
+
+    public void setPlayed(Boolean played) {
+        this.played = played;
     }
 
     @Override

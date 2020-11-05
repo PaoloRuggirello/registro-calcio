@@ -41,6 +41,9 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+
+    private Boolean isActive;
+
     @OneToMany(mappedBy = "creator")
     List<Event> events;
 
@@ -115,6 +118,22 @@ public class User implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
+    public List<UserEvent> getPlayedMatches() {
+        return playedMatches;
+    }
+
+    public void setPlayedMatches(List<UserEvent> playedMatches) {
+        this.playedMatches = playedMatches;
     }
 
     @Override
