@@ -41,16 +41,14 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-
-    private Boolean isActive;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isActive = true;
 
     @OneToMany(mappedBy = "creator")
     List<Event> events;
 
     @OneToMany(mappedBy = "user")
     List<UserEvent> playedMatches;
-
-
 
     public User() {
 
@@ -134,6 +132,14 @@ public class User implements Serializable {
 
     public void setPlayedMatches(List<UserEvent> playedMatches) {
         this.playedMatches = playedMatches;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 
     @Override

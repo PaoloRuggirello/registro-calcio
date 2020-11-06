@@ -4,9 +4,7 @@ package com.example.registrocalcio.handler;
 import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
 import com.example.registrocalcio.enumPackage.Role;
-import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
-import com.example.registrocalcio.model.UserEvent;
 import com.example.registrocalcio.other.PasswordHash;
 import com.example.registrocalcio.other.Utils;
 import com.example.registrocalcio.repository.UserRepository;
@@ -34,7 +32,7 @@ public class UserHandler {
     }
 
     public Optional<User> findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameAndActiveIsTrue(username);
     }
 
     public User findUserByUsernameCheckOptional(String username){
@@ -104,10 +102,10 @@ public class UserHandler {
      * @return a boolean value - true is present - false isn't present
      */
     public boolean checkIfPresentByEmail(String email){
-        return userRepository.findByEmail(email).isPresent();
+        return userRepository.findByEmailAndActiveIsTrue(email).isPresent();
     }
     public Optional<User> findByEmail(String email){
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmailAndActiveIsTrue(email);
     }
 
     public String passwordEncryption(String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -120,7 +118,7 @@ public class UserHandler {
      * @return an empty user if the given user doesn't exist in db or has been passed wrong credentials, otherwise return the user
      */
     public Optional<User> checkUserCredentials(UserDTO toAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        Optional<User> userOptional = userRepository.findByUsername(toAuthenticate.getUsername());
+        Optional<User> userOptional = userRepository.findByUsernameAndActiveIsTrue(toAuthenticate.getUsername());
         if(userOptional.isPresent()){
             User user = userOptional.get();
             if(PasswordHash.validatePassword(toAuthenticate.getPassword(), user.getPassword()))
@@ -137,7 +135,7 @@ public class UserHandler {
      */
     public UserDTO setAvailableUsername(UserDTO toSetUsername){
         String username = toSetUsername.getUsername();
-        Long numberOfHomonyms = userRepository.countByNameAndSurnameIgnoreCase(toSetUsername.getName(), toSetUsername.getSurname());
+        Long numberOfHomonyms = userRepository.countByNameAndSurnameIgnoreCaseAndActiveIsTrue(toSetUsername.getName(), toSetUsername.getSurname());
         System.out.println("Number of homonymus : " + numberOfHomonyms);
         if(numberOfHomonyms > 0)
             username += numberOfHomonyms;
