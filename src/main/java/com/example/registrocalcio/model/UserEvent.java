@@ -5,7 +5,6 @@ import com.example.registrocalcio.enumPackage.Team;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.util.ObjectUtils;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

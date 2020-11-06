@@ -12,6 +12,7 @@ import com.example.registrocalcio.model.UserEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,11 @@ public class UserController {
     @Autowired
     private UserEventHandler userEventHandler;
 
+    @GetMapping("/test")
+    public String test(){
+        return "test";
+    }
+
     @PostMapping("/authenticate")
     public UserDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         System.out.println(userToAuthenticate);
@@ -59,7 +65,7 @@ public class UserController {
     public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind){
         User user = userHandler.findUserByUsernameCheckOptional(toBind.getPlayerUsername());
         Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
-        if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event))
+        if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event)) // if there is less than 3 hours to the event or if the user is already registered to a valid event
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event, toBind);
         return new UserEventDTO(userEventHandler.save(bound));

@@ -32,7 +32,7 @@ public class UserEventHandler {
             return false; //User haven't any registration
         else {
             for(UserEvent temp : userEventList) {
-                if(temp.getEvent().getDate().isBefore(toRegister.getDate()))
+                if(temp.getEvent().getDate().isBefore(toRegister.getDate()) && temp.getEvent().getDate().isBefore(mostRecentEvent.getDate()))
                     mostRecentEvent = temp.getEvent();
             }
         }
