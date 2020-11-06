@@ -3,6 +3,7 @@ package com.example.registrocalcio.controller;
 import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.dto.UserEventDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
+import com.example.registrocalcio.enumPackage.Role;
 import com.example.registrocalcio.handler.EventHandler;
 import com.example.registrocalcio.handler.UserEventHandler;
 import com.example.registrocalcio.handler.UserHandler;
@@ -10,15 +11,19 @@ import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.model.UserEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.websocket.server.PathParam;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
@@ -37,10 +42,6 @@ public class UserController {
     @Autowired
     private UserEventHandler userEventHandler;
 
-    @GetMapping("/test")
-    public String test(){
-        return "test";
-    }
 
     @PostMapping("/authenticate")
     public UserDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -69,6 +70,16 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event, toBind);
         return new UserEventDTO(userEventHandler.save(bound));
+    }
+
+    @PostMapping("/delete/{username}")
+    public UserDTO deleteUser(@PathVariable("username") String username, @RequestBody UserDTO inCharge){
+        User employee = userHandler.findUserByUsernameCheckOptional(inCharge.getUsername());
+        userHandler.hasUserPermissions(Role.ADMIN, employee.getRole());
+        User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
+        userEventHandler.removeFromActiveEvents(userToDelete);
+        userToDelete.setActive(false);
+        return new UserDTO(userHandler.save(userToDelete)).withoutPassword();
     }
 
 

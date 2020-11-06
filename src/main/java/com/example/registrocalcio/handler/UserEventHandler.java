@@ -5,6 +5,7 @@ import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.model.UserEvent;
 import com.example.registrocalcio.repository.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -39,5 +40,7 @@ public class UserEventHandler {
         return !mostRecentEvent.getDate().isBefore(nowPlus48Hours) || !mostRecentEvent.getDate().isAfter(now);
     }
 
-
+    public void removeFromActiveEvents(User toRemove){
+        userEventRepository.deleteByUserEventId(userEventRepository.findUserEventByDeletingUser(toRemove));
+    }
 }

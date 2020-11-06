@@ -6,12 +6,12 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
-    private String username;
-    private String name;
-    private String surname;
-    private String password;
-    private String role;
-    private String email;
+    public String username;
+    public String name;
+    public String surname;
+    public String password;
+    public String role;
+    public String email;
     public Boolean isActive;
 
     public UserDTO() {
@@ -91,6 +91,11 @@ public class UserDTO {
         this.username = user.getUsername();
         this.role = user.getRole().toString();
         this.email = user.getEmail();
+    }
+
+    public UserDTO withoutPassword(){
+        this.setPassword(null);
+        return this;
     }
 
     @Override

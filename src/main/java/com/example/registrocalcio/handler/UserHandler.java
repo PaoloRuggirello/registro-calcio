@@ -32,7 +32,7 @@ public class UserHandler {
     }
 
     public Optional<User> findUserByUsername(String username) {
-        return userRepository.findByUsernameAndActiveIsTrue(username);
+        return userRepository.findByUsernameAndIsActiveIsTrue(username);
     }
 
     public User findUserByUsernameCheckOptional(String username){
@@ -102,10 +102,10 @@ public class UserHandler {
      * @return a boolean value - true is present - false isn't present
      */
     public boolean checkIfPresentByEmail(String email){
-        return userRepository.findByEmailAndActiveIsTrue(email).isPresent();
+        return userRepository.findByEmailAndIsActiveIsTrue(email).isPresent();
     }
     public Optional<User> findByEmail(String email){
-        return userRepository.findByEmailAndActiveIsTrue(email);
+        return userRepository.findByEmailAndIsActiveIsTrue(email);
     }
 
     public String passwordEncryption(String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -118,7 +118,7 @@ public class UserHandler {
      * @return an empty user if the given user doesn't exist in db or has been passed wrong credentials, otherwise return the user
      */
     public Optional<User> checkUserCredentials(UserDTO toAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        Optional<User> userOptional = userRepository.findByUsernameAndActiveIsTrue(toAuthenticate.getUsername());
+        Optional<User> userOptional = userRepository.findByUsernameAndIsActiveIsTrue(toAuthenticate.getUsername());
         if(userOptional.isPresent()){
             User user = userOptional.get();
             if(PasswordHash.validatePassword(toAuthenticate.getPassword(), user.getPassword()))
@@ -135,7 +135,7 @@ public class UserHandler {
      */
     public UserDTO setAvailableUsername(UserDTO toSetUsername){
         String username = toSetUsername.getUsername();
-        Long numberOfHomonyms = userRepository.countByNameAndSurnameIgnoreCaseAndActiveIsTrue(toSetUsername.getName(), toSetUsername.getSurname());
+        Long numberOfHomonyms = userRepository.countByNameAndSurnameIgnoreCaseAndIsActiveIsTrue(toSetUsername.getName(), toSetUsername.getSurname());
         System.out.println("Number of homonymus : " + numberOfHomonyms);
         if(numberOfHomonyms > 0)
             username += numberOfHomonyms;

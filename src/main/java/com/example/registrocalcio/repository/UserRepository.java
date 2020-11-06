@@ -12,8 +12,8 @@ public interface UserRepository extends JpaRepository <User, Long> {
     @Query("select u.role from User u where u.username = :username")
     Optional<String> findRoleByUsername(@Param("username")String username);
 
-    Long countByNameAndSurnameIgnoreCaseAndActiveIsTrue(String name, String username);
-    Optional<User> findByEmailAndActiveIsTrue(String email);
-    Optional<User> findByUsernameAndActiveIsTrue(String username);
+    Long countByNameAndSurnameIgnoreCaseAndIsActiveIsTrue(String name, String username);
+    Optional<User> findByEmailAndIsActiveIsTrue(String email);
+    Optional<User> findByUsernameAndIsActiveIsTrue(String username);
 
 }
