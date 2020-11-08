@@ -36,8 +36,8 @@ public class UserHandler {
         return userRepository.findByUsernameAndIsActiveIsTrue(username);
     }
 
-    public List<User> findAll(){
-        return userRepository.findAll();
+    public List<User> findActiveUsers(){
+        return userRepository.findAllByIsActiveIsTrue();
     }
 
     public User findUserByUsernameCheckOptional(String username){

@@ -96,7 +96,7 @@ public class UserController {
 
     @GetMapping("/find")
     public List<UserDTO> findAll(){
-        return userHandler.findAll().stream().map(UserDTO::new).collect(Collectors.toList());
+        return userHandler.findActiveUsers().stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
     @GetMapping("/find/{username}")
