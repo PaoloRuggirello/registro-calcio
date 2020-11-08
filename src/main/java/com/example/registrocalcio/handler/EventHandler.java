@@ -71,4 +71,14 @@ public class EventHandler {
     public void delete(Event event){
         eventRepository.delete(event);
     }
+
+    public List<Event> findAll(){
+        return eventRepository.findAll();
+    }
+    public List<Event> findActiveEvents(){
+        return eventRepository.findAllByPlayedIsFalse();
+    }
+    public List<Event> findPastEvents(){
+        return eventRepository.findAllByPlayedIsTrue();
+    }
 }
