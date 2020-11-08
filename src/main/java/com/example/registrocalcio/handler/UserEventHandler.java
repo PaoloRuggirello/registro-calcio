@@ -45,4 +45,7 @@ public class UserEventHandler {
     public void deleteByEvent(Event event){
         userEventRepository.deleteByEvent(event);
     }
+    public void deleteByUserAndEvent(User toDelete, Event event){
+        userEventRepository.deleteByUserAndEvent(toDelete, event);
+    }
 }

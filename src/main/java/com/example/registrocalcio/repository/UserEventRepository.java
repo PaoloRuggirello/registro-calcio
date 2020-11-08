@@ -24,4 +24,6 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     void deleteByUserEventId(List<Long> userEventId);
 
     void deleteByEvent(Event event);
+
+    void deleteByUserAndEvent(User user, Event event);
 }

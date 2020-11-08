@@ -70,6 +70,16 @@ public class UserController {
     }
 
     @Transactional
+    @PostMapping("/removeFromEvent/{username}/{eventId}")
+    public void removeBinding(@PathVariable("username")String username, @PathVariable("eventId") Long eventId,  @RequestBody UserDTO inCharge){
+        User employee = userHandler.findUserByUsernameCheckOptional(inCharge.getUsername());
+        userHandler.hasUserPermissions(Role.ADMIN, employee.getRole());
+        User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
+        Event event = eventHandler.findEventByIdCheckOptional(eventId);
+        userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
+    }
+
+    @Transactional
     @PostMapping("/delete/{username}")
     public UserDTO deleteUser(@PathVariable("username") String username, @RequestBody UserDTO inCharge){
         User employee = userHandler.findUserByUsernameCheckOptional(inCharge.getUsername());
