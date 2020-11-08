@@ -1,5 +1,6 @@
 package com.example.registrocalcio.controller;
 
+import com.example.registrocalcio.dto.EventDTO;
 import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.dto.UserEventDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
@@ -13,6 +14,7 @@ import com.example.registrocalcio.model.UserEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +27,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -90,6 +94,20 @@ public class UserController {
         return new UserDTO(userHandler.save(userToDelete)).withoutPassword();
     }
 
+    @GetMapping("/find")
+    public List<UserDTO> findAll(){
+        return userHandler.findAll().stream().map(UserDTO::new).collect(Collectors.toList());
+    }
+
+    @GetMapping("/find/{username}")
+    public UserDTO findUser(@PathVariable("username")String username){
+        return new UserDTO(userHandler.findUserByUsernameCheckOptional(username));
+    }
+
+    @GetMapping("/findBoundEvents/{username}")
+    public List<EventDTO> findBoundEvents(@PathVariable("username")String username){
+        return userEventHandler.findByUser(userHandler.findUserByUsernameCheckOptional(username)).stream().map(EventDTO::new).collect(Collectors.toList());
+    }
 
 
 }

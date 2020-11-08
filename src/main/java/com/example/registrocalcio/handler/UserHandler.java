@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 
@@ -33,6 +34,10 @@ public class UserHandler {
 
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsernameAndIsActiveIsTrue(username);
+    }
+
+    public List<User> findAll(){
+        return userRepository.findAll();
     }
 
     public User findUserByUsernameCheckOptional(String username){

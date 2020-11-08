@@ -1,6 +1,7 @@
 package com.example.registrocalcio.dto;
 
 import com.example.registrocalcio.model.Event;
+import com.example.registrocalcio.model.UserEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -24,6 +25,13 @@ public class EventDTO {
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
+    }
+    public EventDTO(UserEvent userEvent){
+        this.id = userEvent.getId();
+        this.date = Date.from(userEvent.getEvent().getDate());
+        this.category = userEvent.getEvent().getCategory().toString();
+        this.creator = new UserDTO(userEvent.getEvent().getCreator());
+        this.played = userEvent.getEvent().getPlayed();
     }
 
     public Long getId() {

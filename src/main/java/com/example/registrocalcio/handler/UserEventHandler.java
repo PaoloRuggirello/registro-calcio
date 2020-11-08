@@ -48,4 +48,8 @@ public class UserEventHandler {
     public void deleteByUserAndEvent(User toDelete, Event event){
         userEventRepository.deleteByUserAndEvent(toDelete, event);
     }
+
+    public List<UserEvent> findByUser(User user){
+        return userEventRepository.findByUser(user);
+    }
 }
