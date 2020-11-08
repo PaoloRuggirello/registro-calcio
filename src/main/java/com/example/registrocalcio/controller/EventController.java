@@ -1,6 +1,7 @@
 package com.example.registrocalcio.controller;
 
 import com.example.registrocalcio.dto.EventDTO;
+import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
 import com.example.registrocalcio.enumPackage.Role;
 import com.example.registrocalcio.handler.EventHandler;
@@ -52,7 +53,9 @@ public class EventController {
 
     @Transactional
     @PostMapping("/delete/{eventId}")
-    public EventDTO deleteEvent(@PathVariable("eventId")Long eventId){
+    public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestBody UserDTO inCharge){
+        User employee = userHandler.findUserByUsernameCheckOptional(inCharge.getUsername());
+        userHandler.hasUserPermissions(Role.ADMIN, employee.getRole());
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
         EventDTO toDeleteEvent = new EventDTO(toDelete);
         userEventHandler.deleteByEvent(toDelete);
