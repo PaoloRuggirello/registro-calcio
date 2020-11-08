@@ -67,4 +67,8 @@ public class EventHandler {
             }
         return isEventAlone;
     }
+
+    public void delete(Event event){
+        eventRepository.delete(event);
+    }
 }

@@ -11,19 +11,16 @@ import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.model.UserEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.websocket.server.PathParam;
+import javax.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
@@ -72,12 +69,13 @@ public class UserController {
         return new UserEventDTO(userEventHandler.save(bound));
     }
 
+    @Transactional
     @PostMapping("/delete/{username}")
     public UserDTO deleteUser(@PathVariable("username") String username, @RequestBody UserDTO inCharge){
         User employee = userHandler.findUserByUsernameCheckOptional(inCharge.getUsername());
         userHandler.hasUserPermissions(Role.ADMIN, employee.getRole());
         User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
-        userEventHandler.removeFromActiveEvents(userToDelete);
+        userEventHandler.deleteByUser(userToDelete);
         userToDelete.setActive(false);
         return new UserDTO(userHandler.save(userToDelete)).withoutPassword();
     }

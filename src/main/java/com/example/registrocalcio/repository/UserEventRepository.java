@@ -1,5 +1,6 @@
 package com.example.registrocalcio.repository;
 
+import com.example.registrocalcio.model.Event;
 import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.model.UserEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,6 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     @Modifying
     @Query("delete from UserEvent ue where ue.id in :userEventId")
     void deleteByUserEventId(List<Long> userEventId);
+
+    void deleteByEvent(Event event);
 }
