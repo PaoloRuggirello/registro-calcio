@@ -109,5 +109,10 @@ public class UserController {
         return userEventHandler.findByUser(userHandler.findUserByUsernameCheckOptional(username)).stream().map(EventDTO::new).collect(Collectors.toList());
     }
 
+    @GetMapping("/credits")
+    public String credits(){
+        return "Created By Alessio Billeci and Paolo Ruggirello";
+    }
+
 
 }
