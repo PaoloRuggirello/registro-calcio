@@ -10,3 +10,7 @@ spring:
 server:
   error:
     include-message: always
+
+java:
+  runtime:
+    version: 11
