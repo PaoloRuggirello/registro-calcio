@@ -13,6 +13,8 @@ import com.example.registrocalcio.model.User;
 import com.example.registrocalcio.model.UserEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.spec.InvalidKeySpecException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/user")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class UserController {
 
     @Autowired
@@ -46,12 +50,17 @@ public class UserController {
 
     @PostMapping("/authenticate")
     public UserDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        System.out.println("I'm here");
         System.out.println(userToAuthenticate);
         if(!userHandler.validateLoginFields(userToAuthenticate))// means that some fields are not ready for the login
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate);
         System.out.println(checkedUser);
         return checkedUser.map(UserDTO::new).orElse(null);
+    }
+    @PostMapping("/logout")
+    public void logout(){
+        System.out.println("User logged out");
     }
 
     @PostMapping("/register")
@@ -109,9 +118,19 @@ public class UserController {
         return userEventHandler.findByUser(userHandler.findUserByUsernameCheckOptional(username)).stream().map(EventDTO::new).collect(Collectors.toList());
     }
 
-    @GetMapping("/credits")
+    @GetMapping("/userr")
     public String credits(){
         return "Created By Alessio Billeci and Paolo Ruggirello";
+    }
+
+    @GetMapping("/test/{password}")
+    public String credits(@PathVariable("password") String password){
+        return userHandler.passwordEncryption(password);
+    }
+
+    @GetMapping("/user")
+    public String getUser(Principal principal){
+        return principal.toString();
     }
 
 
