@@ -1,0 +1,30 @@
+version: '3'
+services:
+
+  mysql-database:
+    container_name: mysql-database
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: registro-calcio
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: mysql
+      TZ: UTC
+    ports:
+    - 55500:3306
+    volumes:
+    - './docker/mysql-database/data:/var/lib/mysql'
+    - './docker/mysql-database/sql:/docker-db-setup.d'
+    restart: always
+
+  registro-calcio:
+    build: ./backend
+    container_name: registro-calcio-backend
+    environment:
+      DB_SERVER: mysql-database
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-database:3306/registro-calcio?serverTimezone=UTC
+    ports:
+      - 55501:8080
+    depends_on:
+      - mysql-database
+
