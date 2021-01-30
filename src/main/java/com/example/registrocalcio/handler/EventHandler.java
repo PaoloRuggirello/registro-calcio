@@ -1,7 +1,6 @@
 package com.example.registrocalcio.handler;
 
 import com.example.registrocalcio.dto.EventDTO;
-import com.example.registrocalcio.dto.UserDTO;
 import com.example.registrocalcio.enumPackage.Category;
 import com.example.registrocalcio.enumPackage.FootballRegisterException;
 import com.example.registrocalcio.model.Event;
