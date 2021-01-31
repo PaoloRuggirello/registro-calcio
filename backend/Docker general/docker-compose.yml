@@ -19,7 +19,7 @@ services:
     build: ./backend
     container_name: registro-calcio-backend
     ports:
-      - 55501:8080
+      - 8080:8080
     restart: always
     depends_on:
       - database
@@ -28,7 +28,7 @@ services:
     build: ./frontend/rc-fe-ng
     container_name: registro-calcio-frontend
     ports:
-      - 55502:80
+      - 80:80
     depends_on:
       - registro-calcio-backend
     restart: always
