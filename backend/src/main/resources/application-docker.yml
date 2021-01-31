@@ -1,6 +1,6 @@
 #Database credentials for docker
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/registro-calcio?serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=UTC
     username: mysql
     password: mysql
