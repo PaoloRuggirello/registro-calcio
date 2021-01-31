@@ -29,7 +29,6 @@ services:
     container_name: registro-calcio-frontend
     ports:
       - 55502:80
-
     depends_on:
       - registro-calcio-backend
     restart: always

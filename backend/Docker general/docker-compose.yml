@@ -13,7 +13,7 @@ services:
       MYSQL_USER: mysql
       MYSQL_PASSWORD: mysql
     ports:
-    - 55500:3306
+      - 55500:3306
 
   registro-calcio-backend:
     build: ./backend
@@ -29,7 +29,6 @@ services:
     container_name: registro-calcio-frontend
     ports:
       - 55502:80
-
     depends_on:
       - registro-calcio-backend
     restart: always
