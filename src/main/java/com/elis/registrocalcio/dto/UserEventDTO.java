@@ -1,6 +1,6 @@
 package com.elis.registrocalcio.dto;
 
-import com.elis.registrocalcio.model.UserEvent;
+import com.elis.registrocalcio.model.general.UserEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.util.ObjectUtils;
 

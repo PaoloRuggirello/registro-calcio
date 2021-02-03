@@ -1,7 +1,7 @@
 package com.elis.registrocalcio.dto;
 
-import com.elis.registrocalcio.model.Event;
-import com.elis.registrocalcio.model.UserEvent;
+import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.model.general.UserEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

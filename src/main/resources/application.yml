@@ -1,13 +1,21 @@
 #Project settings
 spring:
+  second-datasource:
+      jdbcUrl: jdbc:hsqldb:mem:active_sessions
+      driverClassName: org.hsqldb.jdbc.JDBCDriver
+      username: token
+      password: token
   datasource:
-    url: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=UTC
-    username: root
-    password: root
+    jdbcUrl: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=UTC
+    username: mysql
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    hibernate.ddl-auto: update
     generate-ddl: true
     show-sql: true
 server:
   error:
     include-message: always
+
+
+

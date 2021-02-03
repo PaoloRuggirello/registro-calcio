@@ -1,4 +1,4 @@
-package com.elis.registrocalcio.model;
+package com.elis.registrocalcio.model.general;
 
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.dto.UserDTO;
@@ -41,7 +41,7 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(name = "is_active", columnDefinition = "boolean default false")
     private Boolean isActive = true;
 
     @OneToMany(mappedBy = "creator")
@@ -52,6 +52,15 @@ public class User implements Serializable {
 
     public User() {
 
+    }
+
+    public User(String username, String name, String surname, String email, String password) {
+        this.username = username;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.isActive = true;
     }
 
     public User(UserDTO toRegister) {

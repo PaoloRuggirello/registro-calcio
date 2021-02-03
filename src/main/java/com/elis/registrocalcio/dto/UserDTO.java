@@ -1,6 +1,6 @@
 package com.elis.registrocalcio.dto;
 
-import com.elis.registrocalcio.model.User;
+import com.elis.registrocalcio.model.general.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

@@ -2,15 +2,18 @@ package com.elis.registrocalcio.controller;
 
 import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
-import com.elis.registrocalcio.model.Event;
+import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.dto.UserDTO;
 import com.elis.registrocalcio.dto.UserEventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.EventHandler;
-import com.elis.registrocalcio.model.User;
-import com.elis.registrocalcio.model.UserEvent;
+import com.elis.registrocalcio.model.general.User;
+import com.elis.registrocalcio.model.general.UserEvent;
+import com.elis.registrocalcio.model.security.Token;
+import com.elis.registrocalcio.repository.general.UserRepository;
+import com.elis.registrocalcio.repository.security.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -112,6 +116,34 @@ public class UserController {
     @GetMapping("/credits")
     public String credits(){
         return "Created By Alessio Billeci and Paolo Ruggirello";
+    }
+
+    @Autowired
+    TokenRepository tokenRepository;
+
+    @GetMapping("/createToken")
+    public void createToken(){
+        Token token = new Token("paolo.ruggirello", Role.ADMIN.toString(), Instant.now());
+        tokenRepository.save(token);
+    }
+
+    @GetMapping("/findToken")
+    public List<Token> findToken(){
+        return tokenRepository.findAll();
+    }
+
+    @Autowired
+    UserRepository userRepository;
+
+    @GetMapping("/createUser")
+    public void createUser(){
+        User paolo = new User("paolo.ruggirello", "paolo", "ruggirello", "ruggirello99@live.it", "password");
+        userRepository.save(paolo);
+    }
+
+    @GetMapping("/findUser")
+    public List<User> findUser(){
+        return userRepository.findAll();
     }
 
 

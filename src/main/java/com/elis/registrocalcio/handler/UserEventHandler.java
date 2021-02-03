@@ -1,9 +1,9 @@
 package com.elis.registrocalcio.handler;
 
-import com.elis.registrocalcio.model.Event;
-import com.elis.registrocalcio.model.User;
-import com.elis.registrocalcio.model.UserEvent;
-import com.elis.registrocalcio.repository.UserEventRepository;
+import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.model.general.User;
+import com.elis.registrocalcio.model.general.UserEvent;
+import com.elis.registrocalcio.repository.general.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

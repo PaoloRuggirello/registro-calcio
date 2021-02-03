@@ -1,8 +1,8 @@
 package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
-import com.elis.registrocalcio.model.Event;
-import com.elis.registrocalcio.repository.EventRepository;
+import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import org.apache.commons.lang3.StringUtils;

@@ -1,4 +1,4 @@
-package com.elis.registrocalcio.model;
+package com.elis.registrocalcio.model.general;
 
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.dto.EventDTO;

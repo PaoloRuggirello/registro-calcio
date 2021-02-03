@@ -1,6 +1,6 @@
-package com.elis.registrocalcio.repository;
+package com.elis.registrocalcio.repository.general;
 
-import com.elis.registrocalcio.model.Event;
+import com.elis.registrocalcio.model.general.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

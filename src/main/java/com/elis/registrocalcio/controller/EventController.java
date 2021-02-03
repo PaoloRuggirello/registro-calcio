@@ -2,14 +2,14 @@ package com.elis.registrocalcio.controller;
 
 import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
-import com.elis.registrocalcio.model.Event;
-import com.elis.registrocalcio.repository.EventRepository;
+import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.dto.UserDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.EventHandler;
-import com.elis.registrocalcio.model.User;
+import com.elis.registrocalcio.model.general.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
