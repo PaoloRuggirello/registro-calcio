@@ -118,33 +118,4 @@ public class UserController {
         return "Created By Alessio Billeci and Paolo Ruggirello";
     }
 
-    @Autowired
-    TokenRepository tokenRepository;
-
-    @GetMapping("/createToken")
-    public void createToken(){
-        Token token = new Token("paolo.ruggirello", Role.ADMIN.toString(), Instant.now());
-        tokenRepository.save(token);
-    }
-
-    @GetMapping("/findToken")
-    public List<Token> findToken(){
-        return tokenRepository.findAll();
-    }
-
-    @Autowired
-    UserRepository userRepository;
-
-    @GetMapping("/createUser")
-    public void createUser(){
-        User paolo = new User("paolo.ruggirello", "paolo", "ruggirello", "ruggirello99@live.it", "password");
-        userRepository.save(paolo);
-    }
-
-    @GetMapping("/findUser")
-    public List<User> findUser(){
-        return userRepository.findAll();
-    }
-
-
 }
