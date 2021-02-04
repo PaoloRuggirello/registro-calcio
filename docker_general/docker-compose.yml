@@ -1,35 +1,35 @@
 version: '3'
 services:
 
-  database:
-    image: library/mysql:latest
-    restart: always
-    container_name: database
-    volumes:
-      - './docker/db/data:/var/lib/mysql'
-    environment:
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: registro-calcio
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: mysql
-    ports:
-      - 55500:3306
+#  database:
+#    image: library/mysql:latest
+#    restart: always
+#    container_name: database
+#    volumes:
+#      - './docker/db/data:/var/lib/mysql'
+#    environment:
+#      MYSQL_ROOT_HOST: '%'
+#      MYSQL_ROOT_PASSWORD: root
+#      MYSQL_DATABASE: registro-calcio
+#      MYSQL_USER: mysql
+#      MYSQL_PASSWORD: mysql
+#    ports:
+#      - 55500:3306
 
   registro-calcio-backend:
     build: ../
-    container_name: registro-calcio-backend
+    container_name: registro-calcio-backend-security
     ports:
-      - 8080:8080
+      - 44400:8080
     restart: always
-    depends_on:
-      - database
+#    depends_on:
+#      - database
 
-  registro-calcio-frontend:
-    build: ../../rc-fe-ng
-    container_name: registro-calcio-frontend
-    ports:
-      - 80:80
-    depends_on:
-      - registro-calcio-backend
-    restart: always
+#  registro-calcio-frontend:
+#    build: ../../rc-fe-ng
+#    container_name: registro-calcio-frontend
+#    ports:
+#      - 80:80
+#    depends_on:
+#      - registro-calcio-backend
+#    restart: always
