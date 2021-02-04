@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 
-@Entity(name = "token")
+@Entity
 public class SecurityToken implements Serializable {
 
     @Id
