@@ -129,6 +129,16 @@ public class UserController {
         return "Created By Alessio Billeci and Paolo Ruggirello";
     }
 
+    @PostMapping("/changeRole/{username}")
+    public UserDTO changeRole(@PathVariable("username") String username, @RequestBody Token userToken){
+        SecurityToken securityToken = tokenHandler.checkToken(userToken, Role.ADMIN);
+        User updatedUser = userHandler.changeUserRole(username);
+        if(username.equals(securityToken.getUsername())){
+            securityToken.setRole(updatedUser.getRole());
+            tokenHandler.save(securityToken);
+        }
+        return new UserDTO(updatedUser);
+    }
 
     @Autowired
     SecurityTokenRepository securityTokenRepository;

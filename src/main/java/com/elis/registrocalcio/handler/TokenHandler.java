@@ -78,4 +78,8 @@ public class TokenHandler {
         return Instant.now().plus(15, ChronoUnit.MINUTES);
 //        return Instant.now();
     }
+
+    public void save(SecurityToken securityToken){
+        securityTokenRepository.save(securityToken);
+    }
 }

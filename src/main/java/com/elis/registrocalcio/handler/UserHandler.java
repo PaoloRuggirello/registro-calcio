@@ -148,13 +148,13 @@ public class UserHandler {
         return toSetUsername;
     }
 
-
-    public boolean hasUserPermissions(Role permissionLevel, Role userRole) {
-        String role = userRole.toString();
-        if((role.equals(Role.ADMIN.toString()) || (permissionLevel == Role.USER && role.equals(Role.USER.toString()))))
-            return true;
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
+    public User changeUserRole(String username){
+        Optional<User> user = userRepository.findByUsernameAndIsActiveIsTrue(username);
+        if(user.isPresent()){
+            Role currentRole = user.get().getRole();
+            user.get().setRole(currentRole == Role.USER ? Role.ADMIN : Role.USER);
+            return userRepository.save(user.get());
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_CHANGE_USER_ROLE.toString());
     }
-
-
 }
