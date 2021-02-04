@@ -16,7 +16,7 @@ services:
 #    ports:
 #      - 55500:3306
 
-  registro-calcio-backend:
+  registro-calcio-backend-security:
     build: ../
     container_name: registro-calcio-backend-security
     ports:
@@ -35,4 +35,4 @@ services:
 #    restart: always
 
 
-#remote server ip: 51.210.41.125 @
+#remote server ip: @51.210.41.125
