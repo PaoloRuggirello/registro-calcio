@@ -15,6 +15,7 @@ public class EventDTO {
     public Date date;
     public UserDTO creator;
     public Boolean played;
+    public int freeSeats;
 
     public EventDTO() {
     }
@@ -25,6 +26,10 @@ public class EventDTO {
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
+        int players = event.getPlayers().size();
+        int totalSeats = event.getCategory().numberOfAllowedPlayers();
+        this.freeSeats = totalSeats > players ? totalSeats - players : 0;
+
     }
     public EventDTO(UserEvent userEvent){
         this.id = userEvent.getId();

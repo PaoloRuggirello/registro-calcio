@@ -20,6 +20,20 @@ public enum Category {
         }
     }
 
+    public int numberOfAllowedPlayers() {
+        switch (this){
+            case CALCIO_A_5:
+                return 10;
+
+            case CALCIO_A_7:
+                return 14;
+
+            case CALCIO_A_11:
+                return 22;
+            default: throw new IllegalArgumentException();
+        }
+    }
+
     public static Category getCategoryFromString(String categoryString){
         if(categoryString.equals(CALCIO_A_5.toString()))
             return CALCIO_A_5;

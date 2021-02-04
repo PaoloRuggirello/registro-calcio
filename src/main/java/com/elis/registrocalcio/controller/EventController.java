@@ -85,6 +85,9 @@ public class EventController {
         tokenHandler.checkToken(userToken);
         return eventHandler.findPastEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
-
-
+    @GetMapping("/findPlayers/{eventId}")
+    public List<String> findPlayers(@PathVariable("eventId") Long eventId, @RequestBody Token userToken){
+        tokenHandler.checkToken(userToken);
+        return eventHandler.findEventPlayers(eventId);
+    }
 }

@@ -5,6 +5,7 @@ import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
+import com.elis.registrocalcio.repository.general.UserEventRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ import java.util.Optional;
 public class EventHandler {
     @Autowired
     EventRepository eventRepository;
+    @Autowired
+    UserEventRepository userEventRepository;
 
     public boolean isEventValid(EventDTO event) throws SQLIntegrityConstraintViolationException {
         if(!areFieldsValid(event))
@@ -79,5 +82,8 @@ public class EventHandler {
     }
     public List<Event> findPastEvents(){
         return eventRepository.findAllByPlayedIsTrue();
+    }
+    public List<String> findEventPlayers(Long eventId){
+        return userEventRepository.findPlayersOfEvent(eventId);
     }
 }
