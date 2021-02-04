@@ -33,6 +33,3 @@ services:
 #    depends_on:
 #      - registro-calcio-backend
 #    restart: always
-
-
-#remote server ip: @51.210.41.125

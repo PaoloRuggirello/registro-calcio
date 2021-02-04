@@ -57,10 +57,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate);
         System.out.println(checkedUser);
-        if(checkedUser.isPresent())
-            return tokenHandler.createToken(checkedUser.get());
-//        return checkedUser.map(UserDTO::new).orElse(null);
-        return null;
+        return checkedUser.map(user -> tokenHandler.createToken(user)).orElse(null);
     }
 
     @PostMapping("/logout")
@@ -70,13 +67,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public Token registerUser(@RequestBody UserDTO userToRegister) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public String registerUser(@RequestBody UserDTO userToRegister) throws InvalidKeySpecException, NoSuchAlgorithmException {
         if(!userHandler.validateRegistrationFields(userToRegister))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
         if(userHandler.checkIfPresentByEmail(userToRegister.getEmail()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.EMAIL_ALREADY_EXIST.toString());
         userHandler.createUserAndSave(userToRegister);
-        return tokenHandler.createToken(new User(userToRegister));
+        return "Successfully created user";
     }
 
     @PostMapping("/bindWithEvent")
@@ -117,7 +114,7 @@ public class UserController {
 
     @GetMapping("/find/{username}")
     public UserDTO findUser(@PathVariable("username")String username, @RequestBody Token userToken){
-        tokenHandler.checkToken(userToken);
+        tokenHandler.checkToken(userToken, Role.ADMIN);
         return new UserDTO(userHandler.findUserByUsernameCheckOptional(username));
     }
 
