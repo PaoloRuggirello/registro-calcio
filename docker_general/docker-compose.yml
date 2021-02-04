@@ -14,7 +14,7 @@ services:
       MYSQL_USER: mysql
       MYSQL_PASSWORD: mysql
     ports:
-      - 55500:3306
+      - 55501:3306
 
   registro-calcio-backend-security:
     build: ../
