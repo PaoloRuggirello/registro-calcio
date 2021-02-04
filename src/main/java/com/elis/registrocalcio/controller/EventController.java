@@ -1,11 +1,12 @@
 package com.elis.registrocalcio.controller;
 
+import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
-import com.elis.registrocalcio.dto.UserDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.EventHandler;
@@ -33,21 +34,20 @@ public class EventController {
 
     @Autowired
     UserHandler userHandler;
-
     @Autowired
     EventHandler eventHandler;
-
     @Autowired
     EventRepository eventRepository;
-
     @Autowired
     UserEventHandler userEventHandler;
+    @Autowired
+    TokenHandler tokenHandler;
 
     @PostMapping("/create")
-    public EventDTO createEvent(@RequestBody EventDTO eventToCreate) throws SQLIntegrityConstraintViolationException {
+    public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestBody Token userToken) throws SQLIntegrityConstraintViolationException {
+        tokenHandler.checkIfAreTheSameUser(userToken, eventToCreate.getCreator().getUsername(), Role.ADMIN);
         System.out.println(eventToCreate);
         User creator = userHandler.findUserByUsernameCheckOptional(eventToCreate.getCreator().getUsername());
-        userHandler.hasUserPermissions(Role.ADMIN, creator.getRole());
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
         Event event = new Event(eventToCreate, creator);
@@ -56,9 +56,8 @@ public class EventController {
 
     @Transactional
     @PostMapping("/delete/{eventId}")
-    public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestBody UserDTO inCharge){
-        User employee = userHandler.findUserByUsernameCheckOptional(inCharge.getUsername());
-        userHandler.hasUserPermissions(Role.ADMIN, employee.getRole());
+    public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestBody Token userToken){
+        tokenHandler.checkToken(userToken, Role.ADMIN);
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
         EventDTO toDeleteEvent = new EventDTO(toDelete);
         userEventHandler.deleteByEvent(toDelete);
@@ -67,19 +66,23 @@ public class EventController {
     }
 
     @GetMapping("/find")
-    public List<EventDTO> findAll(){
+    public List<EventDTO> findAll(@RequestBody Token userToken){
+        tokenHandler.checkToken(userToken);
         return eventHandler.findAll().stream().map(EventDTO::new).collect(Collectors.toList());
     }
     @GetMapping("/find/{eventId}")
-    public EventDTO findEvent(@PathVariable("eventId") Long eventId){
+    public EventDTO findEvent(@PathVariable("eventId") Long eventId, @RequestBody Token userToken){
+        tokenHandler.checkToken(userToken);
         return new EventDTO(eventHandler.findEventByIdCheckOptional(eventId));
     }
     @GetMapping("/findActive")
-    public List<EventDTO> findActiveEvents(){
+    public List<EventDTO> findActiveEvents(@RequestBody Token userToken){
+        tokenHandler.checkToken(userToken);
         return eventHandler.findActiveEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
     @GetMapping("/findPast")
-    public List<EventDTO> findPastEvents(){
+    public List<EventDTO> findPastEvents(@RequestBody Token userToken){
+        tokenHandler.checkToken(userToken);
         return eventHandler.findPastEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
 

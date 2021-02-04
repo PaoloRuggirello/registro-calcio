@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.enumPackage;
 
 public enum FootballRegisterException {
+        INVALID_TOKEN,
         CANNOT_REGISTER_USER,
         EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY,
         EVENT_NOT_FOUND,

@@ -1,5 +1,6 @@
 package com.elis.registrocalcio.model.security;
 
+import com.elis.registrocalcio.dto.Token;
 import com.elis.registrocalcio.enumPackage.Role;
 
 import javax.persistence.Column;
@@ -13,7 +14,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @Entity(name = "token")
-public class Token implements Serializable {
+public class SecurityToken implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,23 +23,25 @@ public class Token implements Serializable {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false) //, columnDefinition = "varchar(20)'")
-//    @Enumerated(EnumType.STRING)
-    private String role;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    @Column(name = "expiration_date", nullable = false)
+    @Column(nullable = false)
     private Instant expirationDate;
 
-    public Token() {
+    public SecurityToken() {
     }
 
-    public Token(String username, String role, Instant expirationDate) {
+    public SecurityToken(String username, Role role, Instant expirationDate) {
         this.id = id;
         this.username = username;
         this.role = role;
         this.expirationDate = expirationDate;
     }
 
+    public SecurityToken(Token token){
+    }
 
     public Long getId() {
         return id;
@@ -52,11 +55,11 @@ public class Token implements Serializable {
         this.username = username;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -66,5 +69,22 @@ public class Token implements Serializable {
 
     public void setExpirationDate(Instant expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public static Long getTokenId(Token token){
+        String tokenIdAsString = token.token.split("-%\\$-")[0];
+        return Long.parseLong(tokenIdAsString);
+    }
+
+    public static Instant getTokenExpirationDate(Token token){
+        String expirationDateAsString = token.token.split("-%\\$-")[1];
+        return Instant.parse(expirationDateAsString);
+    }
+
+    public static String getTokenIdAsString(Token token){
+        return token.token.split("-%\\$-")[0];
+    }
+    public static String getTokenExpirationDateAsString(Token token){
+        return token.token.split("-%\\$-")[1];
     }
 }
