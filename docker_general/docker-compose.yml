@@ -20,7 +20,7 @@ services:
     build: ../
     container_name: registro-calcio-backend-security
     ports:
-      - 44400:8080
+      - 55505:8080
     restart: always
 #    depends_on:
 #      - database
