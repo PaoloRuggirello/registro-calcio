@@ -48,8 +48,8 @@ public class PersistenceGeneralConfiguration {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto","update");
-        properties.put("hibernate.dialect","org.hibernate.dialect.MySQL8Dialect");
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.datasource.ddl-auto"));
+        properties.put("hibernate.dialect",env.getProperty("spring.datasource.dialect"));
         em.setJpaPropertyMap(properties);
         return em;
     }
