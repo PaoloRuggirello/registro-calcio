@@ -15,7 +15,6 @@ public class EncryptionUtils {
 
     public static String encrypt(String toEncrypt){
         try {
-
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, getKey());
             return Base64Utils.encodeToString(cipher.doFinal(toEncrypt.getBytes(StandardCharsets.UTF_8)));

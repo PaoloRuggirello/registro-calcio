@@ -31,4 +31,10 @@ public class Token {
         String decryptedExpirationDate = getTokenExpirationDateAsString(this);
         this.token = decryptedTokenId + "-%$-" +decryptedExpirationDate;
     }
+
+    public void encrypt(){
+        String id = getTokenIdAsString(this);
+        String expirationDate = getTokenExpirationDateAsString(this);
+        this.token = EncryptionUtils.encrypt(EncryptionUtils.encrypt(id) + "-%$-" + expirationDate);
+    }
 }
