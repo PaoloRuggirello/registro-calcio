@@ -53,6 +53,11 @@ public class Event implements Serializable {
         this.creator = creator;
         this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
+    public Event(Category category, Instant date, User creator){
+        this.category = category;
+        this.date = date;
+        this.creator = creator;
+    }
 
     public Long getId() {
         return id;

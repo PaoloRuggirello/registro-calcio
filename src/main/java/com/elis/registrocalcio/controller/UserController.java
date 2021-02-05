@@ -146,5 +146,4 @@ public class UserController {
     public List<SecurityToken> findTokens(){
         return securityTokenRepository.findAll();
     }
-
 }
