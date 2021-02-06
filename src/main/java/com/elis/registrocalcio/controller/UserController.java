@@ -1,5 +1,6 @@
 package com.elis.registrocalcio.controller;
 
+import com.elis.registrocalcio.dto.ChangePasswordDTO;
 import com.elis.registrocalcio.dto.Token;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
@@ -53,9 +54,9 @@ public class UserController {
     @PostMapping("/authenticate")
     public Token authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         System.out.println(userToAuthenticate);
-        if(!userHandler.validateLoginFields(userToAuthenticate))// means that some fields are not ready for the login
+        if(!userHandler.validateLoginFields(userToAuthenticate.getUsername(), userToAuthenticate.getPassword()))// means that some fields are not ready for the login
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
-        Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate);
+        Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
         System.out.println(checkedUser);
         return checkedUser.map(user -> tokenHandler.createToken(user)).orElse(null);
     }
@@ -146,5 +147,22 @@ public class UserController {
     public List<SecurityToken> findTokens(){
         return securityTokenRepository.findAll();
     }
+
+    @PostMapping("/passwordRecovery/{username}")
+    public String passwordRecovery(@PathVariable("username") String username) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        User user = userHandler.findUserByUsernameCheckOptional(username);
+        userHandler.passwordRecoveryProcedure(user);
+        return "Success";
+    }
+
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        Optional<User> user = userHandler.checkUserCredentials(changePasswordDTO.username, changePasswordDTO.currentPassword);
+        if(user.isEmpty() || !userHandler.validatePassword(changePasswordDTO.newPassword)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString()); //User not found or bad
+        user.get().setPassword(userHandler.passwordEncryption(changePasswordDTO.newPassword)); //Setting new password
+        userHandler.save(user.get());
+        return "Success";
+    }
+
 
 }

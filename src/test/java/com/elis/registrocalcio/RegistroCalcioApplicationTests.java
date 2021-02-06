@@ -4,6 +4,7 @@ import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.security.SecurityToken;
+import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.repository.general.UserRepository;
 import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
 import org.junit.jupiter.api.Assertions;
@@ -23,9 +24,10 @@ class RegistroCalcioApplicationTests {
 
 	@Autowired
 	UserRepository userRepository;
-
 	@Autowired
     SecurityTokenRepository securityTokenRepository;
+	@Autowired
+	EmailServiceImpl emailService;
 
 	@Test
 	public void cryptPassword() throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -44,6 +46,11 @@ class RegistroCalcioApplicationTests {
 
 		Assertions.assertNotNull(securityTokenRepository.findAll());
 		Assertions.assertNotNull(userRepository.findAll());
+	}
+
+	@Test
+	public void sendEmail(){
+		emailService.sendEmail();
 	}
 
 }
