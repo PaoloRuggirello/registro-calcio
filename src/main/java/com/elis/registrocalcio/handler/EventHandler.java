@@ -102,6 +102,7 @@ public class EventHandler {
      */
     public void comunicateNewEventToUsers(Event event){
         List<String> mailList = userRepository.findNewsLetter();
-        emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
+        if(mailList.size() > 0)
+            emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
     }
 }

@@ -13,6 +13,15 @@ spring:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
     ddl-auto: create
     dialect: org.hibernate.dialect.HSQLDialect
+  mail:
+    properties.mail.smtp:
+      ssl.enable: true
+      auth: true
+      starttls.enable: true
+    host: smtp.yandex.com
+    port: 465
+    password: regCal2021Pass
+    username: registro.calcio.elis@yandex.com
   jpa:
     generate-ddl: true
     show-sql: true

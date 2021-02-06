@@ -60,24 +60,24 @@ class RegistroCalcioApplicationTests {
 		Assertions.assertNotNull(userRepository.findAll());
 	}
 
-	@Test
-	public void sendEmail(){
-		emailService.sendEmail();
-	}
-
-	@Test
-	public void createEvent() throws SQLIntegrityConstraintViolationException {
-		User admin = userRepository.findByUsernameAndIsActiveIsTrue("admin.admin").get();
-		userRepository.save(admin);
-		Token adminToken = tokenHandler.createToken(admin);
-
-		EventDTO eventDTO = new EventDTO();
-		eventDTO.category = Category.CALCIO_A_7.toString();
-		eventDTO.creator = new UserDTO(admin);
-		eventDTO.date = Date.from(Instant.now().plus(3, ChronoUnit.DAYS));
-		Token token = new Token();
-		token.token = adminToken.token;
-		eventController.createEvent(eventDTO, token);
-	}
+//	@Test
+//	public void sendEmail(){
+//		emailService.sendEmail();
+//	}
+//
+//	@Test
+//	public void createEvent() throws SQLIntegrityConstraintViolationException {
+//		User admin = userRepository.findByUsernameAndIsActiveIsTrue("admin.admin").get();
+//		userRepository.save(admin);
+//		Token adminToken = tokenHandler.createToken(admin);
+//
+//		EventDTO eventDTO = new EventDTO();
+//		eventDTO.category = Category.CALCIO_A_7.toString();
+//		eventDTO.creator = new UserDTO(admin);
+//		eventDTO.date = Date.from(Instant.now().plus(3, ChronoUnit.DAYS));
+//		Token token = new Token();
+//		token.token = adminToken.token;
+//		eventController.createEvent(eventDTO, token);
+//	}
 
 }
