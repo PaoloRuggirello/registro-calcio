@@ -91,7 +91,8 @@ public class UserControllerTest {
 
         //Check authentication fail, invalid username or password
         wrong.setPassword(userHandler.passwordEncryption("password"));
-        assertNull(userController.authenticate(wrong));
+        testException = assertThrows(ResponseStatusException.class, () -> userController.authenticate(wrong), FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
+        assertThat(testException.getMessage(), containsString(FootballRegisterException.AUTHENTICATION_FAILED.toString()));
     }
 
     @Test
