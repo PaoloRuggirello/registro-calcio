@@ -26,17 +26,22 @@ public class EventDTO {
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
-        int players = event.getPlayers()!=null ? event.getPlayers().size() : 0;
+        int players = event.getPlayers() != null ? event.getPlayers().size() : 0;
         int totalSeats = event.getCategory().numberOfAllowedPlayers();
         this.freeSeats = totalSeats > players ? totalSeats - players : 0;
-
     }
+
     public EventDTO(UserEvent userEvent){
         this.id = userEvent.getId();
         this.date = Date.from(userEvent.getEvent().getDate());
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
         this.played = userEvent.getEvent().getPlayed();
+    }
+    public EventDTO(String category, Date date, UserDTO creator){
+        this.category = category;
+        this.date = date;
+        this.creator = creator;
     }
 
     public Long getId() {
@@ -77,6 +82,14 @@ public class EventDTO {
 
     public void setPlayed(Boolean played) {
         this.played = played;
+    }
+
+    public int getFreeSeats() {
+        return freeSeats;
+    }
+
+    public void setFreeSeats(int freeSeats) {
+        this.freeSeats = freeSeats;
     }
 
     @Override

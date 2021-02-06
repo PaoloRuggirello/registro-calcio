@@ -28,15 +28,18 @@ public class UserEventHandler {
         Event mostRecentEvent = toRegister;
         if(userEventList.size() == 0)
             return false; //User haven't any registration
-        else {
-            for(UserEvent temp : userEventList) {
-                if(temp.getEvent().getDate().isBefore(toRegister.getDate()) && temp.getEvent().getDate().isBefore(mostRecentEvent.getDate()))
-                    mostRecentEvent = temp.getEvent();
-            }
-        }
-        Instant now = new Date().toInstant().atZone(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS).toInstant();
-        Instant nowPlus48Hours = now.plus(2, ChronoUnit.DAYS);
-        return !mostRecentEvent.getDate().isBefore(nowPlus48Hours) || !mostRecentEvent.getDate().isAfter(now);
+//        Instant today = new Date().toInstant().atZone(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS).toInstant();
+        Instant today = Instant.now();
+        Instant nowPlus48Hours = today.plus(2, ChronoUnit.DAYS);
+        return !(toRegister.getDate().isBefore(nowPlus48Hours) && toRegister.getDate().isAfter(today));
+//            for(UserEvent temp : userEventList) {
+//                if(temp.getEvent().getDate().isBefore(toRegister.getDate()) && temp.getEvent().getDate().isBefore(mostRecentEvent.getDate()))
+//                    mostRecentEvent = temp.getEvent();
+//            }
+//        }
+//        Instant today = new Date().toInstant().atZone(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS).toInstant();
+//        Instant nowPlus48Hours = today.plus(2, ChronoUnit.DAYS);
+//        return !mostRecentEvent.getDate().isBefore(nowPlus48Hours) || !mostRecentEvent.getDate().isAfter(today);
     }
 
     public void deleteByUser(User toRemove){

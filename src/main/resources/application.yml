@@ -5,11 +5,15 @@ spring:
       driverClassName: org.hsqldb.jdbc.JDBCDriver
       username: token
       password: token
+      ddl-auto: create
+      dialect: org.hibernate.dialect.HSQLDialect
   datasource:
     jdbcUrl: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=UTC
     username: mysql
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
+    ddl-auto: update
+    dialect: org.hibernate.dialect.MySQL8Dialect
   jpa:
     generate-ddl: true
     show-sql: true

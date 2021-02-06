@@ -45,8 +45,8 @@ public class PersistenceSecurityConfiguration {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "create");
-        properties.put("hibernate.dialect","org.hibernate.dialect.HSQLDialect");
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.second-datasource.ddl-auto"));
+        properties.put("hibernate.dialect", env.getProperty("spring.second-datasource.dialect"));
         em.setJpaPropertyMap(properties);
         return em;
     }

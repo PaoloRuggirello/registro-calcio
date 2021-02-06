@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -37,7 +39,7 @@ public class Event implements Serializable {
     @JoinColumn(name = "creator", nullable = false)
     private User creator;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
     private List<UserEvent> players;
 
     @Column(columnDefinition = "boolean default false")
@@ -52,6 +54,18 @@ public class Event implements Serializable {
         this.date = eventDTO.getDate().toInstant();
         this.creator = creator;
         this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
+    }
+    public Event(Category category, Instant date, User creator){
+        this.category = category;
+        this.date = date;
+        this.creator = creator;
+    }
+
+    public Event(Category category, Instant date, User creator, Boolean played) {
+        this.category = category;
+        this.date = date;
+        this.creator = creator;
+        this.played = played;
     }
 
     public Long getId() {

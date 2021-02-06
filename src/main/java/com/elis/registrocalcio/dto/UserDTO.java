@@ -30,6 +30,11 @@ public class UserDTO {
         setFields(user);
     }
 
+    public UserDTO(String username, String password){
+        this.username = username;
+        this.password = password;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -100,6 +105,7 @@ public class UserDTO {
         this.username = user.getUsername();
         this.role = user.getRole().toString();
         this.email = user.getEmail();
+        this.isActive = user.getActive();
     }
 
     public UserDTO withoutPassword(){

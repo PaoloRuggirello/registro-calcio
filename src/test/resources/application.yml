@@ -1,0 +1,21 @@
+spring:
+  second-datasource:
+    jdbcUrl: jdbc:hsqldb:mem:active_sessions
+    driverClassName: org.hsqldb.jdbc.JDBCDriver
+    username: token
+    password: token
+    ddl-auto: create
+    dialect: org.hibernate.dialect.HSQLDialect
+  datasource:
+    jdbcUrl: jdbc:hsqldb:mem:registro_calcio
+    username: mysql
+    password: mysql
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    ddl-auto: create
+    dialect: org.hibernate.dialect.HSQLDialect
+  jpa:
+    generate-ddl: true
+    show-sql: true
+server:
+  error:
+    include-message: always

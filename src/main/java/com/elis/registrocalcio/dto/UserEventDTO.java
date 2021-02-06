@@ -20,6 +20,11 @@ public class UserEventDTO {
         this.team = (!ObjectUtils.isEmpty(userEvent.getTeam())) ? userEvent.getTeam().toString() : null;
     }
 
+    public UserEventDTO(String playerUsername, Long eventId){
+        this.playerUsername = playerUsername;
+        this.eventId = eventId;
+    }
+
     public String getPlayerUsername() {
         return playerUsername;
     }

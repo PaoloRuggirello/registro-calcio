@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,9 +59,8 @@ public class EventHandler {
         return !StringUtils.isBlank(category) && !ObjectUtils.isEmpty(Category.getCategoryFromString(category));
     }
     private boolean validateDate(Date date){
-        Date today = new Date();
-        System.out.println("Today : " + today);
-        return !ObjectUtils.isEmpty(date) && today.before(date);
+        Instant endOfToday = LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneId.of("UTC")).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
+        return !ObjectUtils.isEmpty(date) && endOfToday.isBefore(date.toInstant()); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
     }
 
     private boolean isAloneInDay(EventDTO event) {
