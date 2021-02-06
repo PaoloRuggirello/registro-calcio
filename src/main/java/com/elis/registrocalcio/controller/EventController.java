@@ -51,6 +51,7 @@ public class EventController {
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
         Event event = new Event(eventToCreate, creator);
+        eventHandler.comunicateNewEventToUsers(event);
         return new EventDTO(eventRepository.save(event));
     }
 

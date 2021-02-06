@@ -5,14 +5,22 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 @Component
 public class EmailServiceImpl {
 
     @Autowired
     private JavaMailSender mailSender;
+    private final String antPattern = "EEEEE dd MMMMM";
+    private final String postPattern = "HH:mm";
 
     private final String mailFrom = "registro.calcio.elis@yandex.com";
-    private final String footer = "Buon divertimento,\n Registro calcio ELIS.\n\n" +
+    private final String footer = "\n\nBuon divertimento,\n Registro calcio ELIS.\n\n" +
             "Email generata automaticamente, non rispondere a questa email, se hai bisogno di ulteriore supporto contatta uno degli incaricati.";
 
 
@@ -32,8 +40,30 @@ public class EmailServiceImpl {
         message.setSubject("Procedura recupero password");
         message.setText("Gentile " + userName + ", è stata avviata la procedura di recupero password per il tuo accont. \n" +
                 "La tua password è stata resettata, la tua attuale password è: " + tempPassword + ". \n" +
-                "Puoi scegliere se continuare ad utilizzare questa o cambiarla con una a tuo piacimento, nel caso tu volessi cambiarla recati nella schermata di login e clicca sul pulsante 'Cambia password' e inserisci i dati richiesti.\n\n" +
+                "Puoi scegliere se continuare ad utilizzare questa o cambiarla con una a tuo piacimento, nel caso tu volessi cambiarla recati nella schermata di login e clicca sul pulsante 'Cambia password' e inserisci i dati richiesti." +
                 footer);
         mailSender.send(message);
+    }
+
+    public void comunicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
+        SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
+        SimpleDateFormat postPatternFormat = new SimpleDateFormat(postPattern, new Locale("it", "IT"));
+        String antDate = antPatternFormat.format(Date.from(eventDate));
+        String postDate = postPatternFormat.format(Date.from(eventDate));
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailFrom);
+        message.setTo(convertMailList(mailList));
+        message.setSubject(category + " "+ antDate);
+        message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\n Dettagli: " +
+                category + " - " + antDate + " ore " + postDate + footer);
+        mailSender.send(message);
+    }
+
+    private String[] convertMailList(List<String> mailList){
+        String[] result = new String[mailList.size()];
+        for(int i = 0; i < mailList.size(); i++){
+            result[i] = mailList.get(i);
+        }
+        return result;
     }
 }

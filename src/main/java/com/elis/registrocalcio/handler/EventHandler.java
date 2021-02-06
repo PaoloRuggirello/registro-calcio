@@ -2,10 +2,12 @@ package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
+import com.elis.registrocalcio.repository.general.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +16,15 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -28,6 +33,10 @@ public class EventHandler {
     EventRepository eventRepository;
     @Autowired
     UserEventRepository userEventRepository;
+    @Autowired
+    EmailServiceImpl emailService;
+    @Autowired
+    UserRepository userRepository;
 
     public boolean isEventValid(EventDTO event) throws SQLIntegrityConstraintViolationException {
         if(!areFieldsValid(event))
@@ -85,5 +94,14 @@ public class EventHandler {
     }
     public List<String> findEventPlayers(Long eventId){
         return userEventRepository.findPlayersOfEvent(eventId);
+    }
+
+    /**
+     * This method send an email to each user that want to now the creation of a new Event
+     * @param event
+     */
+    public void comunicateNewEventToUsers(Event event){
+        List<String> mailList = userRepository.findNewsLetter();
+        emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
     }
 }

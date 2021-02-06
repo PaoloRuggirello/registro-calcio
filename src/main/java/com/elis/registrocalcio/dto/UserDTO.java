@@ -13,6 +13,7 @@ public class UserDTO {
     public String role;
     public String email;
     public Boolean isActive;
+    public Boolean newsLetter;
 
     public UserDTO() {
     }
@@ -83,6 +84,14 @@ public class UserDTO {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public Boolean getNewsLetter() {
+        return newsLetter;
+    }
+
+    public void setNewsLetter(Boolean newsLetter) {
+        this.newsLetter = newsLetter;
     }
 
     public void setFields(User user) {

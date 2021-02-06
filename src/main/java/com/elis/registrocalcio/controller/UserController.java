@@ -141,6 +141,15 @@ public class UserController {
         return new UserDTO(updatedUser);
     }
 
+    @PostMapping("/changeNewsLetterStatus/{username}")
+    public String changeNewsLetter(@PathVariable("username") String username, @RequestBody Token token){
+        tokenHandler.checkIfAreTheSameUser(token, username);
+        User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(username);
+        updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status
+        userHandler.save(updateNewsLetter);
+        return "Success";
+    }
+
     @Autowired
     SecurityTokenRepository securityTokenRepository;
     @GetMapping("/findTokens")

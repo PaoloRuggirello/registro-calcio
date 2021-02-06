@@ -26,7 +26,7 @@ public class EventDTO {
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
-        int players = event.getPlayers().size();
+        int players = event.getPlayers()!=null ? event.getPlayers().size() : 0;
         int totalSeats = event.getCategory().numberOfAllowedPlayers();
         this.freeSeats = totalSeats > players ? totalSeats - players : 0;
 

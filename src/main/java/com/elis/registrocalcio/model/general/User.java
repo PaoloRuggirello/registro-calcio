@@ -3,6 +3,7 @@ package com.elis.registrocalcio.model.general;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.dto.UserDTO;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.util.ObjectUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,8 +42,11 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @Column(name = "is_active", columnDefinition = "boolean default false")
+    @Column(name = "is_active", columnDefinition = "boolean default true")
     private Boolean isActive = true;
+
+    @Column(name = "news_letter", columnDefinition = "boolean default false")
+    private Boolean newsLetter = false;
 
     @OneToMany(mappedBy = "creator")
     List<Event> events;
@@ -69,6 +73,8 @@ public class User implements Serializable {
         this.surname = toRegister.getSurname();
         this.email = toRegister.getEmail();
         this.password = toRegister.getPassword();
+        this.isActive = ObjectUtils.isEmpty(toRegister.isActive) || toRegister.isActive;
+        this.newsLetter = !ObjectUtils.isEmpty(toRegister.newsLetter) && toRegister.newsLetter;
     }
 
     public Long getId() {
@@ -149,6 +155,14 @@ public class User implements Serializable {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public Boolean getNewsLetter() {
+        return newsLetter;
+    }
+
+    public void setNewsLetter(Boolean newsLetter) {
+        this.newsLetter = newsLetter;
     }
 
     @Override
