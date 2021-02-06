@@ -58,7 +58,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
         System.out.println(checkedUser);
-        return checkedUser.map(user -> tokenHandler.createToken(user)).orElse(null);
+        return checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.AUTHENTICATION_FAILED.toString()));
     }
 
     @PostMapping("/logout")

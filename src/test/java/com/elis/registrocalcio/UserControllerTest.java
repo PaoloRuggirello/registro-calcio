@@ -308,7 +308,7 @@ public class UserControllerTest {
         assertEquals(admin.getName(), userFromController.getName());
         assertEquals(admin.getSurname(), userFromController.getSurname());
         assertEquals(admin.getRole().toString(), userFromController.getRole());
-        assertTrue(userFromController.getActive());
+        assertTrue(userFromController.getIsActive());
         assertNull(userFromController.getPassword());
     }
 

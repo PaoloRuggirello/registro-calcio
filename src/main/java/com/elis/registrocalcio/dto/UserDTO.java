@@ -83,11 +83,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Boolean getActive() {
+    public Boolean getIsActive() {
         return isActive;
     }
 
-    public void setActive(Boolean active) {
+    public void setIsAsctive(Boolean active) {
         isActive = active;
     }
 
@@ -106,6 +106,7 @@ public class UserDTO {
         this.role = user.getRole().toString();
         this.email = user.getEmail();
         this.isActive = user.getActive();
+        this.newsLetter = user.getNewsLetter();
     }
 
     public UserDTO withoutPassword(){
