@@ -25,11 +25,11 @@ services:
     depends_on:
       - database-testing
 
-#  registro-calcio-frontend:
-#    build: ../../rc-fe-ng
-#    container_name: registro-calcio-frontend
-#    ports:
-#      - 80:80
-#    depends_on:
-#      - registro-calcio-backend
-#    restart: always
+  registro-calcio-frontend:
+    build: ../../rc-fe-ng
+    container_name: registro-calcio-frontend
+    ports:
+      - 80:80
+    depends_on:
+      - registro-calcio-backend-security
+    restart: always

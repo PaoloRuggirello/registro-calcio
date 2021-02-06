@@ -332,5 +332,4 @@ public class UserControllerTest {
         userController.changeRole(user.getUsername(),tokenToUse);
         assertThat(userRepository.findById(user.getId()).get().getRole(), equalTo(Role.USER));
     }
-
 }
