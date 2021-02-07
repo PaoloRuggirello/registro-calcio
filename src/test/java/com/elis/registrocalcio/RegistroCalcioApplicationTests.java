@@ -21,9 +21,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Locale;
 
 @SpringBootTest
 class RegistroCalcioApplicationTests {
@@ -59,6 +62,22 @@ class RegistroCalcioApplicationTests {
 		Assertions.assertNotNull(securityTokenRepository.findAll());
 		Assertions.assertNotNull(userRepository.findAll());
 	}
+
+	@Test
+	public void testDate() throws ParseException {
+		EventDTO event = new EventDTO();
+		event.date = "Tue Feb 23 2021 21:30:16";
+		System.out.println(event.getDate());
+//		String realDateAsStrin = sDate.substring(0,24);
+//		System.out.println(realDateAsStrin);
+//		SimpleDateFormat formatter = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss", Locale.ENGLISH);
+//		Date date = formatter.parse(realDateAsStrin);
+//		Instant date2 = date.toInstant();
+//		System.out.println(date2);
+//		System.out.println(date);
+	}
+
+
 
 //	@Test
 //	public void sendEmail(){

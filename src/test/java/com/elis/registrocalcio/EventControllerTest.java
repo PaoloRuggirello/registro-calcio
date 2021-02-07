@@ -14,6 +14,7 @@ import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
+import com.elis.registrocalcio.other.Utils;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import com.elis.registrocalcio.repository.general.UserRepository;
@@ -28,6 +29,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -70,8 +73,12 @@ public class EventControllerTest {
         userRepository.deleteAll();
     }
 
+    private String covertDate(Date current) throws ParseException {
+        return Utils.getFormatter().format(current);
+    }
+
     @Test
-    public void createEventTest() throws InvalidKeySpecException, NoSuchAlgorithmException, SQLIntegrityConstraintViolationException {
+    public void createEventTest() throws InvalidKeySpecException, NoSuchAlgorithmException, SQLIntegrityConstraintViolationException, ParseException {
         User user = new User("user.user", "name", "surname", "user@email.it", userHandler.passwordEncryption("password"));
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", userHandler.passwordEncryption("password"));
         admin.setRole(Role.ADMIN);
@@ -81,7 +88,7 @@ public class EventControllerTest {
         Token adminToken = tokenHandler.createToken(admin);
         Token tokenToUse = new Token();
 
-        EventDTO eventDTO = new EventDTO(Category.CALCIO_A_5.toString(), new Date(), new UserDTO(user));
+        EventDTO eventDTO = new EventDTO(Category.CALCIO_A_5.toString(), covertDate(new Date()), new UserDTO(user));
 
         //Users can't create events
         tokenToUse.token = userToken.token;
@@ -101,14 +108,14 @@ public class EventControllerTest {
 
         //Create event correct date
         // -- adding hours to date
-        Date threeHoursFromNow = Date.from(Instant.now().plus(3, ChronoUnit.HOURS));
+        String threeHoursFromNow = covertDate(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
         tokenToUse.token = adminToken.token;
         eventDTO.date = threeHoursFromNow;
         testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
         assertThat(testException.getMessage(), containsString(FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString()));
 
         //Create correctly an event
-        Date tomorrow = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
+        String tomorrow = covertDate(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
         tokenToUse.token = adminToken.token;
         eventDTO.date = tomorrow;
         EventDTO createEventDTO = eventController.createEvent(eventDTO, tokenToUse);

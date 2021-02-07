@@ -61,15 +61,15 @@ public class EventHandler {
     private boolean validateEventCategory(String category){
         return !StringUtils.isBlank(category) && !ObjectUtils.isEmpty(Category.getCategoryFromString(category));
     }
-    private boolean validateDate(Date date){
+    private boolean validateDate(Instant date){
         Instant endOfToday = LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneId.of("UTC")).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
-        return !ObjectUtils.isEmpty(date) && endOfToday.isBefore(date.toInstant()); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
+        return !ObjectUtils.isEmpty(date) && endOfToday.isBefore(date); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
     }
 
     private boolean isAloneInDay(EventDTO event) {
         boolean isEventAlone = true;
-        Date date = event.getDate();
-        LocalDateTime startDay = LocalDate.ofInstant(date.toInstant(), ZoneId.of("UTC")).atStartOfDay();
+        Instant date = event.getDate();
+        LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
         LocalDateTime nextDay = startDay.plusDays(1);
         Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();
         Instant nextDayAsInstant = nextDay.atZone(ZoneId.of("UTC")).toInstant();

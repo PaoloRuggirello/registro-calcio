@@ -1,10 +1,15 @@
 package com.elis.registrocalcio.dto;
 
+import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.UserEvent;
+import com.elis.registrocalcio.other.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -12,7 +17,7 @@ public class EventDTO {
 
     public Long id;
     public String category;
-    public Date date;
+    public String date;
     public UserDTO creator;
     public Boolean played;
     public int freeSeats;
@@ -22,7 +27,7 @@ public class EventDTO {
 
     public EventDTO(Event event){
         this.id = event.getId();
-        this.date = Date.from(event.getDate());
+        this.date = Date.from(event.getDate()).toString();
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
@@ -33,12 +38,12 @@ public class EventDTO {
 
     public EventDTO(UserEvent userEvent){
         this.id = userEvent.getId();
-        this.date = Date.from(userEvent.getEvent().getDate());
+        this.date = Date.from(userEvent.getEvent().getDate()).toString();
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
         this.played = userEvent.getEvent().getPlayed();
     }
-    public EventDTO(String category, Date date, UserDTO creator){
+    public EventDTO(String category, String date, UserDTO creator){
         this.category = category;
         this.date = date;
         this.creator = creator;
@@ -68,12 +73,17 @@ public class EventDTO {
         this.creator = creator;
     }
 
-    public Date getDate() {
-        return date;
+    public Instant getDate() {
+        date = date.substring(0,24);
+        try{
+            return Utils.getFormatter().parse(date).toInstant();
+        } catch (Exception e ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
+        }
     }
 
     public void setDate(Date date) {
-        this.date = date;
+        this.date = date.toString();
     }
 
     public Boolean getPlayed() {
