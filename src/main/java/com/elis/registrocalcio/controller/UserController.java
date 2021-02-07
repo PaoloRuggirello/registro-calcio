@@ -50,14 +50,6 @@ public class UserController {
     @Autowired
     private TokenHandler tokenHandler;
 
-
-    /**
-     * Docs test
-     * @param userToAuthenticate
-     * @return
-     * @throws InvalidKeySpecException
-     * @throws NoSuchAlgorithmException
-     */
     @PostMapping("/authenticate")
     public Token authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         System.out.println(userToAuthenticate);
@@ -157,7 +149,6 @@ public class UserController {
         return "Success";
     }
 
-    //TODO cancellare endpoint
     @Autowired
     SecurityTokenRepository securityTokenRepository;
     @GetMapping("/findTokens")
