@@ -63,6 +63,7 @@ public class EventController {
     public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN);
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
+        if(toDelete.getPlayed()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_DELETE_PLAYED_EVENTS.toString());
         EventDTO toDeleteEvent = new EventDTO(toDelete);
         userEventHandler.deleteByEvent(toDelete);
         eventHandler.delete(toDelete);

@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.enumPackage;
 
 public enum FootballRegisterException {
+        CANNOT_DELETE_PLAYED_EVENTS,
         WRONG_DATE_FORMAT,
         WRONG_PLAYERS_ERROR,
         WRONG_TEAM_SIZE,

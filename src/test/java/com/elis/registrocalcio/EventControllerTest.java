@@ -238,8 +238,8 @@ public class EventControllerTest {
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin));
         event = eventRepository.save(event);
         List<User> players = new ArrayList<>();
-        players.add(new User("user.user1", "name", "surname", "eamil1@hotmail.it", "password"));
-        players.add(new User("user.user2", "name", "surname", "amail2@live.it", "password"));
+        players.add(new User("user.user1", "name", "surname", "eamil1@mail.it", "password"));
+        players.add(new User("user.user2", "name", "surname", "amail2@mail.it", "password"));
         userRepository.saveAll(players);
         List<UserEvent> userEventList = new ArrayList<>();
         userEventList.add(new UserEvent(players.get(0),event));
