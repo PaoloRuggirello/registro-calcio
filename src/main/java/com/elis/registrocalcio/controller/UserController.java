@@ -85,7 +85,7 @@ public class UserController {
         Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
         if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event)) // if there is less than 3 hours to the event or if the user is already registered to a valid event
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
-        UserEvent bound = new UserEvent(user, event, toBind);
+        UserEvent bound = new UserEvent(user, event);
         return new UserEventDTO(userEventHandler.save(bound));
     }
 
@@ -114,10 +114,10 @@ public class UserController {
         return userHandler.findActiveUsers().stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
-    @GetMapping("/find/{username}")
-    public UserDTO findUser(@PathVariable("username")String username, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken, Role.ADMIN);
-        return new UserDTO(userHandler.findUserByUsernameCheckOptional(username));
+    @GetMapping("/findInfo")
+    public UserDTO findUser( @RequestHeader("Authorization") Token userToken){
+        SecurityToken token = tokenHandler.checkToken(userToken);
+        return new UserDTO(userHandler.findUserByUsernameCheckOptional(token.getUsername()));
     }
 
     @GetMapping("/findBoundEvents/{username}")

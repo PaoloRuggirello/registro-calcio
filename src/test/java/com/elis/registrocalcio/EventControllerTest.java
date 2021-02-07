@@ -2,15 +2,18 @@ package com.elis.registrocalcio;
 
 import com.elis.registrocalcio.controller.EventController;
 import com.elis.registrocalcio.dto.EventDTO;
+import com.elis.registrocalcio.dto.PlayerDTO;
 import com.elis.registrocalcio.dto.Token;
 import com.elis.registrocalcio.dto.UserDTO;
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
+import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
+import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import com.elis.registrocalcio.repository.general.UserRepository;
@@ -28,11 +31,14 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -206,12 +212,47 @@ public class EventControllerTest {
         token.token = userToken.token;
         EventDTO eventFromService = eventController.findEvent(event.getId(), token);
         token.token = userToken.token;
-        List<String> playersFromService = eventController.findPlayers(event.getId(), token);
+        List<PlayerDTO> playersFromService = eventController.findPlayers(event.getId(), token);
 
         //Assertions
         assertThat(eventFromService.getCategory(), equalTo(Category.CALCIO_A_5.toString()));
         assertThat(eventFromService.getCreator().getUsername(), equalTo(admin.getUsername()));
         assertThat(eventFromService.getFreeSeats(), equalTo(Category.CALCIO_A_5.numberOfAllowedPlayers() - playersFromService.size()));
+    }
+
+    @Test
+    public void testSetTeam(){
+        User admin = new User("admin.admin", "name", "surname", "admin@email.it", "password");
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
+        Token adminToken = tokenHandler.createToken(admin);
+        Token token = new Token();
+
+        Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin));
+        event = eventRepository.save(event);
+        List<User> players = new ArrayList<>();
+        players.add(new User("user.user1", "name", "surname", "eamil1@hotmail.it", "password"));
+        players.add(new User("user.user2", "name", "surname", "amail2@live.it", "password"));
+        userRepository.saveAll(players);
+        List<UserEvent> userEventList = new ArrayList<>();
+        userEventList.add(new UserEvent(players.get(0),event));
+        userEventList.add(new UserEvent(players.get(1),event));
+        userEventRepository.saveAll(userEventList);
+
+
+        token.token = adminToken.token;
+        eventController.setTeam(event.getId(), Collections.singletonList(players.get(0).getUsername()), Collections.singletonList(players.get(1).getUsername()), token);
+        List<UserEvent> eventsFromDB = userEventRepository.findAll();
+        assertThat(eventsFromDB.size(), equalTo(2));
+        assertNotNull(eventsFromDB.get(0).getTeam());
+        assertThat(eventsFromDB.get(0).getTeam(), equalTo(Team.BLACK));
+        assertNotNull(eventsFromDB.get(1).getTeam());
+        assertThat(eventsFromDB.get(1).getTeam(), equalTo(Team.WHITE));
+
+
+
+
+
     }
 
 }

@@ -1,6 +1,8 @@
 package com.elis.registrocalcio.enumPackage;
 
 public enum FootballRegisterException {
+        WRONG_PLAYERS_ERROR,
+        WRONG_TEAM_SIZE,
         AUTHENTICATION_FAILED,
         CANNOT_CHANGE_USER_ROLE,
         INVALID_TOKEN,

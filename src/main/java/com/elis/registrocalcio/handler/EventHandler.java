@@ -1,7 +1,10 @@
 package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
+import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.model.general.User;
+import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
@@ -92,7 +95,7 @@ public class EventHandler {
     public List<Event> findPastEvents(){
         return eventRepository.findAllByPlayedIsTrue();
     }
-    public List<String> findEventPlayers(Long eventId){
+    public List<User> findEventPlayers(Long eventId){
         return userEventRepository.findPlayersOfEvent(eventId);
     }
 
@@ -104,5 +107,6 @@ public class EventHandler {
         List<String> mailList = userRepository.findNewsLetter();
         if(mailList.size() > 0)
             emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
+
     }
 }

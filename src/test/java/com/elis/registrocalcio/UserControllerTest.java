@@ -303,7 +303,7 @@ public class UserControllerTest {
         userRepository.save(admin);
         Token adminToken = tokenHandler.createToken(admin);
 
-        UserDTO userFromController = userController.findUser(admin.getUsername(), adminToken);
+        UserDTO userFromController = userController.findUser(adminToken);
         assertEquals(admin.getUsername(), userFromController.getUsername());
         assertEquals(admin.getEmail(), userFromController.getEmail());
         assertEquals(admin.getName(), userFromController.getName());

@@ -1,6 +1,8 @@
 package com.elis.registrocalcio.controller;
 
+import com.elis.registrocalcio.dto.PlayerDTO;
 import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
@@ -88,8 +90,19 @@ public class EventController {
         return eventHandler.findPastEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
     @GetMapping("/findPlayers/{eventId}")
-    public List<String> findPlayers(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
+    public List<PlayerDTO> findPlayers(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
-        return eventHandler.findEventPlayers(eventId);
+        return eventHandler.findEventPlayers(eventId).stream().map(PlayerDTO::new).collect(Collectors.toList());
+    }
+
+    @PostMapping("/setTeam/{eventId}")
+    public String setTeam(@PathVariable("eventId") Long eventId, @RequestBody List<String> blackTeam, @RequestBody List<String> whiteTeam, @RequestHeader("Authorization") Token token){
+        tokenHandler.checkToken(token, Role.ADMIN);
+        if(blackTeam.size() != whiteTeam.size())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_TEAM_SIZE.toString());
+        userEventHandler.verifyPlayers(eventId, blackTeam, whiteTeam);
+        userEventHandler.setTeam(eventId, blackTeam, Team.BLACK);
+        userEventHandler.setTeam(eventId, whiteTeam, Team.WHITE);
+        return "Success";
     }
 }

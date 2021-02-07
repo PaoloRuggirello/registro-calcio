@@ -59,6 +59,20 @@ public class EmailServiceImpl {
         mailSender.send(message);
     }
 
+    public void comunicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
+        SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
+        SimpleDateFormat postPatternFormat = new SimpleDateFormat(postPattern, new Locale("it", "IT"));
+        String antDate = antPatternFormat.format(Date.from(eventDate));
+        String postDate = postPatternFormat.format(Date.from(eventDate));
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailFrom);
+        message.setTo(convertMailList(mailList));
+        message.setSubject("Assegnazione team " + category + " "+ antDate);
+        message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
+                " farai parte del " + team + " team!" + footer);
+        mailSender.send(message);
+    }
+
     private String[] convertMailList(List<String> mailList){
         String[] result = new String[mailList.size()];
         for(int i = 0; i < mailList.size(); i++){

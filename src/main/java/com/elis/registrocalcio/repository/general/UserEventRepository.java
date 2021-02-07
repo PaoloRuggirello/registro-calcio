@@ -29,6 +29,12 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
 
     List<UserEvent> findByUser(User user);
 
-    @Query("select ue.user.username from UserEvent ue where ue.event.id = :eventId order by ue.registrationTime asc")
-    List<String> findPlayersOfEvent(Long eventId);
+    @Query("select ue.user from UserEvent ue where ue.event.id = :eventId order by ue.registrationTime asc")
+    List<User> findPlayersOfEvent(Long eventId);
+
+    @Query("select ue from UserEvent ue where ue.event.id = :eventId and ue.user.username in :usernames")
+    List<UserEvent> findByEventIdAndUsernameIn(Long eventId, List<String> usernames);
+
+    @Query("select count(ue) from UserEvent ue where ue.event.id = :eventId and ue.user.username in :usernames")
+    int countByEventIdAndUsernameIn(Long eventId, List<String> usernames);
 }

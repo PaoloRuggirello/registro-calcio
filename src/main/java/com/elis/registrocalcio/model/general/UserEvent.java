@@ -33,10 +33,9 @@ public class UserEvent implements Serializable {
 
     public UserEvent() {
     }
-    public UserEvent(User user, Event event, UserEventDTO userEventDTO){
+    public UserEvent(User user, Event event){
         this.user = user;
         this.event = event;
-        this.team = (!ObjectUtils.isEmpty(userEventDTO.getTeam())) ? Team.getTeamFromString(userEventDTO.getTeam()) : null;
     }
 
 
