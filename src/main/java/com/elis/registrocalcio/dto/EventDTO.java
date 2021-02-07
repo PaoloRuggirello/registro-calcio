@@ -1,15 +1,9 @@
 package com.elis.registrocalcio.dto;
 
-import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.UserEvent;
-import com.elis.registrocalcio.other.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.time.Instant;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

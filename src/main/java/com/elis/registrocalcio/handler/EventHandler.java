@@ -104,7 +104,7 @@ public class EventHandler {
      * This method send an email to each user that want to now the creation of a new Event
      * @param event
      */
-    public void comunicateNewEventToUsers(Event event){
+    public void newEventToNewsLetter(Event event){
         List<String> mailList = userRepository.findNewsLetter();
         if(mailList.size() > 0)
             emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());

@@ -46,10 +46,8 @@ public class EmailServiceImpl {
     }
 
     public void comunicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
-        SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
-        SimpleDateFormat postPatternFormat = new SimpleDateFormat(postPattern, new Locale("it", "IT"));
-        String antDate = antPatternFormat.format(Date.from(eventDate));
-        String postDate = postPatternFormat.format(Date.from(eventDate));
+        String antDate = getAndDate(eventDate);
+        String postDate = getPostDate(eventDate);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailFrom);
         message.setTo(convertMailList(mailList));
@@ -60,10 +58,8 @@ public class EmailServiceImpl {
     }
 
     public void comunicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
-        SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
-        SimpleDateFormat postPatternFormat = new SimpleDateFormat(postPattern, new Locale("it", "IT"));
-        String antDate = antPatternFormat.format(Date.from(eventDate));
-        String postDate = postPatternFormat.format(Date.from(eventDate));
+        String antDate = getAndDate(eventDate);
+        String postDate = getPostDate(eventDate);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailFrom);
         message.setTo(convertMailList(mailList));
@@ -73,6 +69,14 @@ public class EmailServiceImpl {
         mailSender.send(message);
     }
 
+    private String getAndDate(Instant eventDate){
+        SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
+        return antPatternFormat.format(Date.from(eventDate));
+    }
+    private String getPostDate(Instant eventDate){
+        SimpleDateFormat postPatternFormat = new SimpleDateFormat(postPattern, new Locale("it", "IT"));
+        return postPatternFormat.format(Date.from(eventDate));
+    }
     private String[] convertMailList(List<String> mailList){
         String[] result = new String[mailList.size()];
         for(int i = 0; i < mailList.size(); i++){

@@ -66,15 +66,16 @@ class RegistroCalcioApplicationTests {
 	@Test
 	public void testDate() throws ParseException {
 		EventDTO event = new EventDTO();
-		event.date = "Tue Feb 23 2021 21:30:16";
-		System.out.println(event.getDate());
+		event.date = "Wed Feb 24 23:01:48 CET 2021";
+//		System.out.println(event.getDate());
 //		String realDateAsStrin = sDate.substring(0,24);
 //		System.out.println(realDateAsStrin);
-//		SimpleDateFormat formatter = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss", Locale.ENGLISH);
-//		Date date = formatter.parse(realDateAsStrin);
-//		Instant date2 = date.toInstant();
-//		System.out.println(date2);
-//		System.out.println(date);
+
+		SimpleDateFormat formatter = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+		Date date = formatter.parse(event.date);
+		Instant date2 = date.toInstant();
+		System.out.println(date2);
+		System.out.println(date);
 	}
 
 

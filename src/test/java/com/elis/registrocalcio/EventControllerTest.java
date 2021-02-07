@@ -96,7 +96,7 @@ public class EventControllerTest {
         assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
 
         //ADMIN can't create events setting another user as creator
-        tokenToUse.token = adminToken.token;
+        tokenToUse.token = userToken.token;
         testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
         assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
 
@@ -227,6 +227,7 @@ public class EventControllerTest {
         assertThat(eventFromService.getFreeSeats(), equalTo(Category.CALCIO_A_5.numberOfAllowedPlayers() - playersFromService.size()));
     }
 
+
     @Test
     public void testSetTeam(){
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", "password");
@@ -255,11 +256,6 @@ public class EventControllerTest {
         assertThat(eventsFromDB.get(0).getTeam(), equalTo(Team.BLACK));
         assertNotNull(eventsFromDB.get(1).getTeam());
         assertThat(eventsFromDB.get(1).getTeam(), equalTo(Team.WHITE));
-
-
-
-
-
     }
 
 }

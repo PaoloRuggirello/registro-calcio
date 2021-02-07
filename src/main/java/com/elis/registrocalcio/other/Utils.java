@@ -20,14 +20,13 @@ public class Utils {
 
     public static SimpleDateFormat getFormatter(){
         if(formatter == null){
-            formatter = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss", Locale.ENGLISH);
+            formatter = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
         }
         return formatter;
     }
 
     public static Instant convertDate(String date){
         try{
-            date = date.substring(0,24);
             return Utils.getFormatter().parse(date).toInstant();
         } catch (Exception e ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());

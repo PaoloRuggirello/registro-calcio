@@ -50,12 +50,11 @@ public class EventController {
     @PostMapping("/create")
     public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestHeader("Authorization") Token userToken) throws SQLIntegrityConstraintViolationException {
         SecurityToken token = tokenHandler.checkToken(userToken, Role.ADMIN);
-        System.out.println(eventToCreate);
         User creator = userHandler.findUserByUsernameCheckOptional(token.getUsername());
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
         Event event = new Event(eventToCreate, creator);
-        eventHandler.comunicateNewEventToUsers(event);
+        eventHandler.newEventToNewsLetter(event);
         return new EventDTO(eventRepository.save(event));
     }
 
