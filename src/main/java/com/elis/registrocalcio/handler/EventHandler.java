@@ -6,6 +6,7 @@ import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
+import com.elis.registrocalcio.other.Utils;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
@@ -48,7 +49,7 @@ public class EventHandler {
         return isAloneInDay(event);
     }
     public boolean areFieldsValid(EventDTO event){
-        return validateEventCategory(event.getCategory()) && validateDate(event.getDate());
+        return validateEventCategory(event.getCategory()) && validateDate(Utils.convertDate(event.getDate()));
     }
 
     public Event findEventByIdCheckOptional(Long id){
@@ -68,7 +69,7 @@ public class EventHandler {
 
     private boolean isAloneInDay(EventDTO event) {
         boolean isEventAlone = true;
-        Instant date = event.getDate();
+        Instant date = Utils.convertDate(event.getDate());
         LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
         LocalDateTime nextDay = startDay.plusDays(1);
         Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();

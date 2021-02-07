@@ -7,6 +7,7 @@ import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.model.security.SecurityToken;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
@@ -48,9 +49,9 @@ public class EventController {
 
     @PostMapping("/create")
     public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestHeader("Authorization") Token userToken) throws SQLIntegrityConstraintViolationException {
-        tokenHandler.checkIfAreTheSameUser(userToken, eventToCreate.getCreator().getUsername(), Role.ADMIN);
+        SecurityToken token = tokenHandler.checkToken(userToken, Role.ADMIN);
         System.out.println(eventToCreate);
-        User creator = userHandler.findUserByUsernameCheckOptional(eventToCreate.getCreator().getUsername());
+        User creator = userHandler.findUserByUsernameCheckOptional(token.getUsername());
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
         Event event = new Event(eventToCreate, creator);

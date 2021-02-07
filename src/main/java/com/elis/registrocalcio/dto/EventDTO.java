@@ -73,13 +73,8 @@ public class EventDTO {
         this.creator = creator;
     }
 
-    public Instant getDate() {
-        date = date.substring(0,24);
-        try{
-            return Utils.getFormatter().parse(date).toInstant();
-        } catch (Exception e ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
-        }
+    public String getDate() {
+        return this.date;
     }
 
     public void setDate(Date date) {

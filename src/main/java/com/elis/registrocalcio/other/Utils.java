@@ -1,7 +1,12 @@
 package com.elis.registrocalcio.other;
 
 
+import com.elis.registrocalcio.enumPackage.FootballRegisterException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -18,5 +23,14 @@ public class Utils {
             formatter = new SimpleDateFormat("E MMM dd yyyy HH:mm:ss", Locale.ENGLISH);
         }
         return formatter;
+    }
+
+    public static Instant convertDate(String date){
+        try{
+            date = date.substring(0,24);
+            return Utils.getFormatter().parse(date).toInstant();
+        } catch (Exception e ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
+        }
     }
 }
