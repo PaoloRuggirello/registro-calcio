@@ -15,6 +15,9 @@ public class Token {
 
     public Token(){
     }
+    public Token(String token){
+        this.token = token;
+    }
     public Token(SecurityToken token){
         String tokenId = EncryptionUtils.encrypt(token.getId().toString());
         String partialToken = tokenId + "-%$-" + token.getExpirationDate();
