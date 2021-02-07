@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -62,7 +63,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public String logout(@RequestBody Token userToken){
+    public String logout(@RequestHeader("Authorization") Token userToken){
         tokenHandler.deleteToken(userToken);
         return "Successfully deleted token";
     }
@@ -78,7 +79,7 @@ public class UserController {
     }
 
     @PostMapping("/bindWithEvent")
-    public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind, @RequestBody Token userToken){
+    public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkIfAreTheSameUser(userToken, toBind.getPlayerUsername());
         User user = userHandler.findUserByUsernameCheckOptional(toBind.getPlayerUsername());
         Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
@@ -90,7 +91,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/removeFromEvent/{username}/{eventId}")
-    public void removeBinding(@PathVariable("username")String username, @PathVariable("eventId") Long eventId, @RequestBody Token userToken){
+    public void removeBinding(@PathVariable("username")String username, @PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkIfAreTheSameUser(userToken, username);
         User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
@@ -99,7 +100,7 @@ public class UserController {
 
     @Transactional
     @PostMapping("/delete/{username}")
-    public UserDTO deleteUser(@PathVariable("username") String username, @RequestBody Token userToken){
+    public UserDTO deleteUser(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN); //Users can only be deleted by admin
         User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
         userEventHandler.deleteByUser(userToDelete);
@@ -108,19 +109,19 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    public List<UserDTO> findAll(@RequestBody Token userToken){
+    public List<UserDTO> findAll(@RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN); //Only admin need all users
         return userHandler.findActiveUsers().stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
     @GetMapping("/find/{username}")
-    public UserDTO findUser(@PathVariable("username")String username, @RequestBody Token userToken){
+    public UserDTO findUser(@PathVariable("username")String username, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN);
         return new UserDTO(userHandler.findUserByUsernameCheckOptional(username));
     }
 
     @GetMapping("/findBoundEvents/{username}")
-    public List<EventDTO> findBoundEvents(@PathVariable("username")String username, @RequestBody Token userToken){
+    public List<EventDTO> findBoundEvents(@PathVariable("username")String username, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkIfAreTheSameUser(userToken, username);
         return userEventHandler.findByUser(userHandler.findUserByUsernameCheckOptional(username)).stream().map(EventDTO::new).collect(Collectors.toList());
     }
@@ -131,7 +132,7 @@ public class UserController {
     }
 
     @PostMapping("/changeRole/{username}")
-    public UserDTO changeRole(@PathVariable("username") String username, @RequestBody Token userToken){
+    public UserDTO changeRole(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         SecurityToken securityToken = tokenHandler.checkToken(userToken, Role.ADMIN);
         User updatedUser = userHandler.changeUserRole(username);
         if(username.equals(securityToken.getUsername())){
@@ -142,7 +143,7 @@ public class UserController {
     }
 
     @PostMapping("/changeNewsLetterStatus/{username}")
-    public String changeNewsLetter(@PathVariable("username") String username, @RequestBody Token token){
+    public String changeNewsLetter(@PathVariable("username") String username, @RequestHeader("Authorization") Token token){
         tokenHandler.checkIfAreTheSameUser(token, username);
         User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(username);
         updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status

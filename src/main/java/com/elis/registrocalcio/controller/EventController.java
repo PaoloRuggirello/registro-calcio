@@ -45,7 +45,7 @@ public class EventController {
     TokenHandler tokenHandler;
 
     @PostMapping("/create")
-    public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestBody Token userToken) throws SQLIntegrityConstraintViolationException {
+    public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestHeader("Authorization") Token userToken) throws SQLIntegrityConstraintViolationException {
         tokenHandler.checkIfAreTheSameUser(userToken, eventToCreate.getCreator().getUsername(), Role.ADMIN);
         System.out.println(eventToCreate);
         User creator = userHandler.findUserByUsernameCheckOptional(eventToCreate.getCreator().getUsername());
@@ -58,7 +58,7 @@ public class EventController {
 
     @Transactional
     @PostMapping("/delete/{eventId}")
-    public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestBody Token userToken){
+    public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN);
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
         EventDTO toDeleteEvent = new EventDTO(toDelete);
@@ -73,22 +73,22 @@ public class EventController {
         return eventHandler.findAll().stream().map(EventDTO::new).collect(Collectors.toList());
     }
     @GetMapping("/find/{eventId}")
-    public EventDTO findEvent(@PathVariable("eventId") Long eventId, @RequestBody Token userToken){
+    public EventDTO findEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
         return new EventDTO(eventHandler.findEventByIdCheckOptional(eventId));
     }
     @GetMapping("/findActive")
-    public List<EventDTO> findActiveEvents(@RequestBody Token userToken){
+    public List<EventDTO> findActiveEvents(@RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
         return eventHandler.findActiveEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
     @GetMapping("/findPast")
-    public List<EventDTO> findPastEvents(@RequestBody Token userToken){
+    public List<EventDTO> findPastEvents(@RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
         return eventHandler.findPastEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
     @GetMapping("/findPlayers/{eventId}")
-    public List<String> findPlayers(@PathVariable("eventId") Long eventId, @RequestBody Token userToken){
+    public List<String> findPlayers(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
         return eventHandler.findEventPlayers(eventId);
     }
