@@ -7,6 +7,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -31,5 +33,20 @@ public class Utils {
         } catch (Exception e ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
         }
+    }
+
+    public static boolean areInTheSameWeek(Instant date1, Instant date2){ //Date2 is Always after date1
+        LocalDate date1L = LocalDate.ofInstant(date1, ZoneId.of("UTC"));
+        LocalDate date2L = LocalDate.ofInstant(date2, ZoneId.of("UTC"));
+        if(date2L.getDayOfWeek().getValue() < date1L.getDayOfWeek().getValue()){
+            LocalDate temp = date2L;
+            date2L = date1L;
+            date1L = temp;
+        }
+        int result = date2L.getDayOfMonth() - date1L.getDayOfMonth();
+        if(date1L.getYear() == date2L.getYear() && date1L.getMonth().getValue() == date2L.getMonth().getValue() && result > 0 &&  result < 7)
+            return true;
+        else
+            return false;
     }
 }

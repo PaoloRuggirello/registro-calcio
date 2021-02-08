@@ -7,6 +7,7 @@ import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
+import com.elis.registrocalcio.other.Utils;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,12 +33,15 @@ public class UserEventHandler {
     }
 
     public boolean isAlreadyRegistered(User user, Event toRegister) {
-        List<UserEvent> userEventList = userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(user); //Get all the events not played yet (ActiveEvent)
+        List<UserEvent> userEventList = userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(user); //Get all the events not played yet (ActiveEvent)
         if(userEventList.size() == 0)
             return false; //User haven't any registration
+        UserEvent lastRegistered = userEventList.get(0); //List sorted by date desc, the first element is the last registration time
+        if(!Utils.areInTheSameWeek(lastRegistered.getEvent().getDate(), toRegister.getDate()))
+            return false; //If events aren't in the same week user can be registered to eachOther
         Instant today = Instant.now();
         Instant nowPlus48Hours = today.plus(2, ChronoUnit.DAYS);
-        return !(toRegister.getDate().isBefore(nowPlus48Hours) && toRegister.getDate().isAfter(today));
+        return !(toRegister.getDate().isBefore(nowPlus48Hours) && toRegister.getDate().isAfter(today));//Check if the event is in the range today - next 48h, if yes return false <- means that user can subscribe the event
     }
 
     public void deleteByUser(User toRemove){

@@ -15,6 +15,10 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     @Query("select ue from UserEvent ue where ue.event.played = false and ue.user = :user order by ue.registrationTime asc")
     List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(User user);
 
+    @Query("select ue from UserEvent ue where ue.event.played = false and ue.user = :user order by ue.registrationTime desc")
+    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(User user);
+
+
     @Query("select ue.id from UserEvent ue where ue.user = :user and ue.event.played = false")
     List<Long> findUserEventByDeletingUser(User user);
 

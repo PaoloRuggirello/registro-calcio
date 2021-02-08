@@ -108,7 +108,7 @@ public class EventControllerTest {
 
         //Create event correct date
         // -- adding hours to date
-        String threeHoursFromNow = covertDate(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+        String threeHoursFromNow = covertDate(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)));
         tokenToUse.token = adminToken.token;
         eventDTO.date = threeHoursFromNow;
         testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));

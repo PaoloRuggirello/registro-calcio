@@ -31,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -95,6 +96,7 @@ public class UserController {
         tokenHandler.checkIfAreTheSameUser(userToken, username);
         User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
+        if(event.getPlayed() || Instant.now().plus(3, ChronoUnit.HOURS).isAfter(event.getDate())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_REMOVE_BINDING.toString()); //Cannot remove binding if event is in less than 3 hours or played yet
         userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
     }
 

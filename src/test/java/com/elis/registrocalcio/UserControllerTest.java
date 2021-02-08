@@ -194,7 +194,7 @@ public class UserControllerTest {
 
         //Try to register to another event, shouldn't works
         Token newToken = tokenHandler.createToken(user);
-        Event event2 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(7, ChronoUnit.DAYS), user));
+        Event event2 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(3, ChronoUnit.DAYS), user));
         UserEventDTO userEvent2 = new UserEventDTO(user.getUsername(),event2.getId());
         Throwable bindUserException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(userEvent2, newToken));
         assertThat(bindUserException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
