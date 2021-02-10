@@ -1,5 +1,6 @@
 package com.elis.registrocalcio.other;
 
+import com.elis.registrocalcio.model.general.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,16 +24,6 @@ public class EmailServiceImpl {
     private final String footer = "\n\nBuon divertimento,\n Registro calcio ELIS.\n\n" +
             "Email generata automaticamente, non rispondere a questa email, se hai bisogno di ulteriore supporto contatta uno degli incaricati.";
 
-
-    public void sendEmail(){
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo("ruggirello99@live.it");
-        message.setSubject("Test invio mail from springboot");
-        message.setText("Questo è il contenuto della mail");
-        mailSender.send(message);
-    }
-
     public void passwordRecovery(String userName, String userEmail ,String tempPassword){
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailFrom);
@@ -40,7 +31,7 @@ public class EmailServiceImpl {
         message.setSubject("Procedura recupero password");
         message.setText("Gentile " + userName + ", è stata avviata la procedura di recupero password per il tuo accont. \n" +
                 "La tua password è stata resettata, la tua attuale password è: " + tempPassword + ". \n" +
-                "Puoi scegliere se continuare ad utilizzare questa o cambiarla con una a tuo piacimento, nel caso tu volessi cambiarla recati nella schermata di login e clicca sul pulsante 'Cambia password' e inserisci i dati richiesti." +
+                "Puoi scegliere se continuare ad utilizzare questa o cambiarla con una a tuo piacimento, nel caso tu volessi cambiarla recati nel tuo profilo e seleziona 'Cambia password'." +
                 footer);
         mailSender.send(message);
     }
@@ -66,6 +57,16 @@ public class EmailServiceImpl {
         message.setSubject("Assegnazione team " + category + " "+ antDate);
         message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
                 " farai parte del " + team + " team!" + footer);
+        mailSender.send(message);
+    }
+
+    public void welcomeUser(User user){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(mailFrom);
+        message.setTo(user.getEmail());
+        message.setSubject("Registro calcio ELIS ti da il benvenuto");
+        message.setText("Ciao " + user.getName() + ", \n registro calcio ELIS è lieto di darti il benvenuto.\nIl tuo username per l'accesso al portale è : " + user.getUsername() + "." +
+                footer);
         mailSender.send(message);
     }
 

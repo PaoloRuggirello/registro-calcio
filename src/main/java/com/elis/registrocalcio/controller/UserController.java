@@ -55,7 +55,6 @@ public class UserController {
 
     @PostMapping("/authenticate")
     public Token authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        System.out.println(userToAuthenticate);
         if(!userHandler.validateLoginFields(userToAuthenticate.getUsername(), userToAuthenticate.getPassword()))// means that some fields are not ready for the login
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
@@ -66,7 +65,7 @@ public class UserController {
     @PostMapping("/logout")
     public String logout(@RequestHeader("Authorization") Token userToken){
         tokenHandler.deleteToken(userToken);
-        return "Successfully deleted token";
+        return "Successfully logged out";
     }
 
     @PostMapping("/register")
@@ -84,7 +83,7 @@ public class UserController {
         tokenHandler.checkIfAreTheSameUser(userToken, toBind.getPlayerUsername());
         User user = userHandler.findUserByUsernameCheckOptional(toBind.getPlayerUsername());
         Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
-        if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event)) // if there is less than 3 hours to the event or if the user is already registered to a valid event
+        if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event)) // if there is in less than 3 hours to the event or if the user is already registered to a valid event
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event);
         return new UserEventDTO(userEventHandler.save(bound));
@@ -144,20 +143,13 @@ public class UserController {
         return new UserDTO(updatedUser);
     }
 
-    @PostMapping("/changeNewsLetterStatus/{username}")
-    public String changeNewsLetter(@PathVariable("username") String username, @RequestHeader("Authorization") Token token){
-        tokenHandler.checkIfAreTheSameUser(token, username);
-        User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(username);
+    @PostMapping("/changeNewsLetterStatus/")
+    public String changeNewsLetter(@RequestHeader("Authorization") Token token){
+        SecurityToken securityToken = tokenHandler.checkToken(token);
+        User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(securityToken.getUsername());
         updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status
         userHandler.save(updateNewsLetter);
         return "Success";
-    }
-
-    @Autowired
-    SecurityTokenRepository securityTokenRepository;
-    @GetMapping("/findTokens")
-    public List<SecurityToken> findTokens(){
-        return securityTokenRepository.findAll();
     }
 
     @PostMapping("/passwordRecovery/{username}")

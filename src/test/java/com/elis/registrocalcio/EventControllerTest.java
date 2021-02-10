@@ -30,11 +30,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -73,7 +71,7 @@ public class EventControllerTest {
         userRepository.deleteAll();
     }
 
-    private String covertDate(Date current) throws ParseException {
+    private String convertDate(Date current) throws ParseException {
         return Utils.getFormatter().format(current);
     }
 
@@ -88,16 +86,11 @@ public class EventControllerTest {
         Token adminToken = tokenHandler.createToken(admin);
         Token tokenToUse = new Token();
 
-        EventDTO eventDTO = new EventDTO(Category.CALCIO_A_5.toString(), covertDate(new Date()), new UserDTO(user));
+        EventDTO eventDTO = new EventDTO(Category.CALCIO_A_5.toString(), convertDate(new Date()), new UserDTO(user));
 
         //Users can't create events
         tokenToUse.token = userToken.token;
         Throwable testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
-        assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
-
-        //ADMIN can't create events setting another user as creator
-        tokenToUse.token = userToken.token;
-        testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
         assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
 
         //Create event invalid date
@@ -108,14 +101,14 @@ public class EventControllerTest {
 
         //Create event correct date
         // -- adding hours to date
-        String threeHoursFromNow = covertDate(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)));
+        String threeHoursFromNow = convertDate(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)));
         tokenToUse.token = adminToken.token;
         eventDTO.date = threeHoursFromNow;
         testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
         assertThat(testException.getMessage(), containsString(FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString()));
 
         //Create correctly an event
-        String tomorrow = covertDate(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
+        String tomorrow = convertDate(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
         tokenToUse.token = adminToken.token;
         eventDTO.date = tomorrow;
         EventDTO createEventDTO = eventController.createEvent(eventDTO, tokenToUse);

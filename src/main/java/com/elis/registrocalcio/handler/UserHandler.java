@@ -59,7 +59,7 @@ public class UserHandler {
     public UserDTO createUserAndSave(UserDTO userToSave) throws InvalidKeySpecException, NoSuchAlgorithmException {
         setAvailableUsername(userToSave);
         userToSave.setPassword(passwordEncryption(userToSave.getPassword()));
-        save(new User(userToSave));
+        emailService.welcomeUser(save(new User(userToSave)));
         userToSave.setPassword(null);
         return userToSave;
     }
@@ -82,7 +82,8 @@ public class UserHandler {
         return validateEmail(userToValidate.getEmail()) &&
                 validateName(userToValidate.getName()) &&
                 validateSurname(userToValidate.getSurname()) &&
-                validateLoginFields(userToValidate.getUsername(), userToValidate.getPassword());
+                validateUsername(userToValidate.getUsername()) &&
+                validatePassword(userToValidate.getPassword());
     }
 
     private boolean validateUsername(String username){

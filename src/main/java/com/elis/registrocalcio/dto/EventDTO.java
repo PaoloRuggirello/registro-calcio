@@ -21,7 +21,7 @@ public class EventDTO {
 
     public EventDTO(Event event){
         this.id = event.getId();
-        this.date = event.getDate().toString();
+        this.date = Date.from(event.getDate()).toString();
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
@@ -32,7 +32,7 @@ public class EventDTO {
 
     public EventDTO(UserEvent userEvent){
         this.id = userEvent.getId();
-        this.date = userEvent.getEvent().getDate().toString();
+        this.date = Date.from(userEvent.getEvent().getDate()).toString();
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
         this.played = userEvent.getEvent().getPlayed();
