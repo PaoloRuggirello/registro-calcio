@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,7 +73,7 @@ public class EventControllerTest {
     }
 
     private String convertDate(Date current) throws ParseException {
-        return Utils.getFormatter().format(current);
+        return Utils.getCompleteDateFormatter().format(current);
     }
 
     @Test
@@ -200,13 +201,15 @@ public class EventControllerTest {
 
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin));
         List<User> players = new ArrayList<>();
-        players.add(new User("user.user1", "name", "surname", "1user@email.it", "password"));
-        players.add(new User("user.user2", "name", "surname", "2user@email.it", "password"));
-        players.add(new User("user.user3", "name", "surname", "3user@email.it", "password"));
-        players.add(new User("user.user4", "name", "surname", "4user@email.it", "password"));
-        players.add(new User("user.user5", "name", "surname", "5user@email.it", "password"));
-        players.add(new User("user.user6", "name", "surname", "6user@email.it", "password"));
+        players.add(new User("user.user1", "name1", "surname", "1user@email.it", "password"));
+        players.add(new User("user.user2", "name2", "surname", "2user@email.it", "password"));
+        players.add(new User("user.user3", "name3", "surname", "3user@email.it", "password"));
+        players.add(new User("user.user4", "name4", "surname", "4user@email.it", "password"));
+        players.add(new User("user.user5", "name5", "surname", "5user@email.it", "password"));
+        players.add(new User("user.user6", "name6", "surname", "6user@email.it", "password"));
         userRepository.saveAll(players);
+        List<UserEvent> userEventList = players.stream().map(player -> new UserEvent(player, event)).collect(Collectors.toList());
+        userEventRepository.saveAll(userEventList);
 
         //Check findEvend combined with findPlayers
         token.token = userToken.token;
@@ -218,6 +221,7 @@ public class EventControllerTest {
         assertThat(eventFromService.getCategory(), equalTo(Category.CALCIO_A_5.toString()));
         assertThat(eventFromService.getCreator().getUsername(), equalTo(admin.getUsername()));
         assertThat(eventFromService.getFreeSeats(), equalTo(Category.CALCIO_A_5.numberOfAllowedPlayers() - playersFromService.size()));
+        players.forEach( player -> assertTrue(playersFromService.stream().map(PlayerDTO::getName).collect(Collectors.toList()).contains(player.getName())));
     }
 
 

@@ -74,7 +74,7 @@ public class User implements Serializable {
         this.email = toRegister.getEmail();
         this.password = toRegister.getPassword();
         this.isActive = ObjectUtils.isEmpty(toRegister.isActive) || toRegister.isActive;
-        this.newsLetter = !ObjectUtils.isEmpty(toRegister.newsLetter) && toRegister.newsLetter; //If parameter not passed set newsLetter to false, otherwise set newsLetter as passed
+        this.newsLetter = !ObjectUtils.isEmpty(toRegister.newsletter) && toRegister.newsletter; //If parameter not passed set newsLetter to false, otherwise set newsLetter as passed
     }
 
     public Long getId() {

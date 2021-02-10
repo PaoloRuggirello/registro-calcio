@@ -1,10 +1,8 @@
 package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
-import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
-import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.Utils;
 import com.elis.registrocalcio.repository.general.EventRepository;
@@ -20,16 +18,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -49,7 +43,7 @@ public class EventHandler {
         return isAloneInDay(event);
     }
     public boolean areFieldsValid(EventDTO event){
-        return validateEventCategory(event.getCategory()) && validateDate(Utils.convertDate(event.getDate()));
+        return validateEventCategory(event.getCategory()) && validateDate(Utils.StringToInstantConverter(event.getDate()));
     }
 
     public Event findEventByIdCheckOptional(Long id){
@@ -69,7 +63,7 @@ public class EventHandler {
 
     private boolean isAloneInDay(EventDTO event) {
         boolean isEventAlone = true;
-        Instant date = Utils.convertDate(event.getDate());
+        Instant date = Utils.StringToInstantConverter(event.getDate());
         LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
         LocalDateTime nextDay = startDay.plusDays(1);
         Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();

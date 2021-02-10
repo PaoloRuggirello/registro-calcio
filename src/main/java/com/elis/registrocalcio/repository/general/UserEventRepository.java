@@ -22,6 +22,8 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     @Query("select ue.id from UserEvent ue where ue.user = :user and ue.event.played = false")
     List<Long> findUserEventByDeletingUser(User user);
 
+    boolean existsByUserAndId(User user, Long id);
+
     @Transactional
     @Modifying
     @Query("delete from UserEvent ue where ue.id in :userEventId")

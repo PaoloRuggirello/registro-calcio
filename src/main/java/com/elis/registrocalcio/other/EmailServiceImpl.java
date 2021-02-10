@@ -37,37 +37,49 @@ public class EmailServiceImpl {
     }
 
     public void comunicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
-        String antDate = getAndDate(eventDate);
-        String postDate = getPostDate(eventDate);
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo(convertMailList(mailList));
-        message.setSubject(category + " "+ antDate);
-        message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\n Dettagli: " +
-                category + " - " + antDate + " ore " + postDate + footer);
-        mailSender.send(message);
+        try {
+            String antDate = getAndDate(eventDate);
+            String postDate = getPostDate(eventDate);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
+            message.setTo(convertMailList(mailList));
+            message.setSubject(category + " " + antDate);
+            message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\n Dettagli: " +
+                    category + " - " + antDate + " ore " + postDate + footer);
+            mailSender.send(message);
+        }catch (Exception e ){
+            System.out.println("Cannot send email");
+        }
     }
 
     public void comunicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
-        String antDate = getAndDate(eventDate);
-        String postDate = getPostDate(eventDate);
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo(convertMailList(mailList));
-        message.setSubject("Assegnazione team " + category + " "+ antDate);
-        message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
-                " farai parte del " + team + " team!" + footer);
-        mailSender.send(message);
+        try{
+            String antDate = getAndDate(eventDate);
+            String postDate = getPostDate(eventDate);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
+            message.setTo(convertMailList(mailList));
+            message.setSubject("Assegnazione team " + category + " "+ antDate);
+            message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
+                    " farai parte del " + team + " team!" + footer);
+            mailSender.send(message);
+        }catch (Exception e ){
+            System.out.println("Cannot send email");
+        }
     }
 
     public void welcomeUser(User user){
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo(user.getEmail());
-        message.setSubject("Registro calcio ELIS ti da il benvenuto");
-        message.setText("Ciao " + user.getName() + ", \n registro calcio ELIS è lieto di darti il benvenuto.\nIl tuo username per l'accesso al portale è : " + user.getUsername() + "." +
-                footer);
-        mailSender.send(message);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
+            message.setTo(user.getEmail());
+            message.setSubject("Registro calcio ELIS ti dà il benvenuto");
+            message.setText("Ciao " + user.getName() + ", \n registro calcio ELIS è lieto di darti il benvenuto.\nIl tuo username per l'accesso al portale è: " + user.getUsername() + "." +
+                    footer);
+            mailSender.send(message);
+        }catch (Exception e ){
+            System.out.println("Cannot send email");
+        }
     }
 
     private String getAndDate(Instant eventDate){

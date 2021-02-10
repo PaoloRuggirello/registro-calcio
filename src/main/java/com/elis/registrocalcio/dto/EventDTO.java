@@ -2,6 +2,7 @@ package com.elis.registrocalcio.dto;
 
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.UserEvent;
+import com.elis.registrocalcio.other.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Date;
@@ -12,6 +13,7 @@ public class EventDTO {
     public Long id;
     public String category;
     public String date;
+    public String hour;
     public UserDTO creator;
     public Boolean played;
     public int freeSeats;
@@ -21,7 +23,8 @@ public class EventDTO {
 
     public EventDTO(Event event){
         this.id = event.getId();
-        this.date = Date.from(event.getDate()).toString();
+        this.date = Utils.getDateFromInstant(event.getDate());
+        this.hour = Utils.getHourFromInstant(event.getDate());
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
@@ -32,7 +35,8 @@ public class EventDTO {
 
     public EventDTO(UserEvent userEvent){
         this.id = userEvent.getId();
-        this.date = Date.from(userEvent.getEvent().getDate()).toString();
+        this.date = Utils.getDateFromInstant(userEvent.getEvent().getDate());
+        this.hour = Utils.getHourFromInstant(userEvent.getEvent().getDate());
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
         this.played = userEvent.getEvent().getPlayed();

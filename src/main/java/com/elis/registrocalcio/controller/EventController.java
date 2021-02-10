@@ -54,8 +54,13 @@ public class EventController {
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
         Event event = new Event(eventToCreate, creator);
-        eventHandler.newEventToNewsLetter(event);
-        return new EventDTO(eventRepository.save(event));
+        EventDTO toReturn = new EventDTO(eventRepository.save(event));
+        try{
+            eventHandler.newEventToNewsLetter(event);
+        }catch (Exception e) {
+            System.out.println("Cannot send email");
+        }
+        return toReturn;
     }
 
     @Transactional

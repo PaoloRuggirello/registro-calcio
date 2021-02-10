@@ -33,6 +33,7 @@ public class UserEventHandler {
     }
 
     public boolean isAlreadyRegistered(User user, Event toRegister) {
+        if(userEventRepository.existsByUserAndId(user, toRegister.getId())) return true; //Check if user is already registered to this event
         List<UserEvent> userEventList = userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(user); //Get all the events not played yet (ActiveEvent)
         if(userEventList.size() == 0)
             return false; //User haven't any registration

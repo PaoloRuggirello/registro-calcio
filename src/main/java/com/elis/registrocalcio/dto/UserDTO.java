@@ -13,7 +13,7 @@ public class UserDTO {
     public String role;
     public String email;
     public Boolean isActive;
-    public Boolean newsLetter;
+    public Boolean newsletter;
 
     public UserDTO() {
     }
@@ -91,12 +91,12 @@ public class UserDTO {
         isActive = active;
     }
 
-    public Boolean getNewsLetter() {
-        return newsLetter;
+    public Boolean getNewsletter() {
+        return newsletter;
     }
 
-    public void setNewsLetter(Boolean newsLetter) {
-        this.newsLetter = newsLetter;
+    public void setNewsletter(Boolean newsletter) {
+        this.newsletter = newsletter;
     }
 
     public void setFields(User user) {
@@ -106,7 +106,7 @@ public class UserDTO {
         this.role = user.getRole().toString();
         this.email = user.getEmail();
         this.isActive = user.getActive();
-        this.newsLetter = user.getNewsLetter();
+        this.newsletter = user.getNewsLetter();
     }
 
     public UserDTO withoutPassword(){

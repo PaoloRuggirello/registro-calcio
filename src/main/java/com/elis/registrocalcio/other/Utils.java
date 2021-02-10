@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -16,22 +17,30 @@ public class Utils {
 
     //Regex used to validate email address
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    public static final String datePattern = "dd/MM/yyyy";
+    public static final String hourPattern = "HH:mm";
+    private static SimpleDateFormat completeDateFormatter;
 
-    private static SimpleDateFormat formatter;
-
-    public static SimpleDateFormat getFormatter(){
-        if(formatter == null){
-            formatter = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+    public static SimpleDateFormat getCompleteDateFormatter(){
+        if(completeDateFormatter == null){
+            completeDateFormatter = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
         }
-        return formatter;
+        return completeDateFormatter;
     }
 
-    public static Instant convertDate(String date){
+    public static Instant StringToInstantConverter(String date){
         try{
-            return Utils.getFormatter().parse(date).toInstant();
+            return Utils.getCompleteDateFormatter().parse(date).toInstant();
         } catch (Exception e ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
         }
+    }
+
+    public static String getDateFromInstant(Instant date){
+        return new SimpleDateFormat(datePattern).format(Date.from(date));
+    }
+    public static String getHourFromInstant(Instant date){
+        return new SimpleDateFormat(hourPattern).format(Date.from(date));
     }
 
     public static boolean areInTheSameWeek(Instant date1, Instant date2){ //Date2 is Always after date1

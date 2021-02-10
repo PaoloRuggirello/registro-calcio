@@ -19,7 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -52,7 +51,7 @@ public class Event implements Serializable {
 
     public Event(EventDTO eventDTO, User creator){
         this.category = Category.getCategoryFromString(eventDTO.getCategory());
-        this.date = Utils.convertDate(eventDTO.getDate());
+        this.date = Utils.StringToInstantConverter(eventDTO.getDate());
         this.creator = creator;
         this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
