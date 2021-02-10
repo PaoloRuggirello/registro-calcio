@@ -4,6 +4,7 @@ import com.elis.registrocalcio.model.general.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +25,7 @@ public class EmailServiceImpl {
     private final String footer = "\n\nBuon divertimento,\n Registro calcio ELIS.\n\n" +
             "Email generata automaticamente, non rispondere a questa email, se hai bisogno di ulteriore supporto contatta uno degli incaricati.";
 
+    @Async
     public void passwordRecovery(String userName, String userEmail ,String tempPassword){
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailFrom);
@@ -36,6 +38,7 @@ public class EmailServiceImpl {
         mailSender.send(message);
     }
 
+    @Async
     public void comunicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
         try {
             String antDate = getAndDate(eventDate);
@@ -52,6 +55,7 @@ public class EmailServiceImpl {
         }
     }
 
+    @Async
     public void comunicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
         try{
             String antDate = getAndDate(eventDate);
@@ -68,6 +72,7 @@ public class EmailServiceImpl {
         }
     }
 
+    @Async
     public void welcomeUser(User user){
         try {
             SimpleMailMessage message = new SimpleMailMessage();
