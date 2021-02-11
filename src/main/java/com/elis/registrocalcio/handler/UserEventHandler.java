@@ -77,4 +77,8 @@ public class UserEventHandler {
         if(mailList.size() > 0)
             emailService.comunicateTeamToMailList(mailList, team.toString(), category.toString(), eventDate);
     }
+
+    public List<Event> findEventsSubscribedByUser(String username){
+        return userEventRepository.findEventsSubscribedByUser(username);
+    }
 }

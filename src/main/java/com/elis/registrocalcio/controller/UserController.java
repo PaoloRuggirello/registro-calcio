@@ -15,7 +15,6 @@ import com.elis.registrocalcio.handler.EventHandler;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.model.security.SecurityToken;
-import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -78,11 +77,12 @@ public class UserController {
         return "Successfully created user";
     }
 
-    @PostMapping("/bindWithEvent")
-    public UserEventDTO bindUserAndEvent(@RequestBody UserEventDTO toBind, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkIfAreTheSameUser(userToken, toBind.getPlayerUsername());
-        User user = userHandler.findUserByUsernameCheckOptional(toBind.getPlayerUsername());
-        Event event = eventHandler.findEventByIdCheckOptional(toBind.getEventId());
+    @Transactional
+    @PostMapping("/bindWithEvent/{eventId}")
+    public UserEventDTO bindUserAndEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
+        String username = tokenHandler.checkToken(userToken).getUsername();
+        User user = userHandler.findUserByUsernameCheckOptional(username);
+        Event event = eventHandler.findEventByIdCheckOptional(eventId);
         if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event)) // if there is in less than 3 hours to the event or if the user is already registered to a valid event
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event);
@@ -90,13 +90,14 @@ public class UserController {
     }
 
     @Transactional
-    @PostMapping("/removeFromEvent/{username}/{eventId}")
-    public void removeBinding(@PathVariable("username")String username, @PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkIfAreTheSameUser(userToken, username);
+    @PostMapping("/removeFromEvent/{eventId}")
+    public String removeBinding(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
+        String username = tokenHandler.checkToken(userToken).getUsername();
         User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
         if(event.getPlayed() || Instant.now().plus(3, ChronoUnit.HOURS).isAfter(event.getDate())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_REMOVE_BINDING.toString()); //Cannot remove binding if event is in less than 3 hours or played yet
         userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
+        return "Success";
     }
 
     @Transactional
@@ -121,7 +122,7 @@ public class UserController {
         return new UserDTO(userHandler.findUserByUsernameCheckOptional(token.getUsername()));
     }
 
-    @GetMapping("/findBoundEvents/{username}")
+    @GetMapping("/findBoundEvents/{username}") //TODO doplicated remove
     public List<EventDTO> findBoundEvents(@PathVariable("username")String username, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkIfAreTheSameUser(userToken, username);
         return userEventHandler.findByUser(userHandler.findUserByUsernameCheckOptional(username)).stream().map(EventDTO::new).collect(Collectors.toList());
@@ -166,6 +167,12 @@ public class UserController {
         user.get().setPassword(userHandler.passwordEncryption(changePasswordDTO.newPassword)); //Setting new password
         userHandler.save(user.get());
         return "Success";
+    }
+
+    @GetMapping("/findSubscribed")
+    public List<EventDTO> findSubscribed(@RequestHeader("Authorization") Token userToken){
+        String username = tokenHandler.checkToken(userToken).getUsername();
+        return userEventHandler.findEventsSubscribedByUser(username).stream().map(EventDTO::new).collect(Collectors.toList());
     }
 
 
