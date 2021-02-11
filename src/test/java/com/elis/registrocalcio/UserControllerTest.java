@@ -169,14 +169,14 @@ public class UserControllerTest {
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.HOURS), correctUser));
         Token userToken = tokenHandler.createToken(correctUser);
         UserEventDTO userEventDTO = new UserEventDTO(wrongBindUser.getUsername(), event.getId());
-        Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(userEventDTO, userToken), FootballRegisterException.PERMISSION_DENIED.toString());
+        Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event.getId(), userToken), FootballRegisterException.PERMISSION_DENIED.toString());
         assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
 
 
         //Try to register to event that will be played in less than 3 hours
         UserEventDTO correctDTO = new UserEventDTO(correctUser.getUsername(), event.getId());
         Token newToken = tokenHandler.createToken(correctUser);
-        testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(correctDTO, newToken), FootballRegisterException.CANNOT_REGISTER_USER.toString());
+        testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event.getId(), newToken), FootballRegisterException.CANNOT_REGISTER_USER.toString());
         assertThat(testException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
     }
 
@@ -190,13 +190,13 @@ public class UserControllerTest {
 
         //Register user in event
         UserEventDTO correctDTO = new UserEventDTO(user.getUsername(), event1.getId());
-        assertNotNull(userController.bindUserAndEvent(correctDTO, userToken));
+        assertNotNull(userController.bindUserAndEvent(event1.getId(), userToken));
 
         //Try to register to another event, shouldn't works
         Token newToken = tokenHandler.createToken(user);
         Event event2 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(3, ChronoUnit.DAYS), user));
         UserEventDTO userEvent2 = new UserEventDTO(user.getUsername(),event2.getId());
-        Throwable bindUserException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(userEvent2, newToken));
+        Throwable bindUserException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event2.getId(), newToken));
         assertThat(bindUserException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
 
 
@@ -204,7 +204,7 @@ public class UserControllerTest {
         Token token3 = tokenHandler.createToken(user);
         Event event3 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(7, ChronoUnit.HOURS), user));
         UserEventDTO userEvent3 = new UserEventDTO(user.getUsername(),event3.getId());
-        assertNotNull(userController.bindUserAndEvent(userEvent3, token3));
+        assertNotNull(userController.bindUserAndEvent(event3.getId(), token3));
 
         //Check how many
         Token token4 = tokenHandler.createToken(user);
@@ -224,7 +224,7 @@ public class UserControllerTest {
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), user));
         Token userToken = tokenHandler.createToken(user);
         UserEventDTO correctDTO = new UserEventDTO(user.getUsername(), event.getId());
-        assertNotNull(userController.bindUserAndEvent(correctDTO, userToken));
+        assertNotNull(userController.bindUserAndEvent(event.getId(), userToken));
 
         //Check if binding recorded
         List<UserEvent> registeredEvents = userEventRepository.findByUser(user);
@@ -234,7 +234,7 @@ public class UserControllerTest {
 
         //Removing binding
         userToken = tokenHandler.createToken(user);
-        userController.removeBinding(user.getUsername(), event.getId(), userToken);
+        userController.removeBinding(event.getId(), userToken);
 
         //Check if DB is now empty
         registeredEvents = userEventRepository.findByUser(user);

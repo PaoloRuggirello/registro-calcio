@@ -13,6 +13,8 @@ import com.elis.registrocalcio.repository.general.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +27,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EventHandler {
@@ -84,8 +87,10 @@ public class EventHandler {
     public List<Event> findAll(){
         return eventRepository.findAll();
     }
-    public List<Event> findActiveEvents(){
-        return eventRepository.findAllByPlayedIsFalse();
+    public List<Event> findActiveEvents(String username){
+        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username).stream().map(Event::getId).collect(Collectors.toList());
+        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc();
+        return eventRepository.findByIdNotIn(subscribedEvents);
     }
     public List<Event> findPastEvents(){
         return eventRepository.findAllByPlayedIsTrue();
@@ -102,6 +107,11 @@ public class EventHandler {
         List<String> mailList = userRepository.findNewsLetter();
         if(mailList.size() > 0)
             emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
+    }
 
+    @Scheduled(fixedRate = 3600000) //Method called each hour
+    private void updateEventsStatus(){
+        eventRepository.updateEvents(Instant.now());
+        System.out.println("Events updated successfully");
     }
 }

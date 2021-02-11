@@ -1,7 +1,10 @@
 package com.elis.registrocalcio.other;
 
 
+import com.elis.registrocalcio.enumPackage.FootballRegisterException;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.Base64Utils;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -30,9 +33,8 @@ public class EncryptionUtils {
             cipher.init(Cipher.DECRYPT_MODE, getKey());
             return new String(cipher.doFinal(Base64Utils.decodeFromString(toDecrypt)));
         } catch (Exception e){
-            System.out.println("Cannot decrypt message");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_TOKEN.toString());
         }
-        return null;
     }
 
     private static Key getKey() throws NoSuchAlgorithmException {

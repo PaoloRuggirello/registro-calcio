@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -83,9 +84,10 @@ public class EventController {
     }
     @GetMapping("/findActive")
     public List<EventDTO> findActiveEvents(@RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken);
-        return eventHandler.findActiveEvents().stream().map(EventDTO::new).collect(Collectors.toList());
+        String username = tokenHandler.checkToken(userToken).getUsername();
+        return eventHandler.findActiveEvents(username).stream().map(EventDTO::new).collect(Collectors.toList());
     }
+
     @GetMapping("/findPast")
     public List<EventDTO> findPastEvents(@RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
@@ -98,7 +100,7 @@ public class EventController {
     }
 
     @PostMapping("/setTeam/{eventId}")
-    public String setTeam(@PathVariable("eventId") Long eventId, @RequestBody List<String> blackTeam, @RequestBody List<String> whiteTeam, @RequestHeader("Authorization") Token token){
+    public String setTeam(@PathVariable("eventId") Long eventId, @RequestParam("blackTeam") List<String> blackTeam, @RequestParam("whiteTeam") List<String> whiteTeam, @RequestHeader("Authorization") Token token){
         tokenHandler.checkToken(token, Role.ADMIN);
         if(blackTeam.size() != whiteTeam.size())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_TEAM_SIZE.toString());

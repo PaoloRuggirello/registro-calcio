@@ -13,7 +13,7 @@ public class CleanTokenDB {
     @Autowired
     SecurityTokenRepository securityTokenRepository;
 
-    @Scheduled(fixedRate = 900000)
+    @Scheduled(fixedRate = 900000) //Time in ms
     public void cleanTokenDB(){
         securityTokenRepository.deleteAllByExpirationDateIsBefore(Instant.now());
     }
