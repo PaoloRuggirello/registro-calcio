@@ -30,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class EventController {
     public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN);
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
-        if(toDelete.getPlayed()) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_DELETE_PLAYED_EVENTS.toString());
+        if(toDelete.getPlayed() || toDelete.getDate().isBefore(Instant.now())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_DELETE_PLAYED_EVENTS.toString());
         EventDTO toDeleteEvent = new EventDTO(toDelete);
         userEventHandler.deleteByEvent(toDelete);
         eventHandler.delete(toDelete);

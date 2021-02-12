@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.controller;
 
 import com.elis.registrocalcio.dto.ChangePasswordDTO;
+import com.elis.registrocalcio.dto.LoginDTO;
 import com.elis.registrocalcio.dto.Token;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
@@ -55,12 +56,12 @@ public class UserController {
 
 
     @PostMapping("/authenticate")
-    public Token authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public LoginDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         if(!userHandler.validateLoginFields(userToAuthenticate.getUsername(), userToAuthenticate.getPassword()))// means that some fields are not ready for the login
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
         System.out.println(checkedUser);
-        return checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.AUTHENTICATION_FAILED.toString()));
+        return new LoginDTO(checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.AUTHENTICATION_FAILED.toString())), checkedUser.get().getRole().toString());
     }
 
     @PostMapping("/logout")
@@ -146,8 +147,8 @@ public class UserController {
         return new UserDTO(updatedUser);
     }
 
-    @PostMapping("/changeNewsLetterStatus/")
-    public ResponseEntity<String> changeNewsLetter(@RequestHeader("Authorization") Token token){
+    @PostMapping("/changeNewsletterStatus/")
+    public ResponseEntity<String> changeNewsletter(@RequestHeader("Authorization") Token token){
         SecurityToken securityToken = tokenHandler.checkToken(token);
         User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(securityToken.getUsername());
         updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status
