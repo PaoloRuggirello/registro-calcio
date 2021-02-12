@@ -1,7 +1,7 @@
 package com.elis.registrocalcio.dto;
 
-import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.model.general.User;
+import com.elis.registrocalcio.model.general.UserEvent;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -9,15 +9,16 @@ public class PlayerDTO {
     public String username;
     public String name;
     public String surname;
-    public Team team;
+    public String team;
 
     public PlayerDTO() {
     }
 
-    public PlayerDTO(User player) {
-        this.username = player.getUsername();
-        this.name = player.getName();
-        this.surname = player.getSurname();
+    public PlayerDTO(UserEvent player) {
+        this.username = player.getUser().getUsername();
+        this.name = player.getUser().getName();
+        this.surname = player.getUser().getSurname();
+        this.team = (player.getTeam() != null) ? player.getTeam().toString() : null;
     }
 
     public String getUsername() {
@@ -44,11 +45,11 @@ public class PlayerDTO {
         this.surname = surname;
     }
 
-    public Team getTeam() {
+    public String getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(String team) {
         this.team = team;
     }
 }

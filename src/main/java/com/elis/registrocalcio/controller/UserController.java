@@ -15,6 +15,7 @@ import com.elis.registrocalcio.handler.EventHandler;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.model.security.SecurityToken;
+import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,19 +64,19 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public String logout(@RequestHeader("Authorization") Token userToken){
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") Token userToken){
         tokenHandler.deleteToken(userToken);
-        return "Successfully logged out";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody UserDTO userToRegister) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public ResponseEntity<String> registerUser(@RequestBody UserDTO userToRegister) throws InvalidKeySpecException, NoSuchAlgorithmException {
         if(!userHandler.validateRegistrationFields(userToRegister))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
         if(userHandler.checkIfPresentByEmail(userToRegister.getEmail()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.EMAIL_ALREADY_EXIST.toString());
         userHandler.createUserAndSave(userToRegister);
-        return "Successfully created user";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Transactional
@@ -92,13 +93,13 @@ public class UserController {
 
     @Transactional
     @PostMapping("/removeFromEvent/{eventId}")
-    public String removeBinding(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
+    public ResponseEntity<String> removeBinding(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         String username = tokenHandler.checkToken(userToken).getUsername();
         User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
         if(event.getPlayed() || Instant.now().plus(3, ChronoUnit.HOURS).isAfter(event.getDate())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_REMOVE_BINDING.toString()); //Cannot remove binding if event is in less than 3 hours or played yet
         userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
-        return "Success";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Transactional
@@ -146,27 +147,34 @@ public class UserController {
     }
 
     @PostMapping("/changeNewsLetterStatus/")
-    public String changeNewsLetter(@RequestHeader("Authorization") Token token){
+    public ResponseEntity<String> changeNewsLetter(@RequestHeader("Authorization") Token token){
         SecurityToken securityToken = tokenHandler.checkToken(token);
         User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(securityToken.getUsername());
         updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status
         userHandler.save(updateNewsLetter);
-        return "Success";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/passwordRecovery/{username}")
-    public String passwordRecovery(@PathVariable("username") String username) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public ResponseEntity<String> passwordRecovery(@PathVariable("username") String username) throws InvalidKeySpecException, NoSuchAlgorithmException {
         User user = userHandler.findUserByUsernameCheckOptional(username);
         userHandler.passwordRecoveryProcedure(user);
-        return "Success";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/changePassword")
-    public String changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) throws InvalidKeySpecException, NoSuchAlgorithmException {
         Optional<User> user = userHandler.checkUserCredentials(changePasswordDTO.username, changePasswordDTO.currentPassword);
         if(user.isEmpty() || !userHandler.validatePassword(changePasswordDTO.newPassword)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString()); //User not found or bad credentials
         user.get().setPassword(userHandler.passwordEncryption(changePasswordDTO.newPassword)); //Setting new password
         userHandler.save(user.get());
-        return "Success";
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Autowired
+    SecurityTokenRepository securityTokenRepository;
+    @GetMapping("/findTokens")
+    public List<SecurityToken> findTokens(){
+        return securityTokenRepository.findAll();
     }
 }

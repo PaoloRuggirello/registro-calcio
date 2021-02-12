@@ -1,12 +1,8 @@
-# Stage 1
 FROM node:12.15-alpine as build
 RUN mkdir -p /app
 WORKDIR /app
 COPY package.json /app
 RUN npm install
+RUN npm install -g @angular/cli@9.1.6
 COPY ./ /app/
-RUN npm run build -- --output-path=./dist/out
-
-#Stage 2
-FROM nginx:1.19.6-alpine
-COPY --from=build /app/dist/out /usr/share/nginx/html
+CMD ng serve --host 0.0.0.0

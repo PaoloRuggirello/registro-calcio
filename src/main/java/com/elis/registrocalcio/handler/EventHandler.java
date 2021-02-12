@@ -3,6 +3,7 @@ package com.elis.registrocalcio.handler;
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
+import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.EventRepository;
@@ -12,6 +13,7 @@ import com.elis.registrocalcio.repository.general.UserEventRepository;
 import com.elis.registrocalcio.repository.general.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,8 @@ public class EventHandler {
     EmailServiceImpl emailService;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    EventHandler eventHandler;
 
     public boolean isEventValid(EventDTO event) throws SQLIntegrityConstraintViolationException {
         if(!areFieldsValid(event))
@@ -90,7 +94,7 @@ public class EventHandler {
     }
 
     public List<Event> findActiveEvents(String username){
-        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username).stream().map(Event::getId).collect(Collectors.toList());
+            List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username).stream().map(Event::getId).collect(Collectors.toList());
         if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc();
         return eventRepository.findByIdNotIn(subscribedEvents);
     }
@@ -98,8 +102,9 @@ public class EventHandler {
         return eventRepository.findAllByPlayedIsTrue();
     }
 
-    public List<User> findEventPlayers(Long eventId){
-        return userEventRepository.findPlayersOfEvent(eventId);
+    public List<UserEvent> findEventPlayers(Long eventId){
+        int maxPlayers = eventHandler.findEventByIdCheckOptional(eventId).getCategory().numberOfAllowedPlayers();
+        return userEventRepository.findPlayersOfEvent(eventId, PageRequest.of(0, maxPlayers));
     }
 
     /**

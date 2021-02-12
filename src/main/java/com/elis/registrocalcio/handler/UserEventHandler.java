@@ -8,8 +8,10 @@ import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.DateUtils;
+import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,6 +29,8 @@ public class UserEventHandler {
     private UserEventRepository userEventRepository;
     @Autowired
     private EmailServiceImpl emailService;
+    @Autowired
+    private EventHandler eventHandler;
 
     public UserEvent save(UserEvent userEvent) {
         return userEventRepository.save(userEvent);
@@ -64,7 +68,8 @@ public class UserEventHandler {
         List<String> allPlayers = new ArrayList<>();
         allPlayers.addAll(team1);
         allPlayers.addAll(team2);
-        int foundPlayers = userEventRepository.countByEventIdAndUsernameIn(eventId, allPlayers);
+        int maxPlayers = eventHandler.findEventByIdCheckOptional(eventId).getCategory().numberOfAllowedPlayers();
+        int foundPlayers = userEventRepository.eventPlayers(eventId, PageRequest.of(0, maxPlayers)).size();
         if(foundPlayers != team1.size() + team2.size())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_PLAYERS_ERROR.toString());
     }

@@ -72,10 +72,6 @@ public class EventControllerTest {
         userRepository.deleteAll();
     }
 
-    private String convertDate(Date current) throws ParseException {
-        return DateUtils.getCompleteDateFormatter().format(current);
-    }
-
     @Test
     public void createEventTest() throws InvalidKeySpecException, NoSuchAlgorithmException, SQLIntegrityConstraintViolationException, ParseException {
         User user = new User("user.user", "name", "surname", "user@email.it", userHandler.passwordEncryption("password"));
@@ -253,6 +249,10 @@ public class EventControllerTest {
         assertThat(eventsFromDB.get(0).getTeam(), equalTo(Team.BLACK));
         assertNotNull(eventsFromDB.get(1).getTeam());
         assertThat(eventsFromDB.get(1).getTeam(), equalTo(Team.WHITE));
+    }
+
+    private String convertDate(Date current){
+        return DateUtils.getCompleteDateFormatter().format(current);
     }
 
 }

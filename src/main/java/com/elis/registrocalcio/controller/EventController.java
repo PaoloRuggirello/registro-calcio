@@ -16,6 +16,7 @@ import com.elis.registrocalcio.handler.EventHandler;
 import com.elis.registrocalcio.model.general.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,13 +101,13 @@ public class EventController {
     }
 
     @PostMapping("/setTeam/{eventId}")
-    public String setTeam(@PathVariable("eventId") Long eventId, @RequestParam("blackTeam") List<String> blackTeam, @RequestParam("whiteTeam") List<String> whiteTeam, @RequestHeader("Authorization") Token token){
+    public ResponseEntity<String> setTeam(@PathVariable("eventId") Long eventId, @RequestParam("blackTeam") List<String> blackTeam, @RequestParam("whiteTeam") List<String> whiteTeam, @RequestHeader("Authorization") Token token){
         tokenHandler.checkToken(token, Role.ADMIN);
         if(blackTeam.size() != whiteTeam.size())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_TEAM_SIZE.toString());
         userEventHandler.verifyPlayers(eventId, blackTeam, whiteTeam);
         userEventHandler.setTeam(eventId, blackTeam, Team.BLACK);
         userEventHandler.setTeam(eventId, whiteTeam, Team.WHITE);
-        return "Success";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
