@@ -76,7 +76,6 @@ public class TokenHandler {
 
     private Instant newExpirationDate(){
         return Instant.now().plus(15, ChronoUnit.MINUTES);
-//        return Instant.now();
     }
 
     public void save(SecurityToken securityToken){

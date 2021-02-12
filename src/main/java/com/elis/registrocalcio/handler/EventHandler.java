@@ -4,7 +4,7 @@ import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.other.EmailServiceImpl;
-import com.elis.registrocalcio.other.Utils;
+import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,8 +44,9 @@ public class EventHandler {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
         return isAloneInDay(event);
     }
+
     public boolean areFieldsValid(EventDTO event){
-        return validateEventCategory(event.getCategory()) && validateDate(Utils.StringToInstantConverter(event.getDate()));
+        return validateEventCategory(event.getCategory()) && validateDate(DateUtils.StringToInstantConverter(event.getDate()));
     }
 
     public Event findEventByIdCheckOptional(Long id){
@@ -59,6 +59,7 @@ public class EventHandler {
     private boolean validateEventCategory(String category){
         return !StringUtils.isBlank(category) && !ObjectUtils.isEmpty(Category.getCategoryFromString(category));
     }
+
     private boolean validateDate(Instant date){
         Instant endOfToday = LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneId.of("UTC")).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
         return !ObjectUtils.isEmpty(date) && endOfToday.isBefore(date); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
@@ -66,7 +67,7 @@ public class EventHandler {
 
     private boolean isAloneInDay(EventDTO event) {
         boolean isEventAlone = true;
-        Instant date = Utils.StringToInstantConverter(event.getDate());
+        Instant date = DateUtils.StringToInstantConverter(event.getDate());
         LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
         LocalDateTime nextDay = startDay.plusDays(1);
         Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();
@@ -87,6 +88,7 @@ public class EventHandler {
     public List<Event> findAll(){
         return eventRepository.findAll();
     }
+
     public List<Event> findActiveEvents(String username){
         List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username).stream().map(Event::getId).collect(Collectors.toList());
         if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc();
@@ -95,6 +97,7 @@ public class EventHandler {
     public List<Event> findPastEvents(){
         return eventRepository.findAllByPlayedIsTrue();
     }
+
     public List<User> findEventPlayers(Long eventId){
         return userEventRepository.findPlayersOfEvent(eventId);
     }

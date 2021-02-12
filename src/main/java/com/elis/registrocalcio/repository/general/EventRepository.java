@@ -15,7 +15,6 @@ public interface EventRepository extends JpaRepository <Event, Long> {
     @Query("select e from Event e where e.date >= :day and e.date < :nextDay")
     List<Event> findEventInSameDateByDay(Instant day, Instant nextDay);
 
-    //TODO sistemare query
     @Query("select e from Event e where e.id not in :ids and e.played = false order by e.date asc")
     List<Event> findByIdNotIn(List<Long> ids);
 

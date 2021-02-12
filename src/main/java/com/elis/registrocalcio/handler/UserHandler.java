@@ -7,7 +7,7 @@ import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.PasswordHash;
-import com.elis.registrocalcio.other.Utils;
+import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,19 +89,23 @@ public class UserHandler {
     private boolean validateUsername(String username){
         return !StringUtils.isBlank(username);
     }
+
     public boolean validatePassword(String password){
         return !(password == null);
     }
+
     private boolean validateName(String name){
         return !StringUtils.isBlank(name);
     }
+
     private boolean validateSurname(String surname){
         return !StringUtils.isBlank(surname);
     }
+
     private boolean validateEmail(String email){
         if(StringUtils.isBlank(email))
             return false;
-        Matcher matcher = Utils.VALID_EMAIL_ADDRESS_REGEX.matcher(email);
+        Matcher matcher = DateUtils.VALID_EMAIL_ADDRESS_REGEX.matcher(email);
         return matcher.find();
     }
 
@@ -112,9 +116,6 @@ public class UserHandler {
      */
     public boolean checkIfPresentByEmail(String email){
         return userRepository.findByEmailAndIsActiveIsTrue(email).isPresent();
-    }
-    public Optional<User> findByEmail(String email){
-        return userRepository.findByEmailAndIsActiveIsTrue(email);
     }
 
     public String passwordEncryption(String password) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -131,7 +132,6 @@ public class UserHandler {
         if(userOptional.isPresent()){
             User user = userOptional.get();
             if(PasswordHash.validatePassword(password, user.getPassword()))
-//            if(user.getPassword().equals(toAuthenticate.getPassword()))
                 return userOptional;
         }
         return Optional.empty();

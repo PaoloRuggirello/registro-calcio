@@ -14,7 +14,7 @@ import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
-import com.elis.registrocalcio.other.Utils;
+import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.EventRepository;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import com.elis.registrocalcio.repository.general.UserRepository;
@@ -73,7 +73,7 @@ public class EventControllerTest {
     }
 
     private String convertDate(Date current) throws ParseException {
-        return Utils.getCompleteDateFormatter().format(current);
+        return DateUtils.getCompleteDateFormatter().format(current);
     }
 
     @Test

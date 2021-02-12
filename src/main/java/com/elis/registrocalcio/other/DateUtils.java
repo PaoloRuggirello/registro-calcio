@@ -13,9 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-public class Utils {
-
-    //Regex used to validate email address
+public class DateUtils {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static final String datePattern = "dd/MM/yyyy";
     public static final String hourPattern = "HH:mm";
@@ -30,7 +28,7 @@ public class Utils {
 
     public static Instant StringToInstantConverter(String date){
         try{
-            return Utils.getCompleteDateFormatter().parse(date).toInstant();
+            return DateUtils.getCompleteDateFormatter().parse(date).toInstant();
         } catch (Exception e ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
         }

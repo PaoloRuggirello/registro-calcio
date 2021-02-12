@@ -161,7 +161,7 @@ public class UserControllerTest {
 
     @Test
     public void bindUserWithEvent_general() throws InvalidKeySpecException, NoSuchAlgorithmException {
-        //Try to bind not me to the event
+        //Try to register to event that starts in less than 3 hours
         User wrongBindUser = new User("wrong", "wrongName", "wrongSurname", "wrong@email.it", userHandler.passwordEncryption("wrong-password"));
         User correctUser = new User("correct", "correctName", "correctSurname", "correct@email.it", userHandler.passwordEncryption("correct-password"));
         userRepository.save(wrongBindUser);
@@ -170,7 +170,7 @@ public class UserControllerTest {
         Token userToken = tokenHandler.createToken(correctUser);
         UserEventDTO userEventDTO = new UserEventDTO(wrongBindUser.getUsername(), event.getId());
         Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event.getId(), userToken), FootballRegisterException.PERMISSION_DENIED.toString());
-        assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
+        assertThat(testException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
 
 
         //Try to register to event that will be played in less than 3 hours
@@ -185,7 +185,7 @@ public class UserControllerTest {
         //Try to bind not me to the event
         User user = new User("user", "userName", "userSurname", "user@email.it", userHandler.passwordEncryption("user-password"));
         userRepository.save(user);
-        Event event1 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), user));
+        Event event1 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(4, ChronoUnit.DAYS), user));
         Token userToken = tokenHandler.createToken(user);
 
         //Register user in event
@@ -194,7 +194,7 @@ public class UserControllerTest {
 
         //Try to register to another event, shouldn't works
         Token newToken = tokenHandler.createToken(user);
-        Event event2 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(3, ChronoUnit.DAYS), user));
+        Event event2 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(5, ChronoUnit.DAYS), user));
         UserEventDTO userEvent2 = new UserEventDTO(user.getUsername(),event2.getId());
         Throwable bindUserException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event2.getId(), newToken));
         assertThat(bindUserException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
@@ -209,7 +209,7 @@ public class UserControllerTest {
         //Check how many
         Token token4 = tokenHandler.createToken(user);
         List<Long> registeredUserEvents = userEventRepository.findByUser(user).stream().map(userEvent -> userEvent.getEvent().getId()).collect(Collectors.toList());
-        List<EventDTO> registeredEventsDTO = userController.findBoundEvents(user.getUsername(), token4);
+        List<EventDTO> registeredEventsDTO = userController.findSubscribed(token4);
         assertEquals(registeredUserEvents.size(), 2);
         assertThat(registeredUserEvents.size(), equalTo(registeredEventsDTO.size()));
         assertTrue(registeredUserEvents.contains(event1.getId()));
@@ -303,7 +303,7 @@ public class UserControllerTest {
         userRepository.save(admin);
         Token adminToken = tokenHandler.createToken(admin);
 
-        UserDTO userFromController = userController.findUser(adminToken);
+        UserDTO userFromController = userController.findUserInfo(adminToken);
         assertEquals(admin.getUsername(), userFromController.getUsername());
         assertEquals(admin.getEmail(), userFromController.getEmail());
         assertEquals(admin.getName(), userFromController.getName());

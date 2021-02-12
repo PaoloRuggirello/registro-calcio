@@ -7,7 +7,7 @@ import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
-import com.elis.registrocalcio.other.Utils;
+import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ public class UserEventHandler {
         if(userEventList.size() == 0)
             return false; //User haven't any registration
         UserEvent lastRegistered = userEventList.get(0); //List sorted by date desc, the first element is the last registration time
-        if(!Utils.areInTheSameWeek(lastRegistered.getEvent().getDate(), toRegister.getDate()))
+        if(!DateUtils.areInTheSameWeek(lastRegistered.getEvent().getDate(), toRegister.getDate()))
             return false; //If events aren't in the same week user can be registered to eachOther
         Instant today = Instant.now();
         Instant nowPlus48Hours = today.plus(2, ChronoUnit.DAYS);
@@ -51,6 +51,7 @@ public class UserEventHandler {
     public void deleteByEvent(Event event){
         userEventRepository.deleteByEvent(event);
     }
+
     public void deleteByUserAndEvent(User toDelete, Event event){
         userEventRepository.deleteByUserAndEvent(toDelete, event);
     }
@@ -67,6 +68,7 @@ public class UserEventHandler {
         if(foundPlayers != team1.size() + team2.size())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_PLAYERS_ERROR.toString());
     }
+
     public void setTeam(Long eventId, List<String> users, Team team){
         List<UserEvent> players = userEventRepository.findByEventIdAndUsernameIn(eventId, users);
         players.forEach(player -> player.setTeam(team));

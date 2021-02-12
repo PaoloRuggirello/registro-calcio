@@ -17,6 +17,7 @@ import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.model.security.SecurityToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -117,15 +118,15 @@ public class UserController {
     }
 
     @GetMapping("/findInfo")
-    public UserDTO findUser( @RequestHeader("Authorization") Token userToken){
+    public UserDTO findUserInfo(@RequestHeader("Authorization") Token userToken){
         SecurityToken token = tokenHandler.checkToken(userToken);
         return new UserDTO(userHandler.findUserByUsernameCheckOptional(token.getUsername()));
     }
 
-    @GetMapping("/findBoundEvents/{username}") //TODO doplicated remove
-    public List<EventDTO> findBoundEvents(@PathVariable("username")String username, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkIfAreTheSameUser(userToken, username);
-        return userEventHandler.findByUser(userHandler.findUserByUsernameCheckOptional(username)).stream().map(EventDTO::new).collect(Collectors.toList());
+    @GetMapping("/findSubscribed")
+    public List<EventDTO> findSubscribed(@RequestHeader("Authorization") Token userToken){
+        String username = tokenHandler.checkToken(userToken).getUsername();
+        return userEventHandler.findEventsSubscribedByUser(username).stream().map(EventDTO::new).collect(Collectors.toList());
     }
 
     @GetMapping("/credits")
@@ -163,17 +164,9 @@ public class UserController {
     @PostMapping("/changePassword")
     public String changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) throws InvalidKeySpecException, NoSuchAlgorithmException {
         Optional<User> user = userHandler.checkUserCredentials(changePasswordDTO.username, changePasswordDTO.currentPassword);
-        if(user.isEmpty() || !userHandler.validatePassword(changePasswordDTO.newPassword)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString()); //User not found or bad
+        if(user.isEmpty() || !userHandler.validatePassword(changePasswordDTO.newPassword)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString()); //User not found or bad credentials
         user.get().setPassword(userHandler.passwordEncryption(changePasswordDTO.newPassword)); //Setting new password
         userHandler.save(user.get());
         return "Success";
     }
-
-    @GetMapping("/findSubscribed")
-    public List<EventDTO> findSubscribed(@RequestHeader("Authorization") Token userToken){
-        String username = tokenHandler.checkToken(userToken).getUsername();
-        return userEventHandler.findEventsSubscribedByUser(username).stream().map(EventDTO::new).collect(Collectors.toList());
-    }
-
-
 }

@@ -8,7 +8,7 @@ import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.security.SecurityToken;
 import com.elis.registrocalcio.other.EmailServiceImpl;
-import com.elis.registrocalcio.other.Utils;
+import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.UserRepository;
 import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
 import org.junit.jupiter.api.Assertions;
@@ -83,12 +83,12 @@ class RegistroCalcioApplicationTests {
 		Instant date3 = formatter.parse(date3S).toInstant();
 		Instant date4 = formatter.parse(date4S).toInstant();
 
-		Assertions.assertTrue(Utils.areInTheSameWeek(date1, date2));
-		Assertions.assertFalse(Utils.areInTheSameWeek(date1, date3));
-		Assertions.assertFalse(Utils.areInTheSameWeek(date1, date4));
-		Assertions.assertFalse(Utils.areInTheSameWeek(date2, date3));
-		Assertions.assertFalse(Utils.areInTheSameWeek(date2, date4));
-		Assertions.assertFalse(Utils.areInTheSameWeek(date3, date4));
+		Assertions.assertTrue(DateUtils.areInTheSameWeek(date1, date2));
+		Assertions.assertFalse(DateUtils.areInTheSameWeek(date1, date3));
+		Assertions.assertFalse(DateUtils.areInTheSameWeek(date1, date4));
+		Assertions.assertFalse(DateUtils.areInTheSameWeek(date2, date3));
+		Assertions.assertFalse(DateUtils.areInTheSameWeek(date2, date4));
+		Assertions.assertFalse(DateUtils.areInTheSameWeek(date3, date4));
 
 	}
 }
