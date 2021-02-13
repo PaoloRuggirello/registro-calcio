@@ -8,7 +8,7 @@ services:
     volumes:
       - './docker/db/data:/var/lib/prod/mysql'
     environment:
-      TZ: UTC
+      TZ: Europe/Rome
       MYSQL_ROOT_HOST: '%'
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: registro_calcio
@@ -16,7 +16,7 @@ services:
       MYSQL_PASSWORD: mysql
     ports:
       - 55500:3306
-    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=UTC']
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=+01:00']
 
   registro-calcio-backend:
     build: ../
