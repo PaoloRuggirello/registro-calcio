@@ -2,8 +2,7 @@ version: '3'
 services:
 
   database:
-#    image: library/mysql:latest
-    build: mysql
+    image: library/mysql:latest
     restart: always
     container_name: database
     volumes:
@@ -17,6 +16,7 @@ services:
       MYSQL_PASSWORD: mysql
     ports:
       - 55500:3306
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=UTC']
 
   registro-calcio-backend:
     build: ../
