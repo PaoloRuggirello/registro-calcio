@@ -2,7 +2,8 @@ version: '3'
 services:
 
   database:
-    image: library/mysql:latest
+#    image: library/mysql:latest
+    build: mysql
     restart: always
     container_name: database
     volumes:
