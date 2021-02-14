@@ -26,7 +26,7 @@ public class EventDTO {
     public EventDTO(Event event){
         this.id = event.getId();
         this.date = DateUtils.getDateFromInstant(event.getDate());
-        this.hour = DateUtils.getHourFromInstant(event.getDate().plus(2, ChronoUnit.HOURS));
+        this.hour = DateUtils.getHourFromInstant(event.getDate());
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
@@ -38,7 +38,7 @@ public class EventDTO {
     public EventDTO(UserEvent userEvent){
         this.id = userEvent.getId();
         this.date = DateUtils.getDateFromInstant(userEvent.getEvent().getDate());
-        this.hour = DateUtils.getHourFromInstant(userEvent.getEvent().getDate().plus(1, ChronoUnit.HOURS));
+        this.hour = DateUtils.getHourFromInstant(userEvent.getEvent().getDate());
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
         this.played = userEvent.getEvent().getPlayed();
