@@ -56,7 +56,6 @@ public class EventController {
         User creator = userHandler.findUserByUsernameCheckOptional(token.getUsername());
         if(!eventHandler.isEventValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
-        System.out.println("Date : " + eventToCreate.getDate());
         Event event = new Event(eventToCreate, creator);
         EventDTO toReturn = new EventDTO(eventRepository.save(event));
         eventHandler.newEventToNewsLetter(event);
