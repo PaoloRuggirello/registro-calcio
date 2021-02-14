@@ -5,6 +5,8 @@ import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.DateUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,7 +26,7 @@ public class EventDTO {
     public EventDTO(Event event){
         this.id = event.getId();
         this.date = DateUtils.getDateFromInstant(event.getDate());
-        this.hour = DateUtils.getHourFromInstant(event.getDate());
+        this.hour = DateUtils.getHourFromInstant(event.getDate().plus(1, ChronoUnit.HOURS));
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getPlayed();
