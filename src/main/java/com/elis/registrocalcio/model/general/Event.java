@@ -19,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class Event implements Serializable {
 
     public Event(EventDTO eventDTO, User creator){
         this.category = Category.getCategoryFromString(eventDTO.getCategory());
-        this.date = DateUtils.StringToInstantConverter(eventDTO.getDate()).plus(1, ChronoUnit.HOURS);
+        this.date = DateUtils.StringToInstantConverter(eventDTO.getDate());
         this.creator = creator;
         this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }

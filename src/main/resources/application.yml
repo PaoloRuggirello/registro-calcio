@@ -8,7 +8,7 @@ spring:
       ddl-auto: create
       dialect: org.hibernate.dialect.HSQLDialect
   datasource:
-    jdbcUrl: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=UTC
+    jdbcUrl: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=GMT+2
     username: mysql
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver

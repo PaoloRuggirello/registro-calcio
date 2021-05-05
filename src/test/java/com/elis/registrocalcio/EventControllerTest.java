@@ -31,6 +31,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -70,6 +70,16 @@ public class EventControllerTest {
         userEventRepository.deleteAll();
         eventRepository.deleteAll();
         userRepository.deleteAll();
+    }
+
+    @Test
+    public void testInstantFunctions(){
+        Instant date = Instant.now();
+        Instant startDay = date.truncatedTo(ChronoUnit.DAYS);
+        Instant nextDay = startDay.plus(1l, ChronoUnit.DAYS);
+        Instant now = Instant.now();
+        System.out.println(now);
+        DateUtils.getHourFromInstant(now);
     }
 
     @Test

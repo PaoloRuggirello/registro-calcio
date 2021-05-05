@@ -6,7 +6,7 @@ import com.elis.registrocalcio.other.DateUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneId;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

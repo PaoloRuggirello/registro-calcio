@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class EventHandler {
     @Autowired
     EventHandler eventHandler;
 
-    public boolean isEventValid(EventDTO event) throws SQLIntegrityConstraintViolationException {
+    public boolean isEventValid(EventDTO event) {
         if(!areFieldsValid(event))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
         return isAloneInDay(event);
@@ -65,18 +66,21 @@ public class EventHandler {
     }
 
     private boolean validateDate(Instant date){
-        Instant endOfToday = LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneId.of("UTC")).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
+//        Instant endOfToday = LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneId.of("UTC")).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
+        Instant endOfToday = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
         return !ObjectUtils.isEmpty(date) && endOfToday.isBefore(date); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
     }
 
     private boolean isAloneInDay(EventDTO event) {
         boolean isEventAlone = true;
         Instant date = DateUtils.StringToInstantConverter(event.getDate());
-        LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
-        LocalDateTime nextDay = startDay.plusDays(1);
-        Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();
-        Instant nextDayAsInstant = nextDay.atZone(ZoneId.of("UTC")).toInstant();
-        List<Event> eventsInDay = eventRepository.findEventInSameDateByDay(startDayAsInstant, nextDayAsInstant);
+        Instant startDay = date.truncatedTo(ChronoUnit.DAYS);
+        Instant nextDay = startDay.plus(1l, ChronoUnit.DAYS);
+//        LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
+//        LocalDateTime nextDay = startDay.plusDays(1);
+//        Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();
+//        Instant nextDayAsInstant = nextDay.atZone(ZoneId.of("UTC")).toInstant();
+        List<Event> eventsInDay = eventRepository.findEventInSameDateByDay(startDay, nextDay);
         for (Event eventInDB : eventsInDay)
             if(eventInDB.getCategory().equals(Category.getCategoryFromString(event.getCategory()))){
                 isEventAlone = false;
