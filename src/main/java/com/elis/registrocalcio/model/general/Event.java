@@ -19,8 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Entity
@@ -36,6 +34,9 @@ public class Event implements Serializable {
 
     @Column(nullable = false)
     private Instant date;
+
+    @Column
+    private Integer hourOfFreePeriod = 24;
 
     @ManyToOne
     @JoinColumn(name = "creator", nullable = false)
@@ -54,9 +55,11 @@ public class Event implements Serializable {
     public Event(EventDTO eventDTO, User creator){
         this.category = Category.getCategoryFromString(eventDTO.getCategory());
         this.date = DateUtils.StringToInstantConverter(eventDTO.getDate());
+        this.hourOfFreePeriod = eventDTO.getHourOfFreePeriod();
         this.creator = creator;
         this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
+
     public Event(Category category, Instant date, User creator){
         this.category = category;
         this.date = date;
@@ -116,6 +119,14 @@ public class Event implements Serializable {
 
     public void setPlayed(Boolean played) {
         this.played = played;
+    }
+
+    public Integer getHourOfFreePeriod() {
+        return hourOfFreePeriod;
+    }
+
+    public void setHourOfFreePeriod(Integer freePeriodStart) {
+        this.hourOfFreePeriod = freePeriodStart;
     }
 
     @Override

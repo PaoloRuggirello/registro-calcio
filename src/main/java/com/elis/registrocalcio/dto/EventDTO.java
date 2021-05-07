@@ -6,7 +6,7 @@ import com.elis.registrocalcio.other.DateUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,6 +18,7 @@ public class EventDTO {
     public String hour;
     public UserDTO creator;
     public Boolean played;
+    public int hourOfFreePeriod;
     public int freeSeats;
 
     public EventDTO() {
@@ -27,9 +28,10 @@ public class EventDTO {
         this.id = event.getId();
         this.date = DateUtils.getDateFromInstant(event.getDate());
         this.hour = DateUtils.getHourFromInstant(event.getDate());
+        this.hourOfFreePeriod = event.getHourOfFreePeriod();
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
-        this.played = event.getPlayed();
+        this.played = event.getDate().isBefore(Instant.now());
         int players = event.getPlayers() != null ? event.getPlayers().size() : 0;
         int totalSeats = event.getCategory().numberOfAllowedPlayers();
         this.freeSeats = totalSeats > players ? totalSeats - players : 0;
@@ -41,7 +43,7 @@ public class EventDTO {
         this.hour = DateUtils.getHourFromInstant(userEvent.getEvent().getDate());
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
-        this.played = userEvent.getEvent().getPlayed();
+        this.played = userEvent.getEvent().getDate().isBefore(Instant.now());
     }
     public EventDTO(String category, String date, UserDTO creator){
         this.category = category;
@@ -95,6 +97,14 @@ public class EventDTO {
 
     public void setFreeSeats(int freeSeats) {
         this.freeSeats = freeSeats;
+    }
+
+    public int getHourOfFreePeriod() {
+        return hourOfFreePeriod;
+    }
+
+    public void setHourOfFreePeriod(int hourOfFreePeriod) {
+        this.hourOfFreePeriod = hourOfFreePeriod;
     }
 
     @Override

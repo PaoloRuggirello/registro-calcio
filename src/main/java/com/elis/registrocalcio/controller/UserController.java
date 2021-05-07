@@ -35,7 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -86,7 +85,8 @@ public class UserController {
         String username = tokenHandler.checkToken(userToken).getUsername();
         User user = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
-        if(event.getDate().plus(-3, ChronoUnit.HOURS).isBefore(new Date().toInstant()) || userEventHandler.isAlreadyRegistered(user,event)) // if there is in less than 3 hours to the event or if the user is already registered to a valid event
+        Instant startOfFreePeriod = event.getDate().minus(event.getHourOfFreePeriod(), ChronoUnit.HOURS);
+       if(userEventHandler.isAlreadyRegistered(user,event) && startOfFreePeriod.isAfter(Instant.now())) //User has active events and free period not started
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event);
         return new UserEventDTO(userEventHandler.save(bound));

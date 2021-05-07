@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,11 +50,11 @@ public class EventController {
     TokenHandler tokenHandler;
 
     @PostMapping("/create")
-    public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestHeader("Authorization") Token userToken) throws SQLIntegrityConstraintViolationException {
+    public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestHeader("Authorization") Token userToken) {
         SecurityToken token = tokenHandler.checkToken(userToken, Role.ADMIN);
         User creator = userHandler.findUserByUsernameCheckOptional(token.getUsername());
-        if(!eventHandler.isEventValid(eventToCreate))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString());
+        if(!eventHandler.areFieldsValid(eventToCreate))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
         Event event = new Event(eventToCreate, creator);
         EventDTO toReturn = new EventDTO(eventRepository.save(event));
         eventHandler.newEventToNewsLetter(event);
@@ -104,7 +103,7 @@ public class EventController {
     @PostMapping("/setTeam/{eventId}")
     public ResponseEntity<String> setTeam(@PathVariable("eventId") Long eventId, @RequestParam("blackTeam") List<String> blackTeam, @RequestParam("whiteTeam") List<String> whiteTeam, @RequestHeader("Authorization") Token token){
         tokenHandler.checkToken(token, Role.ADMIN);
-        if(blackTeam.size() != whiteTeam.size())
+        if(!eventHandler.isTeamsSizeValid(blackTeam.size(), whiteTeam.size()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_TEAM_SIZE.toString());
         userEventHandler.verifyPlayers(eventId, blackTeam, whiteTeam);
         userEventHandler.setTeam(eventId, blackTeam, Team.BLACK);

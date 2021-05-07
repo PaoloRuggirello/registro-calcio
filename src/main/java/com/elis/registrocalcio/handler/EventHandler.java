@@ -2,7 +2,6 @@ package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
-import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.DateUtils;
@@ -20,13 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,11 +37,9 @@ public class EventHandler {
     @Autowired
     EventHandler eventHandler;
 
-    public boolean isEventValid(EventDTO event) {
-        if(!areFieldsValid(event))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
-        return isAloneInDay(event);
-    }
+//    public boolean isEventValid(EventDTO event) {
+//        return areFieldsValid(event);
+//    }
 
     public boolean areFieldsValid(EventDTO event){
         return validateEventCategory(event.getCategory()) && validateDate(DateUtils.StringToInstantConverter(event.getDate()));
@@ -66,28 +57,23 @@ public class EventHandler {
     }
 
     private boolean validateDate(Instant date){
-//        Instant endOfToday = LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneId.of("UTC")).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant();
-        Instant endOfToday = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
-        return !ObjectUtils.isEmpty(date) && endOfToday.isBefore(date); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
+//        Instant endOfToday = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS); // Can't create event in the givenDay, admin should do that almost 1 DAY before the event
+        return !ObjectUtils.isEmpty(date) && Instant.now().isBefore(date);
     }
 
-    private boolean isAloneInDay(EventDTO event) {
-        boolean isEventAlone = true;
-        Instant date = DateUtils.StringToInstantConverter(event.getDate());
-        Instant startDay = date.truncatedTo(ChronoUnit.DAYS);
-        Instant nextDay = startDay.plus(1l, ChronoUnit.DAYS);
-//        LocalDateTime startDay = LocalDate.ofInstant(date, ZoneId.of("UTC")).atStartOfDay();
-//        LocalDateTime nextDay = startDay.plusDays(1);
-//        Instant startDayAsInstant = startDay.atZone(ZoneId.of("UTC")).toInstant();
-//        Instant nextDayAsInstant = nextDay.atZone(ZoneId.of("UTC")).toInstant();
-        List<Event> eventsInDay = eventRepository.findEventInSameDateByDay(startDay, nextDay);
-        for (Event eventInDB : eventsInDay)
-            if(eventInDB.getCategory().equals(Category.getCategoryFromString(event.getCategory()))){
-                isEventAlone = false;
-                break;
-            }
-        return isEventAlone;
-    }
+//    private boolean isAloneInDay(EventDTO event) {
+//        boolean isEventAlone = true;
+//        Instant date = DateUtils.StringToInstantConverter(event.getDate());
+//        Instant startDay = date.truncatedTo(ChronoUnit.DAYS);
+//        Instant nextDay = startDay.plus(1l, ChronoUnit.DAYS);
+//        List<Event> eventsInDay = eventRepository.findEventInSameDateByDay(startDay, nextDay);
+//        for (Event eventInDB : eventsInDay)
+//            if(eventInDB.getCategory().equals(Category.getCategoryFromString(event.getCategory()))){
+//                isEventAlone = false;
+//                break;
+//            }
+//        return isEventAlone;
+//    }
 
     public void delete(Event event){
         eventRepository.delete(event);
@@ -109,6 +95,13 @@ public class EventHandler {
     public List<UserEvent> findEventPlayers(Long eventId){
         int maxPlayers = eventHandler.findEventByIdCheckOptional(eventId).getCategory().numberOfAllowedPlayers();
         return userEventRepository.findPlayersOfEvent(eventId, PageRequest.of(0, maxPlayers));
+    }
+
+    public boolean isTeamsSizeValid(int team1, int team2){
+        int major = Math.max(team1, team2);
+        int minor = Math.min(team1, team2);
+        if( major <= minor + 1) return true; //Teams can have at least one player of difference
+        return false;
     }
 
     /**

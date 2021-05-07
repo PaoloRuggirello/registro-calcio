@@ -181,6 +181,24 @@ public class UserControllerTest {
     }
 
     @Test
+    public void bindUserWithEvent() throws InvalidKeySpecException, NoSuchAlgorithmException {
+        //Try to register to event that starts in less than 3 hours
+        User wrongBindUser = new User("wrong", "wrongName", "wrongSurname", "wrong@email.it", userHandler.passwordEncryption("wrong-password"));
+        User correctUser = new User("correct", "correctName", "correctSurname", "correct@email.it", userHandler.passwordEncryption("correct-password"));
+        userRepository.save(wrongBindUser);
+        userRepository.save(correctUser);
+        Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.HOURS), correctUser));
+        Event notRegistrable = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(25, ChronoUnit.HOURS), correctUser));
+        Event registrable = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(20, ChronoUnit.HOURS), correctUser));
+//        Token userToken = tokenHandler.createToken(correctUser);
+        userController.bindUserAndEvent(event.getId(), tokenHandler.createToken(correctUser));
+        userController.bindUserAndEvent(registrable.getId(), tokenHandler.createToken(correctUser));
+        Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(notRegistrable.getId(), tokenHandler.createToken(correctUser)), FootballRegisterException.PERMISSION_DENIED.toString());
+        assertThat(testException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
+
+    }
+
+    @Test
     public void bindUserWithEvent_alreadyRegisteredToValidEvent() throws InvalidKeySpecException, NoSuchAlgorithmException {
         //Try to bind not me to the event
         User user = new User("user", "userName", "userSurname", "user@email.it", userHandler.passwordEncryption("user-password"));
