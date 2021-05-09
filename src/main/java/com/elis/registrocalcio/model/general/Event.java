@@ -56,12 +56,8 @@ public class Event implements Serializable {
     }
 
     public Event(EventDTO eventDTO, User creator){
-        this.category = Category.getCategoryFromString(eventDTO.getCategory());
-        this.date = DateUtils.StringToInstantConverter(eventDTO.getDate());
-        this.hourOfFreePeriod = eventDTO.getHourOfFreePeriod();
-        this.hourOfNoDeleteZone = eventDTO.getHourOfNoDeleteZone();
+        updateFieldsFromDTO(eventDTO);
         this.creator = creator;
-        this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
 
     public Event(Category category, Instant date, User creator){
@@ -75,6 +71,14 @@ public class Event implements Serializable {
         this.date = date;
         this.creator = creator;
         this.played = played;
+    }
+
+    public void updateFieldsFromDTO(EventDTO eventDTO){
+        this.category = Category.getCategoryFromString(eventDTO.getCategory());
+        this.date = DateUtils.StringToInstantConverter(eventDTO.getDate());
+        this.hourOfFreePeriod = eventDTO.getHourOfFreePeriod();
+        this.hourOfNoDeleteZone = eventDTO.getHourOfNoDeleteZone();
+        this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
 
     public Long getId() {

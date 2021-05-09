@@ -44,8 +44,6 @@ public class EventController {
     @Autowired
     EventHandler eventHandler;
     @Autowired
-    EventRepository eventRepository;
-    @Autowired
     UserEventHandler userEventHandler;
     @Autowired
     TokenHandler tokenHandler;
@@ -57,7 +55,7 @@ public class EventController {
         if(!eventHandler.areFieldsValid(eventToCreate))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
         Event event = new Event(eventToCreate, creator);
-        EventDTO toReturn = new EventDTO(eventRepository.save(event));
+        EventDTO toReturn = new EventDTO(eventHandler.save(event));
         eventHandler.newEventToNewsLetter(event);
         return toReturn;
     }
@@ -72,6 +70,15 @@ public class EventController {
         userEventHandler.deleteByEvent(toDelete);
         eventHandler.delete(toDelete);
         return toDeleteEvent;
+    }
+
+    @PostMapping("/modify")
+    public ResponseEntity<String> modifyEvent(@RequestBody EventDTO modifiedEvent, @RequestHeader("Authorization") Token userToken){
+        tokenHandler.checkToken(userToken, Role.ADMIN);
+        Event toModify = eventHandler.findEventByIdCheckOptional(modifiedEvent.getId());
+        toModify.updateFieldsFromDTO(modifiedEvent);
+        eventHandler.save(toModify);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/find")

@@ -261,6 +261,32 @@ public class EventControllerTest {
         assertThat(eventsFromDB.get(1).getTeam(), equalTo(Team.WHITE));
     }
 
+    @Test
+    public void testModifyEvent(){
+        User admin = new User("admin.admin", "name", "surname", "admin@email.it", "password");
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
+
+        EventDTO event = new EventDTO(Category.CALCIO_A_11.toString(), convertDate(Date.from(Instant.now().plus(3, ChronoUnit.DAYS))), new UserDTO(admin));
+        eventController.createEvent(event, tokenHandler.createToken(admin));
+
+        List<Event> allEvents = eventRepository.findAll();
+        assertThat(allEvents, hasSize(1));
+        assertThat(allEvents.get(0).getCategory(), equalTo(Category.CALCIO_A_11));
+        assertTrue(allEvents.get(0).getDate().isAfter(Instant.now()));
+
+        event.setCategory(Category.CALCIO_A_5.toString());
+        event.setDate(convertDate(Date.from(Instant.now().minus(3, ChronoUnit.DAYS))));
+        event.setId(allEvents.get(0).getId());
+
+        eventController.modifyEvent(event, tokenHandler.createToken(admin));
+        allEvents = eventRepository.findAll();
+        assertThat(allEvents, hasSize(1));
+        assertThat(allEvents.get(0).getCategory(), equalTo(Category.CALCIO_A_5));
+        assertTrue(allEvents.get(0).getDate().isBefore(Instant.now()));
+
+    }
+
     private String convertDate(Date current){
         return DateUtils.getCompleteDateFormatter().format(current);
     }

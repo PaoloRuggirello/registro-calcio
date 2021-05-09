@@ -81,8 +81,8 @@ public class EventDTO {
         return this.date;
     }
 
-    public void setDate(Date date) {
-        this.date = date.toString();
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public Boolean getPlayed() {

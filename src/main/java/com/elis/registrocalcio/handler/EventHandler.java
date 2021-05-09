@@ -104,6 +104,10 @@ public class EventHandler {
         return false;
     }
 
+    public Event save(Event event){
+        return eventRepository.save(event);
+    }
+
     /**
      * This method send an email to each user that want to now the creation of a new Event
      * @param event
