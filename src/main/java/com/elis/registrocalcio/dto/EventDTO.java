@@ -19,6 +19,7 @@ public class EventDTO {
     public UserDTO creator;
     public Boolean played;
     public int hourOfFreePeriod;
+    public int hourOfNoDeleteZone;
     public int freeSeats;
 
     public EventDTO() {
@@ -29,6 +30,7 @@ public class EventDTO {
         this.date = DateUtils.getDateFromInstant(event.getDate());
         this.hour = DateUtils.getHourFromInstant(event.getDate());
         this.hourOfFreePeriod = event.getHourOfFreePeriod();
+        this.hourOfNoDeleteZone = event.getHourOfNoDeleteZone();
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
         this.played = event.getDate().isBefore(Instant.now());
@@ -105,6 +107,14 @@ public class EventDTO {
 
     public void setHourOfFreePeriod(int hourOfFreePeriod) {
         this.hourOfFreePeriod = hourOfFreePeriod;
+    }
+
+    public int getHourOfNoDeleteZone() {
+        return hourOfNoDeleteZone;
+    }
+
+    public void setHourOfNoDeleteZone(int hourOfNoDeleteZone) {
+        this.hourOfNoDeleteZone = hourOfNoDeleteZone;
     }
 
     @Override

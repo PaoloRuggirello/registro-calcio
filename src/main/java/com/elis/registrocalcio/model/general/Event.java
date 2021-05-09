@@ -38,6 +38,9 @@ public class Event implements Serializable {
     @Column
     private Integer hourOfFreePeriod = 24;
 
+    @Column
+    private Integer hourOfNoDeleteZone = 6;
+
     @ManyToOne
     @JoinColumn(name = "creator", nullable = false)
     private User creator;
@@ -56,6 +59,7 @@ public class Event implements Serializable {
         this.category = Category.getCategoryFromString(eventDTO.getCategory());
         this.date = DateUtils.StringToInstantConverter(eventDTO.getDate());
         this.hourOfFreePeriod = eventDTO.getHourOfFreePeriod();
+        this.hourOfNoDeleteZone = eventDTO.getHourOfNoDeleteZone();
         this.creator = creator;
         this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
@@ -127,6 +131,14 @@ public class Event implements Serializable {
 
     public void setHourOfFreePeriod(Integer freePeriodStart) {
         this.hourOfFreePeriod = freePeriodStart;
+    }
+
+    public Integer getHourOfNoDeleteZone() {
+        return hourOfNoDeleteZone;
+    }
+
+    public void setHourOfNoDeleteZone(Integer hourOfNoDeleteZone) {
+        this.hourOfNoDeleteZone = hourOfNoDeleteZone;
     }
 
     @Override

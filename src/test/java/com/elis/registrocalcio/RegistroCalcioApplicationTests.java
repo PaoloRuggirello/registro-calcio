@@ -42,7 +42,7 @@ class RegistroCalcioApplicationTests {
 
 	@Test
 	public void cryptPassword() throws InvalidKeySpecException, NoSuchAlgorithmException {
-		String password = "user";
+		String password = "test";
 		String passwordEncrypted = userHandler.passwordEncryption(password);
 		System.out.println(passwordEncrypted);
 	}

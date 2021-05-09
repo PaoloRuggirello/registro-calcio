@@ -252,7 +252,7 @@ public class UserControllerTest {
 
         //Removing binding
         userToken = tokenHandler.createToken(user);
-        userController.removeBinding(event.getId(), userToken);
+        userController.removeBinding(event.getId(),user.getUsername(), userToken);
 
         //Check if DB is now empty
         registeredEvents = userEventRepository.findByUser(user);

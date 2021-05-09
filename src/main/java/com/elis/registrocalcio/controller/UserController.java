@@ -93,12 +93,15 @@ public class UserController {
     }
 
     @Transactional
-    @PostMapping("/removeFromEvent/{eventId}")
-    public ResponseEntity<String> removeBinding(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
-        String username = tokenHandler.checkToken(userToken).getUsername();
+    @PostMapping("/removeFromEvent/{eventId}/{username}")
+    public ResponseEntity<String> removeBinding(@PathVariable("eventId") Long eventId, @PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
+        SecurityToken token = tokenHandler.checkToken(userToken);
+        if(token.getRole().equals(Role.USER) && !token.getUsername().equals(username)) { //If a user is trying to delete another user from the match
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.PERMISSION_DENIED.toString());
+        }
         User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
-        if(event.getPlayed() || Instant.now().plus(3, ChronoUnit.HOURS).isAfter(event.getDate())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_REMOVE_BINDING.toString()); //Cannot remove binding if event is in less than 3 hours or played yet
+        if(event.getPlayed() || (token.getRole().equals(Role.USER) && Instant.now().plus(event.getHourOfNoDeleteZone(), ChronoUnit.HOURS).isAfter(event.getDate()))) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_REMOVE_BINDING.toString()); //Cannot remove binding if event is in less than 3 hours or played yet
         userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
         return new ResponseEntity<>(HttpStatus.OK);
     }
