@@ -72,6 +72,13 @@ class RegistroCalcioApplicationTests {
 	}
 
 	@Test
+	public void testDateConversion(){
+//		DateUtils.StringToInstantConverter("2021-05-26T20:44:14.000Z");
+		Instant date = Instant.parse("2021-05-26T20:44:14.000Z");
+		System.out.println(date);
+	}
+
+	@Test
 	public void chekSameWeek() throws ParseException {
 		String date1S = "Wed Feb 12 23:01:48 GMT 2021";
 		String date2S = "Wed Feb 09 23:01:48 GMT 2021";

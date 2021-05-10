@@ -33,8 +33,12 @@ public class DateUtils {
     public static Instant StringToInstantConverter(String date){
         try{
             return DateUtils.getCompleteDateFormatter().parse(date).toInstant();
-        } catch (Exception e ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
+        } catch (Exception e){
+            try{
+                return Instant.parse(date);
+            }catch (Exception e1){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
+            }
         }
     }
 
