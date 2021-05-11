@@ -86,7 +86,7 @@ public class UserController {
         User user = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
         Instant startOfFreePeriod = event.getDate().minus(event.getHourOfFreePeriod(), ChronoUnit.HOURS);
-       if(userEventHandler.isAlreadyRegistered(user,event) && startOfFreePeriod.isAfter(Instant.now())) //User has active events and free period not started
+       if(userEventHandler.isAlreadyRegistered(user,event) || (userEventHandler.hasActiveEvents(user)) && startOfFreePeriod.isAfter(Instant.now())) //User has active events and free period not started
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
         UserEvent bound = new UserEvent(user, event);
         return new UserEventDTO(userEventHandler.save(bound));

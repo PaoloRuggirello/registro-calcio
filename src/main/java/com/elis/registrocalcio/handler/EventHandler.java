@@ -84,7 +84,7 @@ public class EventHandler {
     }
 
     public List<Event> findActiveEvents(String username){
-            List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now()).stream().map(Event::getId).collect(Collectors.toList());
+        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now()).stream().map(Event::getId).collect(Collectors.toList());
         if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc(Instant.now());
         return eventRepository.findByIdNotIn(subscribedEvents, Instant.now());
     }

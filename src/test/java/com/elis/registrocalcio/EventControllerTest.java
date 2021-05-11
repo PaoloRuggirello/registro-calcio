@@ -110,8 +110,9 @@ public class EventControllerTest {
         String threeHoursFromNow = convertDate(Date.from(Instant.now().plus(3, ChronoUnit.HOURS)));
         tokenToUse.token = adminToken.token;
         eventDTO.date = threeHoursFromNow;
-        testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
-        assertThat(testException.getMessage(), containsString(FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString()));
+        assertNotNull(eventController.createEvent(eventDTO, tokenToUse));
+//        testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
+//        assertThat(testException.getMessage(), containsString(FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString()));
 
         //Create correctly an event
         String tomorrow = convertDate(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
@@ -123,8 +124,9 @@ public class EventControllerTest {
 
         //Try to create another event of the same category in the same day
         tokenToUse.token = adminToken.token;
-        testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
-        assertThat(testException.getMessage(), containsString(FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString()));
+        assertNotNull(eventController.createEvent(eventDTO, tokenToUse));
+//        testException = assertThrows(ResponseStatusException.class, () -> eventController.createEvent(eventDTO, tokenToUse));
+//        assertThat(testException.getMessage(), containsString(FootballRegisterException.EVENT_ALREADY_EXIST_IN_THE_GIVEN_DAY.toString()));
 
         //Try to create event of another category in the same day, should works
         eventDTO.category = Category.CALCIO_A_7.toString();
@@ -132,7 +134,7 @@ public class EventControllerTest {
         EventDTO calcioA7 = eventController.createEvent(eventDTO, tokenToUse);
         assertTrue(eventRepository.findById(calcioA7.id).isPresent());
         assertThat(eventRepository.findById(calcioA7.id).get().getCategory().toString(), equalTo(eventDTO.getCategory()));
-        assertThat(eventRepository.findAll(), Matchers.hasSize(2));
+        assertThat(eventRepository.findAll(), Matchers.hasSize(4));
     }
 
     @Test
@@ -181,18 +183,17 @@ public class EventControllerTest {
         //GetActiveEvents
         token.token = userToken.token;
         eventsFromDB = eventController.findActiveEvents(token);
-        assertThat(eventsFromDB, hasSize(3));
+        assertThat(eventsFromDB, hasSize(4));
         assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_5.toString())).collect(Collectors.toList()), hasSize(1));
         assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_7.toString())).collect(Collectors.toList()), hasSize(1));
-        assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_11.toString())).collect(Collectors.toList()), hasSize(1));
+        assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_11.toString())).collect(Collectors.toList()), hasSize(2));
 
         //GetPastEvents
         token.token = userToken.token;
         eventsFromDB = eventController.findPastEvents(token);
-        assertThat(eventsFromDB, hasSize(3));
+        assertThat(eventsFromDB, hasSize(2));
         assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_5.toString())).collect(Collectors.toList()), hasSize(1));
         assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_7.toString())).collect(Collectors.toList()), hasSize(1));
-        assertThat(eventsFromDB.stream().filter(eventDTO -> eventDTO.getCategory().equals(Category.CALCIO_A_11.toString())).collect(Collectors.toList()), hasSize(1));
     }
 
     @Test

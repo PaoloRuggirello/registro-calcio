@@ -47,11 +47,11 @@ public class UserEventHandler {
 //    }
 
     public boolean isAlreadyRegistered(User user, Event toRegister) {
-        if(userEventRepository.existsByUserAndId(user, toRegister.getId())) return true; //Check if user is already registered to this event
-        List<UserEvent> userEventList = userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(user, Instant.now()); //Get all the events not played yet (ActiveEvent)
-        userEventList = userEventList.stream().filter(ue -> ue.getEvent().getDate().isAfter(Instant.now())).collect(Collectors.toList()); //Double check about isPlayed value
-        if(userEventList.size() > 0) return true; //User has not played events
-        return false; //User hasn't any not played events
+        return userEventRepository.existsByUserAndEvent(user, toRegister); //Check if user is already registered to this event
+     }
+
+     public boolean hasActiveEvents(User user){
+         return userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(user, Instant.now()).size() > 0; //Get all the events not played yet (ActiveEvent)
      }
 
     public void deleteByUser(User toRemove){

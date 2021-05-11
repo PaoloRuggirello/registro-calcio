@@ -28,7 +28,7 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     @Query("select ue.event from UserEvent ue where ue.event.date > :now and ue.user.username = :username order by ue.event.date asc")
     List<Event> findEventsSubscribedByUser(String username, Instant now);
 
-    boolean existsByUserAndId(User user, Long id);
+    boolean existsByUserAndEvent(User user, Event event);
 
     @Transactional
     @Modifying
