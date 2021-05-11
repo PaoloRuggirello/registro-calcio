@@ -31,7 +31,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -166,9 +165,9 @@ public class EventControllerTest {
         events.add(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin));
         events.add(new Event(Category.CALCIO_A_7, Instant.now().plus(3, ChronoUnit.DAYS), admin));
         events.add(new Event(Category.CALCIO_A_11, Instant.now().plus(4, ChronoUnit.DAYS), admin));
-        events.add(new Event(Category.CALCIO_A_5, Instant.now().plus(-2, ChronoUnit.DAYS), admin, true));
-        events.add(new Event(Category.CALCIO_A_7, Instant.now().plus(-3, ChronoUnit.DAYS), admin, true));
-        events.add(new Event(Category.CALCIO_A_11, Instant.now().plus(4, ChronoUnit.DAYS), admin, true));
+        events.add(new Event(Category.CALCIO_A_5, Instant.now().plus(-2, ChronoUnit.DAYS), admin));
+        events.add(new Event(Category.CALCIO_A_7, Instant.now().plus(-3, ChronoUnit.DAYS), admin));
+        events.add(new Event(Category.CALCIO_A_11, Instant.now().plus(4, ChronoUnit.DAYS), admin));
         eventRepository.saveAll(events);
 
         //Get events from service

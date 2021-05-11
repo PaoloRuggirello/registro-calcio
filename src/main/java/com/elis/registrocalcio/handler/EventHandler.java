@@ -84,12 +84,12 @@ public class EventHandler {
     }
 
     public List<Event> findActiveEvents(String username){
-            List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username).stream().map(Event::getId).collect(Collectors.toList());
-        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc();
-        return eventRepository.findByIdNotIn(subscribedEvents);
+            List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now()).stream().map(Event::getId).collect(Collectors.toList());
+        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc(Instant.now());
+        return eventRepository.findByIdNotIn(subscribedEvents, Instant.now());
     }
     public List<Event> findPastEvents(){
-        return eventRepository.findAllByPlayedIsTrue();
+        return eventRepository.findAllByPlayedIsTrue(Instant.now());
     }
 
     public List<UserEvent> findEventPlayers(Long eventId){
@@ -118,9 +118,9 @@ public class EventHandler {
             emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
     }
 
-    @Scheduled(fixedRate = 3600000) //Method called each hour
-    private void updateEventsStatus(){
-        eventRepository.updateEvents(Instant.now());
-        System.out.println("Events updated successfully");
-    }
+//    @Scheduled(fixedRate = 3600000) //Method called each hour
+//    private void updateEventsStatus(){
+//        eventRepository.updateEvents(Instant.now());
+//        System.out.println("Events updated successfully");
+//    }
 }

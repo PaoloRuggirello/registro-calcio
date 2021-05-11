@@ -15,15 +15,12 @@ public interface EventRepository extends JpaRepository <Event, Long> {
     @Query("select e from Event e where e.date >= :day and e.date < :nextDay")
     List<Event> findEventInSameDateByDay(Instant day, Instant nextDay);
 
-    @Query("select e from Event e where e.id not in :ids and e.played = false order by e.date asc")
-    List<Event> findByIdNotIn(List<Long> ids);
+    @Query("select e from Event e where e.id not in :ids and e.date > :now order by e.date asc")
+    List<Event> findByIdNotIn(List<Long> ids, Instant now);
 
-    List<Event> findAllByPlayedIsTrue();
+    @Query("select e from Event e where e.date < :now")
+    List<Event> findAllByPlayedIsTrue(Instant now);
 
-    List<Event> findAllByPlayedIsFalseOrderByDateAsc();
-
-    @Transactional
-    @Modifying
-    @Query("update Event e set e.played = true where e.played = false and e.date < :now")
-    void updateEvents(Instant now);
+    @Query("select e from Event e where e.date > :now order by e.date asc")
+    List<Event> findAllByPlayedIsFalseOrderByDateAsc(Instant now);
 }

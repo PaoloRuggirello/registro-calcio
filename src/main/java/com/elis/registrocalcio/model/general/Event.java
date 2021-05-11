@@ -63,19 +63,11 @@ public class Event implements Serializable {
         this.creator = creator;
     }
 
-    public Event(Category category, Instant date, User creator, Boolean played) {
-        this.category = category;
-        this.date = date;
-        this.creator = creator;
-        this.played = played;
-    }
-
     public void updateFieldsFromDTO(EventDTO eventDTO){
         this.category = Category.getCategoryFromString(eventDTO.getCategory());
         this.date = DateUtils.StringToInstantConverter(eventDTO.getDate());
         this.hourOfFreePeriod = eventDTO.getHourOfFreePeriod();
         this.hourOfNoDeleteZone = eventDTO.getHourOfNoDeleteZone();
-        this.played = !ObjectUtils.isEmpty(eventDTO.played) && eventDTO.getPlayed();
     }
 
     public Long getId() {
@@ -119,11 +111,7 @@ public class Event implements Serializable {
     }
 
     public Boolean getPlayed() {
-        return played;
-    }
-
-    public void setPlayed(Boolean played) {
-        this.played = played;
+        return Instant.now().isAfter(this.date);
     }
 
     public Integer getHourOfFreePeriod() {

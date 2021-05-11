@@ -6,9 +6,6 @@ import com.elis.registrocalcio.other.DateUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.Instant;
-import java.util.Date;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EventDTO {
 
@@ -33,7 +30,7 @@ public class EventDTO {
         this.hourOfNoDeleteZone = event.getHourOfNoDeleteZone();
         this.category = event.getCategory().toString();
         this.creator = new UserDTO(event.getCreator());
-        this.played = event.getDate().isBefore(Instant.now());
+        this.played = event.getPlayed();
         int players = event.getPlayers() != null ? event.getPlayers().size() : 0;
         int totalSeats = event.getCategory().numberOfAllowedPlayers();
         this.freeSeats = totalSeats > players ? totalSeats - players : 0;
@@ -45,7 +42,7 @@ public class EventDTO {
         this.hour = DateUtils.getHourFromInstant(userEvent.getEvent().getDate());
         this.category = userEvent.getEvent().getCategory().toString();
         this.creator = new UserDTO(userEvent.getEvent().getCreator());
-        this.played = userEvent.getEvent().getDate().isBefore(Instant.now());
+        this.played = userEvent.getEvent().getPlayed();
     }
     public EventDTO(String category, String date, UserDTO creator){
         this.category = category;

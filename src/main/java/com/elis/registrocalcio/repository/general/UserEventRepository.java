@@ -9,22 +9,24 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
+    //Played = false -> eventDate > now
+    //Played = true -> eventDate < now
 
-    @Query("select ue from UserEvent ue where ue.event.played = false and ue.user = :user order by ue.registrationTime asc")
-    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(User user);
+    @Query("select ue from UserEvent ue where ue.event.date > :now and ue.user = :user order by ue.registrationTime asc")
+    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(User user, Instant now);
 
-    @Query("select ue from UserEvent ue where ue.event.played = false and ue.user = :user order by ue.registrationTime desc")
-    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(User user);
+    @Query("select ue from UserEvent ue where ue.event.date > :now and ue.user = :user order by ue.registrationTime desc")
+    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(User user, Instant now);
 
-    @Query("select ue.id from UserEvent ue where ue.user = :user and ue.event.played = false")
-    List<Long> findUserEventByDeletingUser(User user);
+    @Query("select ue.id from UserEvent ue where ue.user = :user and ue.event.date > :now")
+    List<Long> findUserEventByDeletingUser(User user, Instant now);
 
-    @Query("select ue.event from UserEvent ue where ue.event.played = false and ue.user.username = :username order by ue.event.date asc")
-    List<Event> findEventsSubscribedByUser(String username);
+    @Query("select ue.event from UserEvent ue where ue.event.date > :now and ue.user.username = :username order by ue.event.date asc")
+    List<Event> findEventsSubscribedByUser(String username, Instant now);
 
     boolean existsByUserAndId(User user, Long id);
 
