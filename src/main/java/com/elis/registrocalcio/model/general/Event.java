@@ -48,9 +48,6 @@ public class Event implements Serializable {
     @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
     private List<UserEvent> players;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean played = false;
-
 
     public Event() {
     }
