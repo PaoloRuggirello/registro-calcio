@@ -79,11 +79,11 @@ public class EmailServiceImpl {
     public void communicateChangeToMailList(List<String> mailList, ChangeType changeType, String category, Instant eventDate, Event newEvent){
         try{
             String antDate = getAntDate(eventDate);
-            String postDate = getPostDate(eventDate);
+            String postDate = DateUtils.getHourFromInstant(eventDate);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
-            message.setSubject("Modifica Evento " + category + " " + antDate + " " + postDate);
+            message.setSubject(ChangeType.abstractType(changeType) + " evento " + category + " " + antDate + " " + postDate);
             message.setText("Gentile utente,\nregistro calcio ELIS ti comunica che l'evento a cui ti sei iscritto (" + category + " - " + antDate + " " + postDate +") è stato "
                     + changeType + ".");
             if(changeType.equals(ChangeType.MODIFY)){

@@ -14,4 +14,14 @@ public enum ChangeType {
             default: throw new IllegalArgumentException();
         }
     }
+
+    public static String abstractType(ChangeType changeType){
+        switch (changeType){
+            case MODIFY:
+                return "Modifica";
+            case DELETE:
+                return "Cancellazione";
+            default: throw new IllegalArgumentException();
+        }
+    }
 }
