@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -86,7 +87,7 @@ public class EmailServiceImpl {
             message.setText("Gentile utente,\nregistro calcio ELIS ti comunica che l'evento a cui ti sei iscritto (" + category + " - " + antDate + " " + postDate +") è stato "
                     + changeType + ".");
             if(changeType.equals(ChangeType.MODIFY)){
-                message.setText(message.getText() + "\nIl nuovo evento si terrà sul campo di " + newEvent.getCategory() + " alle " + getAntDate(newEvent.getDate()) + " " + getPostDate(newEvent.getDate()) + ".");
+                message.setText(message.getText() + "\nIl nuovo evento si terrà sul campo di " + newEvent.getCategory() + " " + getAntDate(newEvent.getDate()) + " alle " + DateUtils.getHourFromInstant(newEvent.getDate()) + ".");
             }
             message.setText(message.getText() + footer);
             mailSender.send(message);
