@@ -52,6 +52,10 @@ public class Event implements Serializable {
     public Event() {
     }
 
+    public Event(EventDTO eventDTO){
+        updateFieldsFromDTO(eventDTO);
+    }
+
     public Event(EventDTO eventDTO, User creator){
         updateFieldsFromDTO(eventDTO);
         this.creator = creator;

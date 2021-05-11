@@ -2,6 +2,7 @@ package com.elis.registrocalcio.controller;
 
 import com.elis.registrocalcio.dto.PlayerDTO;
 import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.enumPackage.ChangeType;
 import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
@@ -67,6 +68,7 @@ public class EventController {
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
         if(toDelete.getPlayed() || toDelete.getDate().isBefore(Instant.now())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_DELETE_PLAYED_EVENTS.toString());
         EventDTO toDeleteEvent = new EventDTO(toDelete);
+        userEventHandler.notifyChange(toDelete, ChangeType.DELETE, null);
         userEventHandler.deleteByEvent(toDelete);
         eventHandler.delete(toDelete);
         return toDeleteEvent;
@@ -76,6 +78,7 @@ public class EventController {
     public ResponseEntity<String> modifyEvent(@RequestBody EventDTO modifiedEvent, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN);
         Event toModify = eventHandler.findEventByIdCheckOptional(modifiedEvent.getId());
+        userEventHandler.notifyChange(toModify, ChangeType.MODIFY, new Event(modifiedEvent));
         toModify.updateFieldsFromDTO(modifiedEvent);
         eventHandler.save(toModify);
         return new ResponseEntity<>(HttpStatus.OK);

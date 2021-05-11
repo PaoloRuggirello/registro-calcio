@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
+import com.elis.registrocalcio.enumPackage.ChangeType;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.model.general.Event;
@@ -92,5 +93,11 @@ public class UserEventHandler {
 
     public List<Event> findEventsSubscribedByUser(String username){
         return userEventRepository.findEventsSubscribedByUser(username, Instant.now());
+    }
+
+    public void notifyChange(Event oldEvent, ChangeType changeType, Event newEvent){
+        int maxPlayers = eventHandler.findEventByIdCheckOptional(oldEvent.getId()).getCategory().numberOfAllowedPlayers();
+        List<String> mailList = userEventRepository.findPlayersOfEvent(oldEvent.getId(), PageRequest.of(0, maxPlayers*2)).stream().map(ue -> ue.getUser().getEmail()).collect(Collectors.toList());
+        emailService.communicateChangeToMailList(mailList, changeType, oldEvent.getCategory().toString(), oldEvent.getDate(), newEvent);
     }
 }

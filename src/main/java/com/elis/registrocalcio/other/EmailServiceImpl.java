@@ -1,5 +1,7 @@
 package com.elis.registrocalcio.other;
 
+import com.elis.registrocalcio.enumPackage.ChangeType;
+import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -41,7 +43,7 @@ public class EmailServiceImpl {
     @Async
     public void comunicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
         try {
-            String antDate = getAndDate(eventDate);
+            String antDate = getAntDate(eventDate);
             String postDate = getPostDate(eventDate);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
@@ -58,7 +60,7 @@ public class EmailServiceImpl {
     @Async
     public void comunicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
         try{
-            String antDate = getAndDate(eventDate);
+            String antDate = getAntDate(eventDate);
             String postDate = getPostDate(eventDate);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
@@ -66,6 +68,27 @@ public class EmailServiceImpl {
             message.setSubject("Assegnazione team " + category + " "+ antDate);
             message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
                     " farai parte del " + team + " team!" + footer);
+            mailSender.send(message);
+        }catch (Exception e ){
+            System.out.println("Cannot send email");
+        }
+    }
+
+    @Async
+    public void communicateChangeToMailList(List<String> mailList, ChangeType changeType, String category, Instant eventDate, Event newEvent){
+        try{
+            String antDate = getAntDate(eventDate);
+            String postDate = getPostDate(eventDate);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
+            message.setTo(convertMailList(mailList));
+            message.setSubject("Modifica Evento " + category + " " + antDate + " " + postDate);
+            message.setText("Gentile utente,\nregistro calcio ELIS ti comunica che l'evento a cui ti sei iscritto (" + category + " - " + antDate + " " + postDate +") è stato "
+                    + changeType + ".");
+            if(changeType.equals(ChangeType.MODIFY)){
+                message.setText(message.getText() + "\nIl nuovo evento si terrà sul campo di " + newEvent.getCategory() + " alle " + getAntDate(newEvent.getDate()) + " " + getPostDate(newEvent.getDate()) + ".");
+            }
+            message.setText(message.getText() + footer);
             mailSender.send(message);
         }catch (Exception e ){
             System.out.println("Cannot send email");
@@ -87,7 +110,7 @@ public class EmailServiceImpl {
         }
     }
 
-    private String getAndDate(Instant eventDate){
+    private String getAntDate(Instant eventDate){
         SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
         return antPatternFormat.format(Date.from(eventDate));
     }
