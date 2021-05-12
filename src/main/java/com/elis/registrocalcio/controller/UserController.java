@@ -17,6 +17,8 @@ import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.model.security.SecurityToken;
 import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +55,7 @@ public class UserController {
     @Autowired
     private TokenHandler tokenHandler;
 
+    private static Logger logger = LogManager.getLogger(UserController.class);
 
     @PostMapping("/authenticate")
     public LoginDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -60,6 +63,8 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
         System.out.println(checkedUser);
+        System.out.println("SIamo qui");
+        logger.info("User trying to authenticate");
         return new LoginDTO(checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.AUTHENTICATION_FAILED.toString())), checkedUser.get().getRole().toString());
     }
 

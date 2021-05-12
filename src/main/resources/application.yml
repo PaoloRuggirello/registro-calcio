@@ -8,7 +8,7 @@ spring:
       ddl-auto: create
       dialect: org.hibernate.dialect.HSQLDialect
   datasource:
-    jdbcUrl: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=GMT+2
+    jdbcUrl: jdbc:mysql://localhost:3306/registro_calcio?serverTimezone=UTC
     username: mysql
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -31,5 +31,10 @@ server:
   error:
     include-message: always
 
-
-
+logging:
+  level:
+    org.springframework: WARN
+    com.appicantion.name: INFO
+  file:
+    name: log/registro-calcio_${currenttime}.log
+    max-size: 10MB
