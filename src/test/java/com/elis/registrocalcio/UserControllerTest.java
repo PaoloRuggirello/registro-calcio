@@ -102,7 +102,7 @@ public class UserControllerTest {
         User testUser = new User("username", "name", "surname", "emailo@email.it", userHandler.passwordEncryption("password"));
         testUser.setRole(Role.ADMIN);
         userRepository.save(testUser);
-        Token userToken = tokenHandler.createToken(testUser);
+        Token userToken = tokenHandler.createToken(testUser.getUsername());
 
         //Check if token is present
         userToken.decrypt();
@@ -130,7 +130,7 @@ public class UserControllerTest {
         //CheckPermissionLevel
         testUser.setRole(Role.USER);
         userRepository.save(testUser);
-        Token newUserToken = tokenHandler.createToken(testUser);
+        Token newUserToken = tokenHandler.createToken(testUser.getUsername());
         testException = assertThrows(ResponseStatusException.class, () -> userController.findAll(newUserToken), FootballRegisterException.PERMISSION_DENIED.toString());
         assertThat(testException.getMessage(), containsString(FootballRegisterException.PERMISSION_DENIED.toString()));
 
@@ -169,7 +169,7 @@ public class UserControllerTest {
         userRepository.save(wrongBindUser);
         userRepository.save(correctUser);
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.HOURS), correctUser));
-        Token userToken = tokenHandler.createToken(correctUser);
+        Token userToken = tokenHandler.createToken(correctUser.getUsername());
         UserEventDTO userEventDTO = new UserEventDTO(wrongBindUser.getUsername(), event.getId());
         assertNotNull(userController.bindUserAndEvent(event.getId(), userToken));
 //        Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event.getId(), userToken), FootballRegisterException.PERMISSION_DENIED.toString());
@@ -178,7 +178,7 @@ public class UserControllerTest {
 
         //Try to register to event that will be played in less than 3 hours
         UserEventDTO correctDTO = new UserEventDTO(correctUser.getUsername(), event.getId());
-        Token newToken = tokenHandler.createToken(correctUser);
+        Token newToken = tokenHandler.createToken(correctUser.getUsername());
         Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event.getId(), newToken), FootballRegisterException.CANNOT_REGISTER_USER.toString());
         assertThat(testException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
     }
@@ -194,9 +194,9 @@ public class UserControllerTest {
         Event notRegistrable = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(25, ChronoUnit.HOURS), correctUser));
         Event registrable = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(20, ChronoUnit.HOURS), correctUser));
 //        Token userToken = tokenHandler.createToken(correctUser);
-        userController.bindUserAndEvent(event.getId(), tokenHandler.createToken(correctUser));
-        userController.bindUserAndEvent(registrable.getId(), tokenHandler.createToken(correctUser));
-        Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(notRegistrable.getId(), tokenHandler.createToken(correctUser)), FootballRegisterException.PERMISSION_DENIED.toString());
+        userController.bindUserAndEvent(event.getId(), tokenHandler.createToken(correctUser.getUsername()));
+        userController.bindUserAndEvent(registrable.getId(), tokenHandler.createToken(correctUser.getUsername()));
+        Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(notRegistrable.getId(), tokenHandler.createToken(correctUser.getUsername())), FootballRegisterException.PERMISSION_DENIED.toString());
         assertThat(testException.getMessage(), containsString(FootballRegisterException.CANNOT_REGISTER_USER.toString()));
 
     }
@@ -207,14 +207,14 @@ public class UserControllerTest {
         User user = new User("user", "userName", "userSurname", "user@email.it", userHandler.passwordEncryption("user-password"));
         userRepository.save(user);
         Event event1 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(4, ChronoUnit.DAYS), user));
-        Token userToken = tokenHandler.createToken(user);
+        Token userToken = tokenHandler.createToken(user.getUsername());
 
         //Register user in event
         UserEventDTO correctDTO = new UserEventDTO(user.getUsername(), event1.getId());
         assertNotNull(userController.bindUserAndEvent(event1.getId(), userToken));
 
         //Try to register to another event, shouldn't works
-        Token newToken = tokenHandler.createToken(user);
+        Token newToken = tokenHandler.createToken(user.getUsername());
         Event event2 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(5, ChronoUnit.DAYS), user));
         UserEventDTO userEvent2 = new UserEventDTO(user.getUsername(),event2.getId());
         Throwable bindUserException = assertThrows(ResponseStatusException.class, () -> userController.bindUserAndEvent(event2.getId(), newToken));
@@ -222,13 +222,13 @@ public class UserControllerTest {
 
 
         //Try to register to another event, should works
-        Token token3 = tokenHandler.createToken(user);
+        Token token3 = tokenHandler.createToken(user.getUsername());
         Event event3 = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(7, ChronoUnit.HOURS), user));
         UserEventDTO userEvent3 = new UserEventDTO(user.getUsername(),event3.getId());
         assertNotNull(userController.bindUserAndEvent(event3.getId(), token3));
 
         //Check how many
-        Token token4 = tokenHandler.createToken(user);
+        Token token4 = tokenHandler.createToken(user.getUsername());
         List<Long> registeredUserEvents = userEventRepository.findByUser(user).stream().map(userEvent -> userEvent.getEvent().getId()).collect(Collectors.toList());
         List<EventDTO> registeredEventsDTO = userController.findSubscribed(token4);
         assertEquals(registeredUserEvents.size(), 2);
@@ -243,7 +243,7 @@ public class UserControllerTest {
         User user = new User("user", "userName", "userSurname", "user@email.it", userHandler.passwordEncryption("user-password"));
         userRepository.save(user);
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), user));
-        Token userToken = tokenHandler.createToken(user);
+        Token userToken = tokenHandler.createToken(user.getUsername());
         UserEventDTO correctDTO = new UserEventDTO(user.getUsername(), event.getId());
         assertNotNull(userController.bindUserAndEvent(event.getId(), userToken));
 
@@ -254,7 +254,7 @@ public class UserControllerTest {
         assertThat(registeredEvents.get(0).getEvent().getId(), equalTo(event.getId()));
 
         //Removing binding
-        userToken = tokenHandler.createToken(user);
+        userToken = tokenHandler.createToken(user.getUsername());
         userController.removeBinding(event.getId(),user.getUsername(), userToken);
 
         //Check if DB is now empty
@@ -269,8 +269,8 @@ public class UserControllerTest {
         admin.setRole(Role.ADMIN);
         userRepository.save(user);
         userRepository.save(admin);
-        Token userToken = tokenHandler.createToken(user);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token userToken = tokenHandler.createToken(user.getUsername());
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
         Token methodToken = new Token(); //Token used for methods call, will be decrypted and changed with the property one each time
 
         //Try to delete user using user
@@ -303,8 +303,8 @@ public class UserControllerTest {
         admin.setRole(Role.ADMIN);
         userRepository.save(user);
         userRepository.save(admin);
-        Token userToken = tokenHandler.createToken(user);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token userToken = tokenHandler.createToken(user.getUsername());
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
 
         //Try findall with user, he hasn't permissions to do that
         Throwable testException = assertThrows(ResponseStatusException.class, () -> userController.findAll(userToken));
@@ -322,7 +322,7 @@ public class UserControllerTest {
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", userHandler.passwordEncryption("password"));
         admin.setRole(Role.ADMIN);
         userRepository.save(admin);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
 
         UserDTO userFromController = userController.findUserInfo(adminToken);
         assertEquals(admin.getUsername(), userFromController.getUsername());
@@ -341,7 +341,7 @@ public class UserControllerTest {
         admin.setRole(Role.ADMIN);
         user = userRepository.save(user);
         userRepository.save(admin);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
         Token tokenToUse = new Token();
 
         assertThat(userRepository.findById(user.getId()).get().getRole(), equalTo(Role.USER));

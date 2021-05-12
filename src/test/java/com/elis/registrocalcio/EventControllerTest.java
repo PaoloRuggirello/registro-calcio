@@ -88,8 +88,8 @@ public class EventControllerTest {
         admin.setRole(Role.ADMIN);
         user = userRepository.save(user);
         userRepository.save(admin);
-        Token userToken = tokenHandler.createToken(user);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token userToken = tokenHandler.createToken(user.getUsername());
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
         Token tokenToUse = new Token();
 
         EventDTO eventDTO = new EventDTO(Category.CALCIO_A_5.toString(), convertDate(new Date()), new UserDTO(user));
@@ -142,7 +142,7 @@ public class EventControllerTest {
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", userHandler.passwordEncryption("password"));
         admin.setRole(Role.ADMIN);
         userRepository.save(admin);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
         Event eventToDelete = new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin);
         eventToDelete = eventRepository.save(eventToDelete);
         assertThat(eventRepository.findAll(), Matchers.hasSize(1));
@@ -159,7 +159,7 @@ public class EventControllerTest {
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", userHandler.passwordEncryption("password"));
         userRepository.save(user);
         userRepository.save(admin);
-        Token userToken = tokenHandler.createToken(user);
+        Token userToken = tokenHandler.createToken(user.getUsername());
         Token token = new Token();
 
         //Creating some events
@@ -202,7 +202,7 @@ public class EventControllerTest {
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", userHandler.passwordEncryption("password"));
         userRepository.save(user);
         userRepository.save(admin);
-        Token userToken = tokenHandler.createToken(user);
+        Token userToken = tokenHandler.createToken(user.getUsername());
         Token token = new Token();
 
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin));
@@ -236,7 +236,7 @@ public class EventControllerTest {
         User admin = new User("admin.admin", "name", "surname", "admin@email.it", "password");
         admin.setRole(Role.ADMIN);
         userRepository.save(admin);
-        Token adminToken = tokenHandler.createToken(admin);
+        Token adminToken = tokenHandler.createToken(admin.getUsername());
         Token token = new Token();
 
         Event event = eventRepository.save(new Event(Category.CALCIO_A_5, Instant.now().plus(2, ChronoUnit.DAYS), admin));
@@ -268,7 +268,7 @@ public class EventControllerTest {
         userRepository.save(admin);
 
         EventDTO event = new EventDTO(Category.CALCIO_A_11.toString(), convertDate(Date.from(Instant.now().plus(3, ChronoUnit.DAYS))), new UserDTO(admin));
-        eventController.createEvent(event, tokenHandler.createToken(admin));
+        eventController.createEvent(event, tokenHandler.createToken(admin.getUsername()));
 
         List<Event> allEvents = eventRepository.findAll();
         assertThat(allEvents, hasSize(1));
@@ -279,7 +279,7 @@ public class EventControllerTest {
         event.setDate(convertDate(Date.from(Instant.now().minus(3, ChronoUnit.DAYS))));
         event.setId(allEvents.get(0).getId());
 
-        eventController.modifyEvent(event, tokenHandler.createToken(admin));
+        eventController.modifyEvent(event, tokenHandler.createToken(admin.getUsername()));
         allEvents = eventRepository.findAll();
         assertThat(allEvents, hasSize(1));
         assertThat(allEvents.get(0).getCategory(), equalTo(Category.CALCIO_A_5));

@@ -53,7 +53,7 @@ public class UserHandler {
     public User findUserByUsernameCheckOptional(String username){
         Optional<User> userOptional = findUserByUsername(username);
         if(userOptional.isEmpty())
-            ExceptionUtils.throwResponseStatus(this.getClass(), NOT_FOUND, USER_NOT_FOUND);
+            ExceptionUtils.throwResponseStatus(this.getClass(), NOT_FOUND, USER_NOT_FOUND, "cannot find user: " + username);
         return userOptional.get();
     }
 
@@ -164,9 +164,10 @@ public class UserHandler {
         if(user.isPresent()){
             Role currentRole = user.get().getRole();
             user.get().setRole(currentRole == Role.USER ? Role.ADMIN : Role.USER);
+            log.info("Role for user {} changed from {} to {}", username, currentRole, user.get().getRole());
             return userRepository.save(user.get());
         }
-        ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_CHANGE_USER_ROLE);
+        ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_CHANGE_USER_ROLE , "user " + username +" not found");
         return null;
     }
 

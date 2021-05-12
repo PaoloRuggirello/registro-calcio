@@ -72,7 +72,7 @@ public class UserController {
             ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, INVALID_LOGIN_FIELDS);
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
         log.info("User {} -> {}", userToAuthenticate.getUsername(), checkedUser.isPresent() ? "login ok" : "login failed");
-        return new LoginDTO(checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, AUTHENTICATION_FAILED.toString())), checkedUser.get().getRole().toString());
+        return new LoginDTO(checkedUser.map(user -> tokenHandler.createToken(user.getUsername())).orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, AUTHENTICATION_FAILED.toString())), checkedUser.get().getRole().toString());
     }
 
     @PostMapping("/logout")
@@ -160,10 +160,12 @@ public class UserController {
     @PostMapping("/changeRole/{username}")
     public UserDTO changeRole(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         SecurityToken securityToken = tokenHandler.checkToken(userToken, Role.ADMIN);
+        log.info("{} is changing role for user {}", securityToken.getUsername(), username);
         User updatedUser = userHandler.changeUserRole(username);
         if(username.equals(securityToken.getUsername())){
             securityToken.setRole(updatedUser.getRole());
             tokenHandler.save(securityToken);
+            logout(tokenHandler.createToken(securityToken.getUsername()));//If user is changing his role -> logout
         }
         return new UserDTO(updatedUser);
     }
@@ -172,6 +174,7 @@ public class UserController {
     public ResponseEntity<String> changeNewsletter(@RequestHeader("Authorization") Token token){
         SecurityToken securityToken = tokenHandler.checkToken(token);
         User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(securityToken.getUsername());
+        log.info("{} is changing his newsletter from {} to {}", securityToken.getUsername(), updateNewsLetter.getNewsLetter(), !updateNewsLetter.getNewsLetter());
         updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status
         userHandler.save(updateNewsLetter);
         return new ResponseEntity<>(OK);
@@ -179,6 +182,7 @@ public class UserController {
 
     @PostMapping("/passwordRecovery/{username}")
     public ResponseEntity<String> passwordRecovery(@PathVariable("username") String username) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        log.info("recover password procedure started for user {}", username);
         User user = userHandler.findUserByUsernameCheckOptional(username);
         userHandler.passwordRecoveryProcedure(user);
         return new ResponseEntity<>(OK);
