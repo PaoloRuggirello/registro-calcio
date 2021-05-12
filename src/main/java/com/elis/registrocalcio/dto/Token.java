@@ -40,4 +40,9 @@ public class Token {
         String expirationDate = getTokenExpirationDateAsString(this);
         this.token = EncryptionUtils.encrypt(EncryptionUtils.encrypt(id) + "-%$-" + expirationDate);
     }
+
+    @Override
+    public String toString() {
+        return "Token{" + token + '}';
+    }
 }

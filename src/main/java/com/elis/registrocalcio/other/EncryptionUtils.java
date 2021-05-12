@@ -2,6 +2,8 @@ package com.elis.registrocalcio.other;
 
 
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 public class EncryptionUtils {
 
     private static Key key;
+    private static Logger log = LogManager.getLogger(EncryptionUtils.class);
 
     public static String encrypt(String toEncrypt){
         try {
@@ -22,7 +25,7 @@ public class EncryptionUtils {
             cipher.init(Cipher.ENCRYPT_MODE, getKey());
             return Base64Utils.encodeToString(cipher.doFinal(toEncrypt.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
-            System.out.println("Cannot Encrypt");
+            log.warn("Cannot Encrypt: {}", toEncrypt);
         }
         return null;
     }

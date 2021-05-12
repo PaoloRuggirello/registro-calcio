@@ -23,6 +23,8 @@ services:
     container_name: registro-calcio-backend
     ports:
       - 8080:8080
+    volumes:
+      - '../logs:/logs'
     restart: always
     depends_on:
       - database

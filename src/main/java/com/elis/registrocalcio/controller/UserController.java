@@ -10,17 +10,16 @@ import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.dto.UserDTO;
 import com.elis.registrocalcio.dto.UserEventDTO;
-import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.EventHandler;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.model.security.SecurityToken;
+import com.elis.registrocalcio.other.ExceptionUtils;
 import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +39,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.AUTHENTICATION_FAILED;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.INVALID_LOGIN_FIELDS;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.INVALID_REGISTRATION_FIELDS;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.EMAIL_ALREADY_EXIST;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.CANNOT_REGISTER_USER;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.PERMISSION_DENIED;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.CANNOT_REMOVE_BINDING;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -55,44 +64,45 @@ public class UserController {
     @Autowired
     private TokenHandler tokenHandler;
 
-    private static Logger logger = LogManager.getLogger(UserController.class);
+    private static Logger log = LogManager.getLogger(UserController.class);
 
     @PostMapping("/authenticate")
     public LoginDTO authenticate(@RequestBody UserDTO userToAuthenticate) throws InvalidKeySpecException, NoSuchAlgorithmException {
         if(!userHandler.validateLoginFields(userToAuthenticate.getUsername(), userToAuthenticate.getPassword()))// means that some fields are not ready for the login
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, INVALID_LOGIN_FIELDS);
         Optional<User> checkedUser = userHandler.checkUserCredentials(userToAuthenticate.getUsername(), userToAuthenticate.getPassword());
-        System.out.println(checkedUser);
-        System.out.println("SIamo qui");
-        logger.info("User trying to authenticate");
-        return new LoginDTO(checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.AUTHENTICATION_FAILED.toString())), checkedUser.get().getRole().toString());
+        log.info("User {} -> {}", userToAuthenticate.getUsername(), checkedUser.isPresent() ? "login ok" : "login failed");
+        return new LoginDTO(checkedUser.map(user -> tokenHandler.createToken(user)).orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, AUTHENTICATION_FAILED.toString())), checkedUser.get().getRole().toString());
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") Token userToken){
         tokenHandler.deleteToken(userToken);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserDTO userToRegister) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        log.info("Registration: {}", userToRegister);
         if(!userHandler.validateRegistrationFields(userToRegister))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, INVALID_REGISTRATION_FIELDS);
         if(userHandler.checkIfPresentByEmail(userToRegister.getEmail()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.EMAIL_ALREADY_EXIST.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, EMAIL_ALREADY_EXIST);
         userHandler.createUserAndSave(userToRegister);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
     @Transactional
     @PostMapping("/bindWithEvent/{eventId}")
     public UserEventDTO bindUserAndEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         String username = tokenHandler.checkToken(userToken).getUsername();
+        log.info("Binding user {} with event with id {}", username, eventId);
+        log.info("Usertoken: {}", userToken);
         User user = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
         Instant startOfFreePeriod = event.getDate().minus(event.getHourOfFreePeriod(), ChronoUnit.HOURS);
        if(userEventHandler.isAlreadyRegistered(user,event) || (userEventHandler.hasActiveEvents(user)) && startOfFreePeriod.isAfter(Instant.now())) //User has active events and free period not started
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_REGISTER_USER.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_REGISTER_USER);
         UserEvent bound = new UserEvent(user, event);
         return new UserEventDTO(userEventHandler.save(bound));
     }
@@ -101,23 +111,26 @@ public class UserController {
     @PostMapping("/removeFromEvent/{eventId}/{username}")
     public ResponseEntity<String> removeBinding(@PathVariable("eventId") Long eventId, @PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         SecurityToken token = tokenHandler.checkToken(userToken);
+        log.info("{} is trying to remove {} from event {}", token.getUsername(), username, eventId);
         if(token.getRole().equals(Role.USER) && !token.getUsername().equals(username)) { //If a user is trying to delete another user from the match
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.PERMISSION_DENIED.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), FORBIDDEN, PERMISSION_DENIED);
         }
         User toRemoveBinding = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
-        if(event.getPlayed() || (token.getRole().equals(Role.USER) && Instant.now().plus(event.getHourOfNoDeleteZone(), ChronoUnit.HOURS).isAfter(event.getDate()))) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_REMOVE_BINDING.toString()); //Cannot remove binding if event is in less than 3 hours or played yet
+        if(event.getPlayed() || (token.getRole().equals(Role.USER) && Instant.now().plus(event.getHourOfNoDeleteZone(), ChronoUnit.HOURS).isAfter(event.getDate()))) ExceptionUtils.throwResponseStatus(this.getClass(), FORBIDDEN, CANNOT_REMOVE_BINDING); //Cannot remove binding if event is in less than 3 hours or played yet
         userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
     @Transactional
     @PostMapping("/delete/{username}")
     public UserDTO deleteUser(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN); //Users can only be deleted by admin
+        log.info("Removing user: {}", username);
         User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
         userEventHandler.deleteByUser(userToDelete);
         userToDelete.setActive(false);
+        log.info("{} removed", username);
         return new UserDTO(userHandler.save(userToDelete)).withoutPassword();
     }
 
@@ -161,23 +174,23 @@ public class UserController {
         User updateNewsLetter = userHandler.findUserByUsernameCheckOptional(securityToken.getUsername());
         updateNewsLetter.setNewsLetter(!updateNewsLetter.getNewsLetter()); //Changing newsLetter status
         userHandler.save(updateNewsLetter);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
     @PostMapping("/passwordRecovery/{username}")
     public ResponseEntity<String> passwordRecovery(@PathVariable("username") String username) throws InvalidKeySpecException, NoSuchAlgorithmException {
         User user = userHandler.findUserByUsernameCheckOptional(username);
         userHandler.passwordRecoveryProcedure(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
     @PostMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) throws InvalidKeySpecException, NoSuchAlgorithmException {
         Optional<User> user = userHandler.checkUserCredentials(changePasswordDTO.username, changePasswordDTO.currentPassword);
-        if(user.isEmpty() || !userHandler.validatePassword(changePasswordDTO.newPassword)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_LOGIN_FIELDS.toString()); //User not found or bad credentials
+        if(user.isEmpty() || !userHandler.validatePassword(changePasswordDTO.newPassword)) ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, INVALID_LOGIN_FIELDS); //User not found or bad credentials
         user.get().setPassword(userHandler.passwordEncryption(changePasswordDTO.newPassword)); //Setting new password
         userHandler.save(user.get());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(OK);
     }
 
     @Autowired

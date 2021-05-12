@@ -6,14 +6,16 @@ import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.other.EmailServiceImpl;
+import com.elis.registrocalcio.other.ExceptionUtils;
 import com.elis.registrocalcio.other.PasswordHash;
 import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.UserRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -21,6 +23,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.*;
 
 @Service
 public class UserHandler {
@@ -30,6 +36,7 @@ public class UserHandler {
     @Autowired
     EmailServiceImpl emailService;
 
+    private static final Logger log = LogManager.getLogger(UserHandler.class);
 
     public User save(User user) {
         return userRepository.save(user);
@@ -46,7 +53,7 @@ public class UserHandler {
     public User findUserByUsernameCheckOptional(String username){
         Optional<User> userOptional = findUserByUsername(username);
         if(userOptional.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, FootballRegisterException.USER_NOT_FOUND.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), NOT_FOUND, USER_NOT_FOUND);
         return userOptional.get();
     }
 
@@ -145,7 +152,7 @@ public class UserHandler {
     public UserDTO setAvailableUsername(UserDTO toSetUsername){
         String username = toSetUsername.getUsername();
         Long numberOfHomonyms = userRepository.countByNameAndSurnameIgnoreCaseAndIsActiveIsTrue(toSetUsername.getName(), toSetUsername.getSurname());
-        System.out.println("Number of homonymus : " + numberOfHomonyms);
+        log.warn("User with {} username already exist, assigned username = {}", username, username + numberOfHomonyms);
         if(numberOfHomonyms > 0)
             username += numberOfHomonyms;
         toSetUsername.setUsername(username);
@@ -159,7 +166,8 @@ public class UserHandler {
             user.get().setRole(currentRole == Role.USER ? Role.ADMIN : Role.USER);
             return userRepository.save(user.get());
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.CANNOT_CHANGE_USER_ROLE.toString());
+        ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_CHANGE_USER_ROLE);
+        return null;
     }
 
     public void passwordRecoveryProcedure(User userToRecover) throws InvalidKeySpecException, NoSuchAlgorithmException {

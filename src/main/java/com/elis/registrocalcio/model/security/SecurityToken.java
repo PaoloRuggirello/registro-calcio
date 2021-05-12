@@ -2,6 +2,7 @@ package com.elis.registrocalcio.model.security;
 
 import com.elis.registrocalcio.dto.Token;
 import com.elis.registrocalcio.enumPackage.Role;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -86,5 +87,15 @@ public class SecurityToken implements Serializable {
     }
     public static String getTokenExpirationDateAsString(Token token){
         return token.token.split("-%\\$-")[1];
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("username", username)
+                .append("role", role)
+                .append("expirationDate", expirationDate)
+                .toString();
     }
 }

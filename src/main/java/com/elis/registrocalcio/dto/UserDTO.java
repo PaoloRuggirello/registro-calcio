@@ -120,9 +120,10 @@ public class UserDTO {
                 .append("username", username)
                 .append("name", name)
                 .append("surname", surname)
-                .append("password", password)
                 .append("role", role)
+                .append("email", email)
+                .append("isActive", isActive)
+                .append("newsletter", newsletter)
                 .toString();
     }
-
 }

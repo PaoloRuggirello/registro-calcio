@@ -5,13 +5,15 @@ import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.security.SecurityToken;
+import com.elis.registrocalcio.other.ExceptionUtils;
 import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -24,6 +26,7 @@ public class TokenHandler {
 
     @Autowired
     SecurityTokenRepository securityTokenRepository;
+    private static final Logger log = LogManager.getLogger(TokenHandler.class);
 
     public Token createToken(User whoNeedToken){
         Optional<SecurityToken> currentToken = securityTokenRepository.findByUsername(whoNeedToken.getUsername());
@@ -41,37 +44,41 @@ public class TokenHandler {
         try {
             if(!StringUtils.isEmpty(toDelete.token))
                 toDelete.decrypt();
-                securityTokenRepository.deleteById(getTokenId(toDelete));
+            log.info("Logging out user. {}", toDelete);
+            securityTokenRepository.deleteById(getTokenId(toDelete));
         }catch (EmptyResultDataAccessException e){
-            System.out.println("Token not found, cannot delete");
+            log.warn("Token not found, cannot delete {}", toDelete);
         }
     }
 
     public SecurityToken checkToken(Token token){
         token.decrypt();
+        log.info("Checking token: {}", token);
         if(StringUtils.isEmpty(token.token) || getTokenExpirationDate(token).isBefore(Instant.now()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_TOKEN.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_TOKEN);
         Optional<SecurityToken> securityToken = securityTokenRepository.findById(getTokenId(token));
         if(securityToken.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_TOKEN.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.BAD_REQUEST, FootballRegisterException.INVALID_TOKEN);
         return securityToken.get();
     }
     public SecurityToken checkToken(Token token, Role permissionLevel){
+        log.info("Checking token");
         SecurityToken securityToken = checkToken(token);
+        log.info("Needed [{}] - token info: {}", permissionLevel, securityToken);
         Role role = securityToken.getRole();
         if(role == Role.USER && permissionLevel == Role.ADMIN)
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED);
         return securityToken;
     }
     public void checkIfAreTheSameUser(Token token, String username){
         SecurityToken securityToken = checkToken(token);
         if(!securityToken.getUsername().equals(username))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED);
     }
     public void checkIfAreTheSameUser(Token token, String username, Role role){
         SecurityToken securityToken = checkToken(token, role);
         if(!securityToken.getUsername().equals(username))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN,FootballRegisterException.PERMISSION_DENIED);
     }
 
     private Instant newExpirationDate(){
