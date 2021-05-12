@@ -36,5 +36,6 @@ logging:
     org.springframework: WARN
     com.appicantion.name: INFO
   file:
-    name: logs/registro-calcio_${currenttime}.log
+    name: logs/registro-calcio.log
     max-size: 10MB
+

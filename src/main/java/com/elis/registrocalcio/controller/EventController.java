@@ -9,12 +9,14 @@ import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.security.SecurityToken;
-import com.elis.registrocalcio.repository.general.EventRepository;
+import com.elis.registrocalcio.other.ExceptionUtils;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.EventHandler;
 import com.elis.registrocalcio.model.general.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +29,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,39 +48,47 @@ public class EventController {
     UserEventHandler userEventHandler;
     @Autowired
     TokenHandler tokenHandler;
+    private static Logger log = LogManager.getLogger(EventController.class);
 
     @PostMapping("/create")
     public EventDTO createEvent(@RequestBody EventDTO eventToCreate, @RequestHeader("Authorization") Token userToken) {
         SecurityToken token = tokenHandler.checkToken(userToken, Role.ADMIN);
+        log.info("{} is creating an event. Event info: {}", token.getUsername(), eventToCreate);
         User creator = userHandler.findUserByUsernameCheckOptional(token.getUsername());
         if(!eventHandler.areFieldsValid(eventToCreate))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS.toString());
+            ExceptionUtils.throwResponseStatus(EventController.class, HttpStatus.FORBIDDEN, FootballRegisterException.INVALID_REGISTRATION_FIELDS, " Error during event creation. Creator: "+ token.getUsername() +" Event info: "+ eventToCreate);
         Event event = new Event(eventToCreate, creator);
         EventDTO toReturn = new EventDTO(eventHandler.save(event));
         eventHandler.newEventToNewsLetter(event);
+        log.info("Event {} created by {}", toReturn, token.getUsername());
         return toReturn;
     }
 
     @Transactional
     @PostMapping("/delete/{eventId}")
     public EventDTO deleteEvent(@PathVariable("eventId")Long eventId, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken, Role.ADMIN);
+        String username = tokenHandler.checkToken(userToken, Role.ADMIN).getUsername();
+        log.info("{} is Trying to delete event. EventId {}", username, eventId);
         Event toDelete = eventHandler.findEventByIdCheckOptional(eventId);
-        if(toDelete.getPlayed() || toDelete.getDate().isBefore(Instant.now())) throw new ResponseStatusException(HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_DELETE_PLAYED_EVENTS.toString());
+        if(toDelete.getPlayed() || toDelete.getDate().isBefore(Instant.now())) ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN, FootballRegisterException.CANNOT_DELETE_PLAYED_EVENTS, "Error while deleting event with id :" + eventId + " by user " + username);
         EventDTO toDeleteEvent = new EventDTO(toDelete);
         userEventHandler.notifyChange(toDelete, ChangeType.DELETE, null);
         userEventHandler.deleteByEvent(toDelete);
         eventHandler.delete(toDelete);
+        log.info("Event with id {} deleted by {}", eventId, username);
         return toDeleteEvent;
     }
 
     @PostMapping("/modify")
     public ResponseEntity<String> modifyEvent(@RequestBody EventDTO modifiedEvent, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken, Role.ADMIN);
+        String username = tokenHandler.checkToken(userToken, Role.ADMIN).getUsername();
+        log.info("{} is Trying to modify event with id {}. New fields are: {}", username, modifiedEvent.getId(), modifiedEvent);
         Event toModify = eventHandler.findEventByIdCheckOptional(modifiedEvent.getId());
         userEventHandler.notifyChange(toModify, ChangeType.MODIFY, new Event(modifiedEvent));
         toModify.updateFieldsFromDTO(modifiedEvent);
+        log.info("Event with id {} correctly modified by {}", modifiedEvent.getId(), username);
         eventHandler.save(toModify);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -113,12 +121,14 @@ public class EventController {
 
     @PostMapping("/setTeam/{eventId}")
     public ResponseEntity<String> setTeam(@PathVariable("eventId") Long eventId, @RequestParam("blackTeam") List<String> blackTeam, @RequestParam("whiteTeam") List<String> whiteTeam, @RequestHeader("Authorization") Token token){
-        tokenHandler.checkToken(token, Role.ADMIN);
+        String username = tokenHandler.checkToken(token, Role.ADMIN).getUsername();
+        log.info("{} is setting-up teams for event: {}.\nBLACK TEAM: {} \nWHITE TEAM: {}", username, eventId, blackTeam, whiteTeam);
         if(!eventHandler.isTeamsSizeValid(blackTeam.size(), whiteTeam.size()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_TEAM_SIZE.toString());
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_TEAM_SIZE, " Error while setting up teams. Operated by " + username +" on event "+ eventId + " Teams - Black:"+ blackTeam + " white " + whiteTeam);
         userEventHandler.verifyPlayers(eventId, blackTeam, whiteTeam);
         userEventHandler.setTeam(eventId, blackTeam, Team.BLACK);
         userEventHandler.setTeam(eventId, whiteTeam, Team.WHITE);
+        log.info("Teams correctly set. Operated by {} Teams: Black {} White {}", username, blackTeam, whiteTeam);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

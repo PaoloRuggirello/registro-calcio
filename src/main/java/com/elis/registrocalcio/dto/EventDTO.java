@@ -120,7 +120,12 @@ public class EventDTO {
                 .append("id", id)
                 .append("category", category)
                 .append("date", date)
+                .append("hour", hour)
                 .append("creator", creator)
+                .append("played", played)
+                .append("hourOfFreePeriod", hourOfFreePeriod)
+                .append("hourOfNoDeleteZone", hourOfNoDeleteZone)
+                .append("freeSeats", freeSeats)
                 .toString();
     }
 }
