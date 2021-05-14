@@ -13,6 +13,7 @@ public class EventDTO {
     public String category;
     public String date;
     public String hour;
+    public String hiddenTime;
     public UserDTO creator;
     public Boolean played;
     public int hourOfFreePeriod;
@@ -26,6 +27,7 @@ public class EventDTO {
         this.id = event.getId();
         this.date = DateUtils.getDateFromInstant(event.getDate());
         this.hour = DateUtils.getHourFromInstant(event.getDate());
+        this.hiddenTime = event.getDate().toString();
         this.hourOfFreePeriod = event.getHourOfFreePeriod();
         this.hourOfNoDeleteZone = event.getHourOfNoDeleteZone();
         this.category = event.getCategory().toString();
@@ -112,6 +114,14 @@ public class EventDTO {
 
     public void setHourOfNoDeleteZone(int hourOfNoDeleteZone) {
         this.hourOfNoDeleteZone = hourOfNoDeleteZone;
+    }
+
+    public String getHiddenTime() {
+        return hiddenTime;
+    }
+
+    public void setHiddenTime(String hiddenTime) {
+        this.hiddenTime = hiddenTime;
     }
 
     @Override

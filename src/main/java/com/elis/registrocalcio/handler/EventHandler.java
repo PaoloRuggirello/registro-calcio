@@ -92,9 +92,9 @@ public class EventHandler {
         return eventRepository.findAllByPlayedIsTrue(Instant.now());
     }
 
-    public List<UserEvent> findEventPlayers(Long eventId){
+    public List<UserEvent> findEventPlayers(Long eventId, Integer page){
         int maxPlayers = eventHandler.findEventByIdCheckOptional(eventId).getCategory().numberOfAllowedPlayers();
-        return userEventRepository.findPlayersOfEvent(eventId, PageRequest.of(0, maxPlayers));
+        return userEventRepository.findPlayersOfEvent(eventId, PageRequest.of(page, maxPlayers));
     }
 
     public boolean isTeamsSizeValid(int team1, int team2){

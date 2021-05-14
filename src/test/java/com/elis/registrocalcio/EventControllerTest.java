@@ -221,7 +221,7 @@ public class EventControllerTest {
         token.token = userToken.token;
         EventDTO eventFromService = eventController.findEvent(event.getId(), token);
         token.token = userToken.token;
-        List<PlayerDTO> playersFromService = eventController.findPlayers(event.getId(), token);
+        List<PlayerDTO> playersFromService = eventController.findPlayers(event.getId(), 0, token);
 
         //Assertions
         assertThat(eventFromService.getCategory(), equalTo(Category.CALCIO_A_5.toString()));

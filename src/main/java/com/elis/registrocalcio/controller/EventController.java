@@ -113,10 +113,11 @@ public class EventController {
         tokenHandler.checkToken(userToken);
         return eventHandler.findPastEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
-    @GetMapping("/findPlayers/{eventId}")
-    public List<PlayerDTO> findPlayers(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
+
+    @GetMapping("/findPlayers/{eventId}/{page}")
+    public List<PlayerDTO> findPlayers(@PathVariable("eventId") Long eventId, @PathVariable("page") Integer page, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
-        return eventHandler.findEventPlayers(eventId).stream().map(PlayerDTO::new).collect(Collectors.toList());
+        return eventHandler.findEventPlayers(eventId, page).stream().map(PlayerDTO::new).collect(Collectors.toList());
     }
 
     @PostMapping("/setTeam/{eventId}")
