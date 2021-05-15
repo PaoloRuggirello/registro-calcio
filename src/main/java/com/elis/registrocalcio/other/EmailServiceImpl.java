@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -21,8 +20,7 @@ public class EmailServiceImpl {
 
     @Autowired
     private JavaMailSender mailSender;
-    private final String antPattern = "EEEEE dd MMMMM";
-    private final String postPattern = "HH:mm";
+
 
     private final String mailFrom = "registro.calcio.elis@yandex.com";
     private final String footer = "\n\nBuon divertimento,\n Registro calcio ELIS.\n\n" +
@@ -112,11 +110,11 @@ public class EmailServiceImpl {
     }
 
     private String getAntDate(Instant eventDate){
-        SimpleDateFormat antPatternFormat = new SimpleDateFormat(antPattern, new Locale("it", "IT"));
+        SimpleDateFormat antPatternFormat = new SimpleDateFormat(DateUtils.antPattern, new Locale("it", "IT"));
         return antPatternFormat.format(Date.from(eventDate));
     }
     private String getPostDate(Instant eventDate){
-        SimpleDateFormat postPatternFormat = new SimpleDateFormat(postPattern, new Locale("it", "IT"));
+        SimpleDateFormat postPatternFormat = new SimpleDateFormat(DateUtils.hourPattern, new Locale("it", "IT"));
         return postPatternFormat.format(Date.from(eventDate));
     }
     private String[] convertMailList(List<String> mailList){

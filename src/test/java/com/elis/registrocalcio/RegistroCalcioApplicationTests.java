@@ -73,10 +73,11 @@ class RegistroCalcioApplicationTests {
 
 	@Test
 	public void testDateConversion(){
-//		DateUtils.StringToInstantConverter("2021-05-26T20:44:14.000Z");
-		System.out.println(Instant.now().toString());
-		Instant date = Instant.parse("2021-05-26T20:44:14.000Z");
-		System.out.println(date);
+//		System.out.println(Instant.now().toString());
+//		Instant date = Instant.parse("2021-05-26T20:44:14.000Z");
+//		System.out.println(date);
+
+		System.out.println(DateUtils.getDateFromInstant(Instant.now()));
 	}
 
 	@Test

@@ -1,7 +1,0 @@
-#Database credentials for docker
-spring:
-  datasource:
-    jdbcUrl: jdbc:mysql://database:3306/registro_calcio?serverTimezone=UTC
-    username: mysql
-    password: mysql
-    driver-class-name: com.mysql.cj.jdbc.Driver
