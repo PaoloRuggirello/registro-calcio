@@ -23,7 +23,7 @@ public class EmailServiceImpl {
 
 
     private final String mailFrom = "registro.calcio.elis@yandex.com";
-    private final String footer = "\n\nBuon divertimento,\n Registro calcio ELIS.\n\n" +
+    private final String footer = "\n\nBuon divertimento,\nRegistro calcio ELIS.\n\n" +
             "Email generata automaticamente, non rispondere a questa email, se hai bisogno di ulteriore supporto contatta uno degli incaricati.";
 
     @Async
@@ -48,7 +48,7 @@ public class EmailServiceImpl {
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
             message.setSubject(category + " " + antDate);
-            message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\n Dettagli: " +
+            message.setText("Gentile utente,\nregistro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\nDettagli: " +
                     category + " - " + antDate + " ore " + postDate + footer);
             mailSender.send(message);
         }catch (Exception e ){
@@ -65,7 +65,7 @@ public class EmailServiceImpl {
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
             message.setSubject("Assegnazione team " + category + " "+ antDate);
-            message.setText("Gentile utente,\n registro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
+            message.setText("Gentile utente,\nregistro calcio ELIS è felice di comunicarti che nella partita di " + category + " che si terrà " + antDate + " alle " + postDate +
                     " farai parte del " + team + " team!" + footer);
             mailSender.send(message);
         }catch (Exception e ){
@@ -101,7 +101,7 @@ public class EmailServiceImpl {
             message.setFrom(mailFrom);
             message.setTo(user.getEmail());
             message.setSubject("Registro calcio ELIS ti dà il benvenuto");
-            message.setText("Ciao " + user.getName() + ", \n registro calcio ELIS è lieto di darti il benvenuto.\nIl tuo username per l'accesso al portale è: " + user.getUsername() + "." +
+            message.setText("Ciao " + user.getName() + ",\nregistro calcio ELIS è lieto di darti il benvenuto.\nIl tuo username per l'accesso al portale è: " + user.getUsername() + "." +
                     footer);
             mailSender.send(message);
         }catch (Exception e ){

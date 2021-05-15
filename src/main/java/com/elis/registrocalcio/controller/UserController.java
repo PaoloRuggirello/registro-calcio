@@ -125,12 +125,13 @@ public class UserController {
     @Transactional
     @PostMapping("/delete/{username}")
     public UserDTO deleteUser(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken, Role.ADMIN); //Users can only be deleted by admin
+        String tokenUsername = tokenHandler.checkToken(userToken, Role.ADMIN).getUsername(); //Users can only be deleted by admin
         log.info("Removing user: {}", username);
         User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
         userEventHandler.deleteByUser(userToDelete);
         userToDelete.setActive(false);
         log.info("{} removed", username);
+        if(tokenUsername.equals(username)) logout(tokenHandler.createToken(tokenUsername));
         return new UserDTO(userHandler.save(userToDelete)).withoutPassword();
     }
 
