@@ -31,7 +31,7 @@ public class EventDTO {
         this.hourOfFreePeriod = event.getHourOfFreePeriod();
         this.hourOfNoDeleteZone = event.getHourOfNoDeleteZone();
         this.category = event.getCategory().toString();
-        this.creator = new UserDTO(event.getCreator());
+        this.creator = new UserDTO(event.getCreator()).withEssentialFields();
         this.played = event.getPlayed();
         int players = event.getPlayers() != null ? event.getPlayers().size() : 0;
         int totalSeats = event.getCategory().numberOfAllowedPlayers();

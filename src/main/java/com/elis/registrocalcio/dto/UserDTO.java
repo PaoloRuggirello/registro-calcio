@@ -35,6 +35,7 @@ public class UserDTO {
         this.password = password;
     }
 
+
     public String getUsername() {
         return username;
     }
@@ -97,6 +98,13 @@ public class UserDTO {
 
     public void setNewsletter(Boolean newsletter) {
         this.newsletter = newsletter;
+    }
+
+    public UserDTO withEssentialFields(){
+        this.username = null;
+        this.password = null;
+        this.role = null;
+        return this;
     }
 
     public void setFields(User user) {
