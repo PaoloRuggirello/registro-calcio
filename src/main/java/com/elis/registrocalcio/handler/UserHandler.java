@@ -150,7 +150,7 @@ public class UserHandler {
      * @return the user with updated username
      */
     public UserDTO setAvailableUsername(UserDTO toSetUsername){
-        String username = toSetUsername.getUsername();
+        String username = toSetUsername.getUsername().split("\\[")[0];
         Long numberOfHomonyms = userRepository.countByNameAndSurnameIgnoreCaseAndIsActiveIsTrue(toSetUsername.getName(), toSetUsername.getSurname());
         log.warn("User with {} username already exist, assigned username = {}", username, username + numberOfHomonyms);
         if(numberOfHomonyms > 0)

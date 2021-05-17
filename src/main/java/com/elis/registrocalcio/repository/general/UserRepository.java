@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository <User, Long> {
 
     Long countByNameAndSurnameIgnoreCaseAndIsActiveIsTrue(String name, String username);
     Optional<User> findByEmailAndIsActiveIsTrue(String email);
-    Optional<User> findByUsernameAndIsActiveIsTrue(String username);
+
+    @Query("select u from User u where u.isActive = true and (u.username = :username or u.email = :username)")
+    Optional<User> findByUsernameAndIsActiveIsTrue(@Param("username") String username);
     List<User> findAllByIsActiveIsTrue();
 }
