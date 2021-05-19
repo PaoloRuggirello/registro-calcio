@@ -33,7 +33,7 @@ public class EmailServiceImpl {
         message.setTo(userEmail);
         message.setSubject("Procedura recupero password");
         message.setText("Gentile " + userName + ", è stata avviata la procedura di recupero credenziali. \n" +
-                "La tua attuale password è: " + tempPassword + ". \n" +
+                "La tua attuale password è: '" + tempPassword + "'. \n" +
                 "Puoi scegliere se continuare ad utilizzare questa o cambiarla con una a tuo piacimento, nel caso tu volessi cambiarla recati nella sezione 'profilo' della tua homePage." +
                 footer);
         mailSender.send(message);

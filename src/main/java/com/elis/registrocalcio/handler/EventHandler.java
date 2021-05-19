@@ -142,6 +142,7 @@ public class EventHandler {
 
         List<String> blackTeam = ofNullable(event.getPlayers()).orElse(new ArrayList<>()).stream().filter(p -> Team.BLACK.equals(p.getTeam())).map(player -> player.getUser().getNameAndSurname()).collect(Collectors.toList());
         List<String> whiteTeam = ofNullable(event.getPlayers()).orElse(new ArrayList<>()).stream().filter(p -> Team.WHITE.equals(p.getTeam())).map(player -> player.getUser().getNameAndSurname()).collect(Collectors.toList());
+        List<String> noTeam = ofNullable(event.getPlayers()).orElse(new ArrayList<>()).stream().filter(p -> p.getTeam() == null).map(player -> player.getUser().getNameAndSurname()).collect(Collectors.toList());
 
 
         exportedMatch.open();
@@ -156,32 +157,41 @@ public class EventHandler {
         Paragraph blackTeamPlayers = new Paragraph();
         Paragraph whiteTeamTitle = new Paragraph();
         Paragraph whiteTeamPlayers = new Paragraph();
+        Paragraph noTeamTitle = new Paragraph();
+        Paragraph noTeamPlayers = new Paragraph();
 
         title.setAlignment(Element.ALIGN_CENTER);
         subTitle.setAlignment(Element.ALIGN_CENTER);
         blackTeamTitle.setAlignment(Element.ALIGN_BASELINE);
         whiteTeamTitle.setAlignment(Element.ALIGN_BASELINE);
+        noTeamPlayers.setAlignment(Element.ALIGN_BASELINE);
         blackTeamTitle.setSpacingBefore(20);
+        whiteTeamTitle.setSpacingBefore(20);
 
 
         Chunk titleText = new Chunk(event.getCategory().toString(), titleFont);
         Chunk subTitleText = new Chunk(DateUtils.getDateFromInstant(event.getDate()) + " " + DateUtils.getHourFromInstant(event.getDate()), subTitleFont);
         Chunk blackTeamTitleText = new Chunk("BLACK:",teamTitleFont);
         Chunk whiteTeamTitleText = new Chunk("WHITE:", teamTitleFont);
+        Chunk noTeamTitleText = new Chunk("PLAYERS WITHOUT TEAM:", teamTitleFont);
 
-        if(whiteTeam.size() > 0 && blackTeam.size() > 0) {
-            blackTeam.forEach(player -> blackTeamPlayers.add(new Chunk(player + "\n", playerFont)));
-            whiteTeam.forEach(player -> whiteTeamPlayers.add(new Chunk(player + "\n", playerFont)));
-        } else {
+
+
+        if(blackTeam.size() > 0) blackTeam.forEach(player -> blackTeamPlayers.add(new Chunk(player + "\n", playerFont)));
+        else blackTeamTitleText = null;
+        if(whiteTeam.size() > 0) whiteTeam.forEach(player -> whiteTeamPlayers.add(new Chunk(player + "\n", playerFont)));
+        else whiteTeamTitleText = null;
+        if(noTeam.size() > 0) noTeam.forEach(player -> noTeamPlayers.add(new Chunk(player + "\n", playerFont)));
+        else noTeamTitleText = null;
+
+        if(whiteTeam.size() == 0 && blackTeam.size() == 0 && noTeam.size() == 0)
             blackTeamTitleText = new Chunk("Nessun giocatore presente");
-            whiteTeamTitleText = null;
-        }
-
 
         title.add(titleText);
         subTitle.add(subTitleText);
         blackTeamTitle.add(blackTeamTitleText);
         whiteTeamTitle.add(whiteTeamTitleText);
+        noTeamTitle.add(noTeamTitleText);
 
 
         exportedMatch.add(title);
@@ -190,6 +200,8 @@ public class EventHandler {
         exportedMatch.add(blackTeamPlayers);
         exportedMatch.add(whiteTeamTitle);
         exportedMatch.add(whiteTeamPlayers);
+        exportedMatch.add(noTeamTitle);
+        exportedMatch.add(noTeamPlayers);
         exportedMatch.close();
 
 
