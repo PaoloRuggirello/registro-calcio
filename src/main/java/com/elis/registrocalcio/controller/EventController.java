@@ -18,7 +18,11 @@ import com.elis.registrocalcio.model.general.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +35,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -131,5 +138,35 @@ public class EventController {
         userEventHandler.setTeam(eventId, whiteTeam, Team.WHITE);
         log.info("Teams correctly set. Operated by {} Teams: Black {} White {}", username, blackTeam, whiteTeam);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/export/{eventId}")
+    public ResponseEntity<InputStreamResource> exportEvent(@PathVariable("eventId") Long eventId) throws FileNotFoundException {
+//        String username = tokenHandler.checkToken(token, Role.ADMIN).getUsername();
+        String username = "paolo.ruggirello";
+        log.info("{} is exporting event {}", username, eventId);
+        Event toExport = eventHandler.findEventByIdCheckOptional(eventId);
+        if(!toExport.getPlayed()) ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_NOT_PLAYED_YET, username + " is trying to download not played event: " + toExport);
+        String filePath = "";
+        String fileName = eventHandler.generateFileName(toExport);
+        try {
+            filePath = eventHandler.exportEvent(toExport, fileName);
+        } catch (Exception e){
+            ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.INTERNAL_SERVER_ERROR, FootballRegisterException.CANNOT_EXPORT_FILE, " " + username + " - cannot export file relative to match :" + toExport + "\n" + e);
+        }
+
+        File match = new File(filePath);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(match));
+
+        ContentDisposition contentDisposition = ContentDisposition.builder("inline")
+                .filename(fileName)
+                .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(contentDisposition);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(match.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 }

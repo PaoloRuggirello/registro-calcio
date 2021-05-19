@@ -15,12 +15,13 @@ import java.util.regex.Pattern;
 
 public class DateUtils {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-    public static final String datePattern = "dd/MM/yyyy";
+    public static final String datePattern = "dd-MM-yyyy";
     public static final String hourPattern = "HH:mm";
     public static final String antPattern = "EEEE dd MMMM";
     private static SimpleDateFormat completeDateFormatter;
     private static DateTimeFormatter hourDateTimeFormatter = DateTimeFormatter.ofPattern(hourPattern);
     private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(antPattern, new Locale("it", "IT"));
+    private static DateTimeFormatter dateTimeFormatterSmall = DateTimeFormatter.ofPattern(datePattern, new Locale("it", "IT"));
 
     public static SimpleDateFormat getCompleteDateFormatter(){
         if(completeDateFormatter == null){
@@ -43,6 +44,10 @@ public class DateUtils {
 
     public static String getDateFromInstant(Instant date){
         String dateAsString = date.atZone(ZoneId.of("GMT+2")).format(dateTimeFormatter);
+        return dateAsString.substring(0,1).toUpperCase() + dateAsString.substring(1);
+    }
+    public static String getSmallDateFromInstant(Instant date){
+        String dateAsString = date.atZone(ZoneId.of("GMT+2")).format(dateTimeFormatterSmall);
         return dateAsString.substring(0,1).toUpperCase() + dateAsString.substring(1);
     }
     public static String getHourFromInstant(Instant date){

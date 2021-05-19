@@ -1,6 +1,8 @@
 package com.elis.registrocalcio.handler;
 
+import com.elis.registrocalcio.controller.EventController;
 import com.elis.registrocalcio.enumPackage.Category;
+import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
@@ -10,7 +12,18 @@ import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.repository.general.UserEventRepository;
 import com.elis.registrocalcio.repository.general.UserRepository;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -19,10 +32,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static java.util.Optional.ofNullable;
+
 
 @Service
 public class EventHandler {
@@ -37,9 +56,7 @@ public class EventHandler {
     @Autowired
     EventHandler eventHandler;
 
-//    public boolean isEventValid(EventDTO event) {
-//        return areFieldsValid(event);
-//    }
+    private static Logger log = LogManager.getLogger(EventController.class);
 
     public boolean areFieldsValid(EventDTO event){
         return validateEventCategory(event.getCategory()) && validateDate(DateUtils.StringToInstantConverter(event.getDate()));
@@ -118,9 +135,76 @@ public class EventHandler {
             emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
     }
 
-//    @Scheduled(fixedRate = 3600000) //Method called each hour
-//    private void updateEventsStatus(){
-//        eventRepository.updateEvents(Instant.now());
-//        System.out.println("Events updated successfully");
-//    }
+    public String exportEvent(Event event, String filename) throws IOException, DocumentException {
+        String file = "export/" + filename;
+        Document exportedMatch = new com.itextpdf.text.Document();
+        PdfWriter.getInstance(exportedMatch, new FileOutputStream(file));
+
+        List<String> blackTeam = ofNullable(event.getPlayers()).orElse(new ArrayList<>()).stream().filter(p -> Team.BLACK.equals(p.getTeam())).map(player -> player.getUser().getNameAndSurname()).collect(Collectors.toList());
+        List<String> whiteTeam = ofNullable(event.getPlayers()).orElse(new ArrayList<>()).stream().filter(p -> Team.WHITE.equals(p.getTeam())).map(player -> player.getUser().getNameAndSurname()).collect(Collectors.toList());
+
+
+        exportedMatch.open();
+        Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD, BaseColor.BLACK);
+        Font subTitleFont = new Font(Font.FontFamily.TIMES_ROMAN, 15, Font.ITALIC, BaseColor.BLACK);
+        Font teamTitleFont = new Font(Font.FontFamily.TIMES_ROMAN, 15, Font.BOLD, BaseColor.BLACK);
+        Font playerFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.ITALIC, BaseColor.BLACK);
+
+        Paragraph title = new Paragraph();
+        Paragraph subTitle = new Paragraph();
+        Paragraph blackTeamTitle = new Paragraph();
+        Paragraph blackTeamPlayers = new Paragraph();
+        Paragraph whiteTeamTitle = new Paragraph();
+        Paragraph whiteTeamPlayers = new Paragraph();
+
+        title.setAlignment(Element.ALIGN_CENTER);
+        subTitle.setAlignment(Element.ALIGN_CENTER);
+        blackTeamTitle.setAlignment(Element.ALIGN_BASELINE);
+        whiteTeamTitle.setAlignment(Element.ALIGN_BASELINE);
+        blackTeamTitle.setSpacingBefore(20);
+
+
+        Chunk titleText = new Chunk(event.getCategory().toString(), titleFont);
+        Chunk subTitleText = new Chunk(DateUtils.getDateFromInstant(event.getDate()) + " " + DateUtils.getHourFromInstant(event.getDate()), subTitleFont);
+        Chunk blackTeamTitleText = new Chunk("BLACK:",teamTitleFont);
+        Chunk whiteTeamTitleText = new Chunk("WHITE:", teamTitleFont);
+
+        if(whiteTeam.size() > 0 && blackTeam.size() > 0) {
+            blackTeam.forEach(player -> blackTeamPlayers.add(new Chunk(player + "\n", playerFont)));
+            whiteTeam.forEach(player -> whiteTeamPlayers.add(new Chunk(player + "\n", playerFont)));
+        } else {
+            blackTeamTitleText = new Chunk("Nessun giocatore presente");
+            whiteTeamTitleText = null;
+        }
+
+
+        title.add(titleText);
+        subTitle.add(subTitleText);
+        blackTeamTitle.add(blackTeamTitleText);
+        whiteTeamTitle.add(whiteTeamTitleText);
+
+
+        exportedMatch.add(title);
+        exportedMatch.add(subTitle);
+        exportedMatch.add(blackTeamTitle);
+        exportedMatch.add(blackTeamPlayers);
+        exportedMatch.add(whiteTeamTitle);
+        exportedMatch.add(whiteTeamPlayers);
+        exportedMatch.close();
+
+
+        return file;
+    }
+
+
+    public String generateFileName(Event event){
+        return event.getCategory() + " - " + DateUtils.getSmallDateFromInstant(event.getDate()) + " " + DateUtils.getHourFromInstant(event.getDate()) +".pdf";
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    private void deleteFiles() throws IOException {
+        File directory = new File("export/");
+        FileUtils.cleanDirectory(directory);
+        log.warn("Scheduled operation - deleted all files");
+    }
 }

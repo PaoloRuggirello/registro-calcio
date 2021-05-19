@@ -20,7 +20,7 @@ services:
 
   registro-calcio-backend:
     build: ../
-    container_name: registro-calcio-backend
+    container_name: registro_calcio_backend
     ports:
       - 8080:8080
     volumes:
@@ -28,12 +28,16 @@ services:
     restart: always
     depends_on:
       - database
+    links:
+      - database
 
   registro-calcio-frontend-prime:
     build: ../../rc-fe-prime-ng
     container_name: registro-calcio-frontend-prime
     ports:
-      - 81:4200
+      - 80:4200
     depends_on:
+      - registro-calcio-backend
+    links:
       - registro-calcio-backend
     restart: always

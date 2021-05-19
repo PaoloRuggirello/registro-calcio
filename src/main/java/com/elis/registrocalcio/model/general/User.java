@@ -165,6 +165,9 @@ public class User implements Serializable {
         this.newsLetter = newsLetter;
     }
 
+    public String getNameAndSurname(){
+        return this.name + " " + this.surname;
+    }
     @Override
     public String toString() {
         return new ToStringBuilder(this)

@@ -126,7 +126,7 @@ public class UserController {
     @PostMapping("/delete/{username}")
     public UserDTO deleteUser(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         String tokenUsername = tokenHandler.checkToken(userToken, Role.ADMIN).getUsername(); //Users can only be deleted by admin
-        log.info("Removing user: {}", username);
+        log.info("{} is removing user: {}", tokenUsername, username);
         User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
         userEventHandler.deleteByUser(userToDelete);
         userToDelete.setActive(false);
