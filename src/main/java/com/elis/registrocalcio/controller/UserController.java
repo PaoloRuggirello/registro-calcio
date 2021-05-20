@@ -36,6 +36,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -138,7 +139,11 @@ public class UserController {
     @GetMapping("/find")
     public List<UserDTO> findAll(@RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken, Role.ADMIN); //Only admin need all users
-        return userHandler.findActiveUsers().stream().map(UserDTO::new).collect(Collectors.toList());
+        List<User> allUsers = userHandler.findActiveUsers();
+        List<UserDTO> external = allUsers.stream().filter(user -> user.getSurname().contains("[ext]")).map(UserDTO::new).collect(Collectors.toList());
+        List<UserDTO> allUsersDTO = allUsers.stream().filter(user -> !user.getSurname().contains("[ext]")).map(UserDTO::new).collect(Collectors.toList());
+        allUsersDTO.addAll(external);
+        return allUsersDTO;
     }
 
     @GetMapping("/findInfo")
