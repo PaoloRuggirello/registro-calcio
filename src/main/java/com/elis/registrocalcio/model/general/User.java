@@ -67,6 +67,16 @@ public class User implements Serializable {
         this.isActive = true;
     }
 
+    public User(String username, String name, String surname, String email, String password, Boolean newsLetter) {
+        this.username = username;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.isActive = true;
+        this.newsLetter = newsLetter;
+    }
+
     public User(UserDTO toRegister) {
         this.username = toRegister.getUsername();
         this.name = toRegister.getName();

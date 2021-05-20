@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.repository.general;
 
 import com.elis.registrocalcio.model.general.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ public interface UserRepository extends JpaRepository <User, Long> {
     Optional<String> findRoleByUsername(@Param("username")String username);
 
     @Query("select u.email from User u where u.isActive = true and u.newsLetter = true")
-    List<String> findNewsLetter();
+    List<String> findNewsLetter(Pageable pageable);
 
     Long countByNameAndSurnameIgnoreCaseAndIsActiveIsTrue(String name, String username);
     Optional<User> findByEmailAndIsActiveIsTrue(String email);

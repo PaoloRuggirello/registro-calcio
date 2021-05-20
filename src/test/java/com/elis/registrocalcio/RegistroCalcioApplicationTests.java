@@ -21,7 +21,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 @SpringBootTest
@@ -99,5 +101,14 @@ class RegistroCalcioApplicationTests {
 		Assertions.assertFalse(DateUtils.areInTheSameWeek(date2, date4));
 		Assertions.assertFalse(DateUtils.areInTheSameWeek(date3, date4));
 
+	}
+
+	@Test
+	public void testingList(){
+		List<String> test = new ArrayList<>();
+		test.add("1");
+		test.add("2");
+
+		System.out.println(test.subList(0, 10));
 	}
 }

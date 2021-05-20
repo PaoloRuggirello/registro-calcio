@@ -263,7 +263,7 @@ public class EventControllerTest {
 
     @Test
     public void testModifyEvent(){
-        User admin = new User("admin.admin", "name", "surname", "admin@email.it", "password");
+        User admin = new User("admin.admin", "name", "surname", "admin@email.it", "password", true);
         admin.setRole(Role.ADMIN);
         userRepository.save(admin);
 

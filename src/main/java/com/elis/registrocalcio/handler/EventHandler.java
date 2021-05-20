@@ -20,6 +20,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -112,10 +113,22 @@ public class EventHandler {
      * This method send an email to each user that want to now the creation of a new Event
      * @param event
      */
-    public void newEventToNewsLetter(Event event){
-        List<String> mailList = userRepository.findNewsLetter();
-        if(mailList.size() > 0)
-            emailService.comunicateNewEventToMailList(mailList, event.getCategory().toString(), event.getDate());
+    public void newEventToNewsLetter(Event event) {
+        List<List<String>> mailList = new ArrayList<>();
+        boolean end = false;
+        int page = 0;
+        while(!end){
+            List<String> current = userRepository.findNewsLetter(PageRequest.of(page, 25));
+            if(current.size() > 0){
+                page++;
+                mailList.add(current);
+            } else {
+                end = true;
+            }
+        }
+        if (mailList.size() > 0) {
+            mailList.forEach(list -> emailService.comunicateNewEventToMailList(list, event.getCategory().toString(), event.getDate()));
+        }
     }
 
 //    @Scheduled(fixedRate = 3600000) //Method called each hour
