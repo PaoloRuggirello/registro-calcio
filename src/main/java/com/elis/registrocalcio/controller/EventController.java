@@ -117,7 +117,7 @@ public class EventController {
 
     @GetMapping("/findPast")
     public List<EventDTO> findPastEvents(@RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken);
+        tokenHandler.checkToken(userToken, Role.ADMIN);
         return eventHandler.findPastEvents().stream().map(EventDTO::new).collect(Collectors.toList());
     }
 
@@ -141,9 +141,8 @@ public class EventController {
     }
 
     @GetMapping("/export/{eventId}")
-    public ResponseEntity<InputStreamResource> exportEvent(@PathVariable("eventId") Long eventId) throws FileNotFoundException {
-//        String username = tokenHandler.checkToken(token, Role.ADMIN).getUsername();
-        String username = "paolo.ruggirello";
+    public ResponseEntity<InputStreamResource> exportEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token token) throws FileNotFoundException {
+        String username = tokenHandler.checkToken(token, Role.ADMIN).getUsername();
         log.info("{} is exporting event {}", username, eventId);
         Event toExport = eventHandler.findEventByIdCheckOptional(eventId);
         if(!toExport.getPlayed()) ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_NOT_PLAYED_YET, username + " is trying to download not played event: " + toExport);
