@@ -3,6 +3,8 @@ package com.elis.registrocalcio.other;
 import com.elis.registrocalcio.enumPackage.ChangeType;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,6 +22,7 @@ public class EmailServiceImpl {
 
     @Autowired
     private JavaMailSender mailSender;
+    private static Logger log = LogManager.getLogger(EmailServiceImpl.class);
 
 
     private final String mailFrom = "registro.calcio.elis@yandex.com";
@@ -47,12 +50,14 @@ public class EmailServiceImpl {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
+            log.info("Sendin email to mail list: {}", mailList);
             message.setSubject(category + " " + antDate);
             message.setText("Gentile utente,\nregistro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\nDettagli: " +
                     category + " - " + antDate + " ore " + postDate + footer);
             mailSender.send(message);
-        }catch (Exception e ){
+        }catch (Exception e){
             System.out.println("Cannot send email");
+            log.error("Cannot sand email to mail List. Mail list: {} {}", mailList, e);
         }
     }
 
