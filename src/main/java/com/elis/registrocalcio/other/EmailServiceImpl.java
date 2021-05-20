@@ -43,7 +43,7 @@ public class EmailServiceImpl {
     }
 
     @Async
-    public void comunicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
+    public void communicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
         try {
             String antDate = getAntDate(eventDate);
             String postDate = getPostDate(eventDate);
@@ -62,7 +62,7 @@ public class EmailServiceImpl {
     }
 
     @Async
-    public void comunicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
+    public void communicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
         try{
             String antDate = getAntDate(eventDate);
             String postDate = getPostDate(eventDate);

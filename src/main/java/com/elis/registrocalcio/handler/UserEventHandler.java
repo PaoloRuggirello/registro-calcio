@@ -34,19 +34,6 @@ public class UserEventHandler {
         return userEventRepository.save(userEvent);
     }
 
-//    public boolean isAlreadyRegistered(User user, Event toRegister) {
-//        if(userEventRepository.existsByUserAndId(user, toRegister.getId())) return true; //Check if user is already registered to this event
-//        List<UserEvent> userEventList = userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(user); //Get all the events not played yet (ActiveEvent)
-//        if(userEventList.size() == 0)
-//            return false; //User haven't any registration
-//        UserEvent lastRegistered = userEventList.get(0); //List sorted by date desc, the first element is the last registration time
-//        if(!DateUtils.areInTheSameWeek(lastRegistered.getEvent().getDate(), toRegister.getDate()))
-//            return false; //If events aren't in the same week user can be registered to eachOther
-//        Instant today = Instant.now();
-//        Instant nowPlus48Hours = today.plus(2, ChronoUnit.DAYS);
-//        return !(toRegister.getDate().isBefore(nowPlus48Hours) && toRegister.getDate().isAfter(today));//Check if the event is in the range today - next 48h, if yes return false <- means that user can subscribe the event
-//    }
-
     public boolean isAlreadyRegistered(User user, Event toRegister) {
         return userEventRepository.existsByUserAndEvent(user, toRegister); //Check if user is already registered to this event
      }
@@ -88,7 +75,7 @@ public class UserEventHandler {
         Instant eventDate = players.get(0).getEvent().getDate();
         List<String> mailList = players.stream().map(userEvent -> userEvent.getUser().getEmail()).collect(Collectors.toList());
         if(mailList.size() > 0)
-            emailService.comunicateTeamToMailList(mailList, team.toString(), category.toString(), eventDate);
+            emailService.communicateTeamToMailList(mailList, team.toString(), category.toString(), eventDate);
     }
 
     public List<Event> findEventsSubscribedByUser(String username){
@@ -96,8 +83,18 @@ public class UserEventHandler {
     }
 
     public void notifyChange(Event oldEvent, ChangeType changeType, Event newEvent){
-        int maxPlayers = eventHandler.findEventByIdCheckOptional(oldEvent.getId()).getCategory().numberOfAllowedPlayers();
-        List<String> mailList = userEventRepository.findPlayersOfEvent(oldEvent.getId(), PageRequest.of(0, maxPlayers*2)).stream().map(ue -> ue.getUser().getEmail()).collect(Collectors.toList());
-        emailService.communicateChangeToMailList(mailList, changeType, oldEvent.getCategory().toString(), oldEvent.getDate(), newEvent);
+        List<List<String>> mailList = new ArrayList<>();
+        boolean end = false;
+        int page = 0;
+        while(!end){
+            List<String> current = userEventRepository.findPlayersOfEvent(oldEvent.getId(), PageRequest.of(page, 25)).stream().map(ue -> ue.getUser().getEmail()).collect(Collectors.toList());
+            if(current.size() > 0){
+                page++;
+                mailList.add(current);
+            } else {
+                end = true;
+            }
+        }
+        mailList.forEach(list -> emailService.communicateChangeToMailList(list, changeType, oldEvent.getCategory().toString(), oldEvent.getDate(), newEvent));
     }
 }

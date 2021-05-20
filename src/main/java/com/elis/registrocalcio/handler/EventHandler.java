@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -127,7 +126,7 @@ public class EventHandler {
             }
         }
         if (mailList.size() > 0) {
-            mailList.forEach(list -> emailService.comunicateNewEventToMailList(list, event.getCategory().toString(), event.getDate()));
+            mailList.forEach(list -> emailService.communicateNewEventToMailList(list, event.getCategory().toString(), event.getDate()));
         }
     }
 
