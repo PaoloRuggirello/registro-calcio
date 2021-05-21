@@ -99,6 +99,22 @@ public class EmailServiceImpl {
         }
     }
 
+    public void communicateRemoval(String appointed, String email, Event event) {
+        try{
+            String antDate = getAntDate(event.getDate());
+            String postDate = DateUtils.getHourFromInstant(event.getDate());
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
+            message.setTo(email);
+            message.setSubject("Iscrizione cancellata da " + event.getCategory() + " " + antDate + " " + postDate);
+            message.setText("Gentile utente,\nregistro calcio ELIS ti comunica che la tua iscrizione all'evento di " + event.getCategory() + " - " + antDate + " " + postDate +") è stata cancellata da " + appointed + ".");
+            message.setText(message.getText() + footer);
+            mailSender.send(message);
+        }catch (Exception e ){
+            System.out.println("Cannot send email");
+        }
+    }
+
     @Async
     public void welcomeUser(User user){
         try {
@@ -129,4 +145,6 @@ public class EmailServiceImpl {
         }
         return result;
     }
+
+
 }

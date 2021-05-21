@@ -2,6 +2,7 @@ package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
+import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.DateUtils;
@@ -129,6 +130,11 @@ public class EventHandler {
             mailList.forEach(list -> emailService.communicateNewEventToMailList(list, event.getCategory().toString(), event.getDate()));
         }
     }
+
+    public void communicateRemoval(String appointed, String email, Event event) {
+        emailService.communicateRemoval(appointed, email, event);
+    }
+
 
 //    @Scheduled(fixedRate = 3600000) //Method called each hour
 //    private void updateEventsStatus(){

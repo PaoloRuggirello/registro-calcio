@@ -36,7 +36,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -112,7 +111,7 @@ public class UserController {
     @PostMapping("/removeFromEvent/{eventId}/{username}")
     public ResponseEntity<String> removeBinding(@PathVariable("eventId") Long eventId, @PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         SecurityToken token = tokenHandler.checkToken(userToken);
-        log.info("{} is trying to remove {} from event {}", token.getUsername(), username, eventId);
+        log.info("{} is removing {} from event {}", token.getUsername(), username, eventId);
         if(token.getRole().equals(Role.USER) && !token.getUsername().equals(username)) { //If a user is trying to delete another user from the match
             ExceptionUtils.throwResponseStatus(this.getClass(), FORBIDDEN, PERMISSION_DENIED);
         }
@@ -120,6 +119,10 @@ public class UserController {
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
         if(event.getPlayed() || (token.getRole().equals(Role.USER) && Instant.now().plus(event.getHourOfNoDeleteZone(), ChronoUnit.HOURS).isAfter(event.getDate()))) ExceptionUtils.throwResponseStatus(this.getClass(), FORBIDDEN, CANNOT_REMOVE_BINDING); //Cannot remove binding if event is in less than 3 hours or played yet
         userEventHandler.deleteByUserAndEvent(toRemoveBinding, event);
+        User appointed = toRemoveBinding;
+        if(!token.getUsername().equals(username))
+            appointed = userHandler.findUserByUsername(token.getUsername()).get();
+        eventHandler.communicateRemoval(appointed.getName() + " " + appointed.getSurname(), toRemoveBinding.getEmail(), event);
         return new ResponseEntity<>(OK);
     }
 
