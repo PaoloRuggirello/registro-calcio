@@ -18,6 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,8 @@ public class UserEventHandler {
     private EmailServiceImpl emailService;
     @Autowired
     private EventHandler eventHandler;
+
+    private final Executor executor = Executors.newFixedThreadPool(5);
 
     public UserEvent save(UserEvent userEvent) {
         return userEventRepository.save(userEvent);
@@ -75,7 +79,7 @@ public class UserEventHandler {
         Instant eventDate = players.get(0).getEvent().getDate();
         List<String> mailList = players.stream().map(userEvent -> userEvent.getUser().getEmail()).collect(Collectors.toList());
         if(mailList.size() > 0)
-            emailService.communicateTeamToMailList(mailList, team.toString(), category.toString(), eventDate);
+            executor.execute(() -> emailService.communicateTeamToMailList(mailList, team.toString(), category.toString(), eventDate));
     }
 
     public List<Event> findEventsSubscribedByUser(String username){
@@ -95,6 +99,6 @@ public class UserEventHandler {
                 end = true;
             }
         }
-        mailList.forEach(list -> emailService.communicateChangeToMailList(list, changeType, oldEvent.getCategory().toString(), oldEvent.getDate(), newEvent));
+        mailList.forEach(list -> executor.execute(() -> emailService.communicateChangeToMailList(list, changeType, oldEvent.getCategory().toString(), oldEvent.getDate(), newEvent)));
     }
 }

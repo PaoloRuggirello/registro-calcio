@@ -2,7 +2,6 @@ package com.elis.registrocalcio.handler;
 
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
-import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.DateUtils;
@@ -23,6 +22,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,9 +39,7 @@ public class EventHandler {
     @Autowired
     EventHandler eventHandler;
 
-//    public boolean isEventValid(EventDTO event) {
-//        return areFieldsValid(event);
-//    }
+    private final Executor executor = Executors.newFixedThreadPool(5);
 
     public boolean areFieldsValid(EventDTO event){
         return validateEventCategory(event.getCategory()) && validateDate(DateUtils.StringToInstantConverter(event.getDate()));
@@ -127,12 +126,12 @@ public class EventHandler {
             }
         }
         if (mailList.size() > 0) {
-            mailList.forEach(list -> emailService.communicateNewEventToMailList(list, event.getCategory().toString(), event.getDate()));
+            mailList.forEach(list -> executor.execute(() -> emailService.communicateNewEventToMailList(list, event.getCategory().toString(), event.getDate())));
         }
     }
 
     public void communicateRemoval(String appointed, String email, Event event) {
-        emailService.communicateRemoval(appointed, email, event);
+        executor.execute(() -> emailService.communicateRemoval(appointed, email, event));
     }
 
 
