@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -110,5 +111,14 @@ class RegistroCalcioApplicationTests {
 		test.add("2");
 
 		System.out.println(test.subList(0, 10));
+	}
+
+	@Test
+	public void test(){
+		List<String> test = Arrays.asList("ciao", "due");
+		Assertions.assertFalse(test.contains(null));
+		Assertions.assertFalse(test.contains(""));
+		Assertions.assertTrue(test.contains("CIAO"));
+
 	}
 }

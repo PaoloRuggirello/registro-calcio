@@ -46,7 +46,7 @@ public class EmailServiceImpl {
     public void communicateNewEventToMailList(List<String> mailList, String category, Instant eventDate){
         try {
             String antDate = getAntDate(eventDate);
-            String postDate = getPostDate(eventDate);
+            String postDate = DateUtils.getHourFromInstant(eventDate);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
@@ -65,7 +65,7 @@ public class EmailServiceImpl {
     public void communicateTeamToMailList(List<String> mailList, String team, String category, Instant eventDate){
         try{
             String antDate = getAntDate(eventDate);
-            String postDate = getPostDate(eventDate);
+            String postDate = DateUtils.getHourFromInstant(eventDate);
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
