@@ -1,5 +1,6 @@
 package com.elis.registrocalcio.other;
 
+import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.enumPackage.ChangeType;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
@@ -51,6 +52,7 @@ public class EmailServiceImpl {
             message.setFrom(mailFrom);
             message.setTo(convertMailList(mailList));
             log.info("Sendin email to mail list: {}", mailList);
+            category = (category.equals(Category.CALCIO_A_11.toString()) ? "Petrack's cup" : category);
             message.setSubject(category + " " + antDate);
             message.setText("Gentile utente,\nregistro calcio ELIS è felice di comunicarti che è stato creato un nuovo evento.\n\nDettagli: " +
                     category + " - " + antDate + " ore " + postDate + footer);
@@ -106,8 +108,8 @@ public class EmailServiceImpl {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailFrom);
             message.setTo(email);
-            message.setSubject("Iscrizione cancellata da " + event.getCategory() + " " + antDate + " " + postDate);
-            message.setText("Gentile utente,\nregistro calcio ELIS ti comunica che la tua iscrizione all'evento di " + event.getCategory() + " - " + antDate + " " + postDate +" è stata cancellata da " + appointed + ".");
+            message.setSubject("Iscrizione cancellata da " + (event.getCategory().equals(Category.CALCIO_A_11) ? "Petrack's cup" : event.getCategory()) + " " + antDate + " " + postDate);
+            message.setText("Gentile utente,\nregistro calcio ELIS ti comunica che la tua iscrizione all'evento di " + (event.getCategory().equals(Category.CALCIO_A_11) ? "Petrack's cup" : event.getCategory()) + " - " + antDate + " " + postDate +" è stata cancellata da " + appointed + ".");
             message.setText(message.getText() + footer);
             mailSender.send(message);
         }catch (Exception e ){

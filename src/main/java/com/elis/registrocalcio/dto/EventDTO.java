@@ -1,5 +1,6 @@
 package com.elis.registrocalcio.dto;
 
+import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.UserEvent;
 import com.elis.registrocalcio.other.DateUtils;
@@ -19,6 +20,7 @@ public class EventDTO {
     public int hourOfFreePeriod;
     public int hourOfNoDeleteZone;
     public int freeSeats;
+    public String label;
 
     public EventDTO() {
     }
@@ -36,6 +38,7 @@ public class EventDTO {
         int players = event.getPlayers() != null ? event.getPlayers().size() : 0;
         int totalSeats = event.getCategory().numberOfAllowedPlayers();
         this.freeSeats = totalSeats > players ? totalSeats - players : 0;
+        this.label = event.getCategory().equals(Category.CALCIO_A_11) ? "Petrack's cup!" : null;
     }
 
     public EventDTO(UserEvent userEvent){
