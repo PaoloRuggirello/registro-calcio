@@ -2,7 +2,7 @@ FROM node:12.15-alpine as build
 RUN mkdir -p /app
 WORKDIR /app
 COPY package.json /app
-RUN npm install
-RUN npm install -g @angular/cli@9.1.6
+
+RUN npm install -g @angular/cli@9.1.6 --production
 COPY ./ /app/
-CMD ng serve --host 0.0.0.0 --disableHostCheck true
+CMD ng serve --host 0.0.0.0
