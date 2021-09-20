@@ -27,13 +27,13 @@ public enum Category {
     public int numberOfAllowedPlayers() {
         switch (this){
             case CALCIO_A_5:
-            case BASKET:
                 return 10;
             case CALCIO_A_7:
                 return 14;
             case CALCIO_A_11:
                 return 22;
             case PALLAVOLO:
+            case BASKET:
                 return 12;
             default: throw new IllegalArgumentException();
         }
