@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -24,7 +25,7 @@ public class DateUtils {
 
     public static SimpleDateFormat getCompleteDateFormatter(){
         if(completeDateFormatter == null){
-            completeDateFormatter = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            completeDateFormatter = new SimpleDateFormat("E MMM dd HH:mm:ss zzz yyyy", Locale.ITALIAN);
         }
         return completeDateFormatter;
     }
@@ -34,7 +35,7 @@ public class DateUtils {
             return DateUtils.getCompleteDateFormatter().parse(date).toInstant();
         } catch (Exception e){
             try{
-                return Instant.parse(date);
+                return Instant.parse(date).truncatedTo(ChronoUnit.MINUTES);
             }catch (Exception e1){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, FootballRegisterException.WRONG_DATE_FORMAT.toString());
             }
@@ -42,11 +43,11 @@ public class DateUtils {
     }
 
     public static String getDateFromInstant(Instant date){
-        String dateAsString = date.atZone(ZoneId.of("GMT+2")).format(dateTimeFormatter);
+        String dateAsString = date.atZone(ZoneId.of("Europe/Rome")).format(dateTimeFormatter);
         return dateAsString.substring(0,1).toUpperCase() + dateAsString.substring(1);
     }
     public static String getHourFromInstant(Instant date){
-        return date.atZone(ZoneId.of("GMT+2")).format(hourDateTimeFormatter);
+        return date.atZone(ZoneId.of("Europe/Rome")).format(hourDateTimeFormatter);
     }
 
     public static boolean areInTheSameWeek(Instant date1, Instant date2){ //Date2 is Always after date1

@@ -3,6 +3,7 @@ package com.elis.registrocalcio.controller;
 import com.elis.registrocalcio.dto.ChangePasswordDTO;
 import com.elis.registrocalcio.dto.LoginDTO;
 import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.enumPackage.FootballRegisterException;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserEventHandler;
 import com.elis.registrocalcio.handler.UserHandler;
@@ -39,6 +40,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.elis.registrocalcio.enumPackage.FootballRegisterException.OVERLAPPING_EVENTS;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -97,12 +100,17 @@ public class UserController {
     public UserEventDTO bindUserAndEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         String username = tokenHandler.checkToken(userToken).getUsername();
         log.info("Binding user {} with event with id {}", username, eventId);
-        log.info("Usertoken: {}", userToken);
+        log.info("UserToken: {}", userToken);
         User user = userHandler.findUserByUsernameCheckOptional(username);
         Event event = eventHandler.findEventByIdCheckOptional(eventId);
-        Instant startOfFreePeriod = event.getDate().minus(event.getHourOfFreePeriod(), ChronoUnit.HOURS);
-       if(userEventHandler.isAlreadyRegistered(user,event) || (userEventHandler.hasActiveEvents(user)) && startOfFreePeriod.isAfter(Instant.now())) //User has active events and free period not started
-            ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_REGISTER_USER);
+        if(!userEventHandler.freeCategories.contains(event.getCategory())) {
+            Instant startOfFreePeriod = event.getDate().minus(event.getHourOfFreePeriod(), ChronoUnit.HOURS);
+            if (userEventHandler.isAlreadyRegistered(user, event) || (userEventHandler.hasActiveEvents(user)) && startOfFreePeriod.isAfter(Instant.now())) //User has active events and free period not started
+                ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_REGISTER_USER);
+        }
+        if(userEventHandler.hasOverlappingEvents(user, event)){
+            ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, OVERLAPPING_EVENTS);
+        }
         UserEvent bound = new UserEvent(user, event);
         return new UserEventDTO(userEventHandler.save(bound));
     }

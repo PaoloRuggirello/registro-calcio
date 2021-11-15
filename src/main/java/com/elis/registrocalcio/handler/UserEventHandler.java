@@ -17,10 +17,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import static com.elis.registrocalcio.enumPackage.Category.BASKET;
+import static com.elis.registrocalcio.enumPackage.Category.PALLAVOLO;
 
 @Service
 public class UserEventHandler {
@@ -31,6 +35,8 @@ public class UserEventHandler {
     private EmailServiceImpl emailService;
     @Autowired
     private EventHandler eventHandler;
+
+    public final List<Category> freeCategories = Arrays.asList(PALLAVOLO, BASKET);
 
     private final Executor executor = Executors.newFixedThreadPool(5);
 
@@ -43,8 +49,12 @@ public class UserEventHandler {
      }
 
      public boolean hasActiveEvents(User user){
-         return userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(user, Instant.now()).size() > 0; //Get all the events not played yet (ActiveEvent)
+        return userEventRepository.findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(user, Instant.now(), freeCategories).size() > 0; //Get all the events not played yet (ActiveEvent)
      }
+
+    public boolean hasOverlappingEvents(User user, Event event) {
+        return userEventRepository.findByUserWithStart(user, event.getDate()).size() > 0;
+    }
 
     public void deleteByUser(User toRemove){
         userEventRepository.deleteByUserEventId(userEventRepository.findUserEventByDeletingUser(toRemove, Instant.now()));

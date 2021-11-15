@@ -16,5 +16,6 @@ public enum FootballRegisterException {
         PERMISSION_DENIED,
         EMAIL_ALREADY_EXIST,
         INVALID_REGISTRATION_FIELDS,
-        INVALID_LOGIN_FIELDS;
+        INVALID_LOGIN_FIELDS,
+        OVERLAPPING_EVENTS
 }

@@ -1,5 +1,6 @@
 package com.elis.registrocalcio.repository.general;
 
+import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;
@@ -16,11 +17,11 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     //Played = false -> eventDate > now
     //Played = true -> eventDate < now
 
-    @Query("select ue from UserEvent ue where ue.event.date > :now and ue.user = :user order by ue.registrationTime asc")
-    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(User user, Instant now);
+    @Query("select ue from UserEvent ue where ue.event.date > :now and ue.user = :user and ue.event.category not in :freeCategories order by ue.registrationTime asc")
+    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeAsc(User user, Instant now, List<Category> freeCategories);
 
-    @Query("select ue from UserEvent ue where ue.event.date > :now and ue.user = :user order by ue.registrationTime desc")
-    List<UserEvent> findByUserAndPlayedIsFalseOrderByRegistrationTimeDesc(User user, Instant now);
+    @Query("select ue from UserEvent ue where ue.event.date = :start and ue.user = :user")
+    List<UserEvent> findByUserWithStart(User user, Instant start);
 
     @Query("select ue.id from UserEvent ue where ue.user = :user and ue.event.date > :now")
     List<Long> findUserEventByDeletingUser(User user, Instant now);
