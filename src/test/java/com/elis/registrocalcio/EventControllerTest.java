@@ -217,7 +217,7 @@ public class EventControllerTest {
         List<UserEvent> userEventList = players.stream().map(player -> new UserEvent(player, event)).collect(Collectors.toList());
         userEventRepository.saveAll(userEventList);
 
-        //Check findEvend combined with findPlayers
+        //Check findEvent combined with findPlayers
         token.token = userToken.token;
         EventDTO eventFromService = eventController.findEvent(event.getId(), token);
         token.token = userToken.token;
@@ -225,7 +225,7 @@ public class EventControllerTest {
 
         //Assertions
         assertThat(eventFromService.getCategory(), equalTo(Category.CALCIO_A_5.toString()));
-        assertThat(eventFromService.getCreator().getUsername(), equalTo(admin.getUsername()));
+        assertThat(eventFromService.getCreator().getUsername(), equalTo(null));
         assertThat(eventFromService.getFreeSeats(), equalTo(Category.CALCIO_A_5.numberOfAllowedPlayers() - playersFromService.size()));
         players.forEach( player -> assertTrue(playersFromService.stream().map(PlayerDTO::getName).collect(Collectors.toList()).contains(player.getName())));
     }
