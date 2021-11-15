@@ -19,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -84,8 +85,8 @@ public class EventHandler {
     }
 
     public List<Event> findActiveEvents(String username){
-        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now()).stream().map(Event::getId).collect(Collectors.toList());
-        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc(Instant.now());
+        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now().plus(2, ChronoUnit.HOURS)).stream().map(Event::getId).collect(Collectors.toList());
+        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc(Instant.now().plus(2, ChronoUnit.HOURS));
         return eventRepository.findByIdNotIn(subscribedEvents, Instant.now());
     }
     public List<Event> findPastEvents(){
