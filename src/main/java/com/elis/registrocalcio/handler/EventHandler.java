@@ -85,9 +85,9 @@ public class EventHandler {
     }
 
     public List<Event> findActiveEvents(String username){
-        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now().plus(2, ChronoUnit.HOURS)).stream().map(Event::getId).collect(Collectors.toList());
-        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc(Instant.now().plus(2, ChronoUnit.HOURS));
-        return eventRepository.findByIdNotIn(subscribedEvents, Instant.now().plus(2, ChronoUnit.HOURS));
+        List<Long> subscribedEvents = userEventRepository.findEventsSubscribedByUser(username, Instant.now().minus(2, ChronoUnit.HOURS)).stream().map(Event::getId).collect(Collectors.toList());
+        if(subscribedEvents.size() == 0) return eventRepository.findAllByPlayedIsFalseOrderByDateAsc(Instant.now().minus(2, ChronoUnit.HOURS));
+        return eventRepository.findByIdNotIn(subscribedEvents, Instant.now().minus(2, ChronoUnit.HOURS));
     }
     public List<Event> findPastEvents(){
         return eventRepository.findAllByPlayedIsTrue(Instant.now());

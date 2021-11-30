@@ -26,7 +26,7 @@ public interface UserEventRepository extends JpaRepository<UserEvent, Long> {
     @Query("select ue.id from UserEvent ue where ue.user = :user and ue.event.date > :now")
     List<Long> findUserEventByDeletingUser(User user, Instant now);
 
-    @Query("select ue.event from UserEvent ue where ue.event.date < :limitDate and ue.user.username = :username order by ue.event.date asc")
+    @Query("select ue.event from UserEvent ue where ue.event.date > :limitDate and ue.user.username = :username order by ue.event.date asc")
     List<Event> findEventsSubscribedByUser(String username, Instant limitDate);
 
     boolean existsByUserAndEvent(User user, Event event);

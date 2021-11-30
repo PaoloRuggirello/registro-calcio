@@ -97,11 +97,13 @@ public class EventController {
         tokenHandler.checkToken(userToken);
         return eventHandler.findAll().stream().map(EventDTO::new).collect(Collectors.toList());
     }
+
     @GetMapping("/find/{eventId}")
     public EventDTO findEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token userToken){
         tokenHandler.checkToken(userToken);
         return new EventDTO(eventHandler.findEventByIdCheckOptional(eventId));
     }
+
     @GetMapping("/findActive")
     public List<EventDTO> findActiveEvents(@RequestHeader("Authorization") Token userToken){
         String username = tokenHandler.checkToken(userToken).getUsername();

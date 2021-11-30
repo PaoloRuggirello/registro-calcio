@@ -94,7 +94,7 @@ public class UserEventHandler {
     }
 
     public List<Event> findEventsSubscribedByUser(String username){
-        Instant date = Instant.now().plus(2, ChronoUnit.HOURS);
+        Instant date = Instant.now().minus(2, ChronoUnit.HOURS);
         return userEventRepository.findEventsSubscribedByUser(username, date);
     }
 
