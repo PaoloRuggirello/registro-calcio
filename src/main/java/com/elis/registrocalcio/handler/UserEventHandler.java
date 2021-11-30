@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,7 +94,8 @@ public class UserEventHandler {
     }
 
     public List<Event> findEventsSubscribedByUser(String username){
-        return userEventRepository.findEventsSubscribedByUser(username, Instant.now());
+        Instant date = Instant.now().plus(2, ChronoUnit.HOURS);
+        return userEventRepository.findEventsSubscribedByUser(username, date);
     }
 
     public void notifyChange(Event oldEvent, ChangeType changeType, Event newEvent){
