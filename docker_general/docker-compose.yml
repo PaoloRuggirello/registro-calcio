@@ -29,9 +29,9 @@ services:
     depends_on:
       - database
 
-#  registro-calcio-frontend-prime:
-#    build: ../../rc-fe-prime-ng
-#    container_name: registro-calcio-frontend-prime
-#    ports:
-#      - 80:4200
-#    restart: always
+  registro-calcio-frontend-prime:
+    build: ../../rc-fe-prime-ng
+    container_name: registro-calcio-frontend-prime
+    ports:
+      - 81:4200
+    restart: always
