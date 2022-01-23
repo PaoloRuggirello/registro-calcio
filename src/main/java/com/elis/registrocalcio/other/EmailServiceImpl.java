@@ -26,7 +26,7 @@ public class EmailServiceImpl {
 
 
     private final String mailFrom = "registro.calcio.elis@yandex.com";
-    private final String footer = "\n\nBuon divertimento,\nRegistro calcio ELIS.\n\n" +
+    private final String footer = "\n\nBuon divertimento,\nRegistro calcio ELIS.\n\n calcio.wink.by \n\n" +
             "Email generata automaticamente, non rispondere a questa email, se hai bisogno di ulteriore supporto contatta uno degli incaricati.";
 
     @Async
