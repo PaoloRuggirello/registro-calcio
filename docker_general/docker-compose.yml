@@ -1,10 +1,10 @@
 version: '3'
 services:
 
-  database:
+  database-dev:
     image: library/mysql:latest
     restart: always
-    container_name: database
+    container_name: database-dev
     volumes:
       - './docker/db/data:/var/lib/prod/mysql'
     environment:
@@ -15,29 +15,27 @@ services:
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     ports:
-      - 55500:3306
+      - 55501:3306
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci','--default-time-zone=+01:00']
 
-  registro-calcio-backend:
+  registro-calcio-backend-dev:
     build: ../
-    container_name: registro_calcio_backend
+    container_name: registro_calcio_backend-dev
     ports:
-      - 8080:8080
+      - 8085:8080
     volumes:
       - '../logs:/logs'
     restart: always
     depends_on:
-      - database
-    links:
-      - database
+      - database-dev
 
-  registro-calcio-frontend-prime:
-    build: ../../rc-fe-prime-ng
-    container_name: registro-calcio-frontend-prime
-    ports:
-      - 80:4200
-    depends_on:
-      - registro-calcio-backend
-    links:
-      - registro-calcio-backend
-    restart: always
+#  registro-calcio-frontend-prime:
+#    build: ../../rc-fe-prime-ng
+#    container_name: registro-calcio-frontend-prime
+#    ports:
+#      - 80:4200
+#    depends_on:
+#      - registro-calcio-backend
+#    links:
+#      - registro-calcio-backend
+#    restart: always
