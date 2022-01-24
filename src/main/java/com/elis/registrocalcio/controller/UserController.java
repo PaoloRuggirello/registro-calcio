@@ -88,6 +88,9 @@ public class UserController {
             ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, INVALID_REGISTRATION_FIELDS);
         if(userHandler.checkIfPresentByEmail(userToRegister.getEmail()))
             ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, EMAIL_ALREADY_EXIST);
+        if(userHandler.numberOfUsers() == 0){
+            userToRegister.role = Role.ADMIN.name();
+        }
         userHandler.createUserAndSave(userToRegister);
         return new ResponseEntity<>(OK);
     }

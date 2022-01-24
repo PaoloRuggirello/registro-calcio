@@ -190,4 +190,9 @@ public class UserHandler {
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
+
+
+    public Long numberOfUsers(){
+        return userRepository.count();
+    }
 }

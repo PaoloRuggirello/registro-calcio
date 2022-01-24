@@ -1,0 +1,3 @@
+spring:
+  datasource:
+    jdbcUrl: jdbc:mysql://database-dev:3306/registro_calcio?serverTimezone=UTC
