@@ -149,12 +149,9 @@ public class UserController {
 
     @GetMapping("/find")
     public List<UserDTO> findAll(@RequestHeader("Authorization") Token userToken){
-        tokenHandler.checkToken(userToken, Role.ADMIN); //Only admin need all users
+        tokenHandler.checkToken(userToken, Role.ADMIN); //Only admins need all users
         List<User> allUsers = userHandler.findActiveUsers();
-        List<UserDTO> external = allUsers.stream().filter(user -> user.getSurname().contains("[ext]")).map(UserDTO::new).collect(Collectors.toList());
-        List<UserDTO> allUsersDTO = allUsers.stream().filter(user -> !user.getSurname().contains("[ext]")).map(UserDTO::new).collect(Collectors.toList());
-        allUsersDTO.addAll(external);
-        return allUsersDTO;
+        return allUsers.stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
     @GetMapping("/findInfo")
