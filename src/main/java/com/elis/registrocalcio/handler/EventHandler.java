@@ -125,10 +125,29 @@ public class EventHandler {
 
     public List<UserEvent> findEventPlayers(Long eventId, Integer page){
         int maxPlayers = eventHandler.findEventByIdCheckOptional(eventId).getCategory().numberOfAllowedPlayers();
-        List<UserEvent> result = userEventRepository.findPlayersOfEvent(eventId, PageRequest.of(0, maxPlayers * 2)).stream().sorted().collect(Collectors.toList());
+        List<UserEvent> result = userEventRepository.findPlayersOfEvent(eventId, PageRequest.of(0, maxPlayers * 2));
+        result = sortListByUserRole(result);
+
         int from = page * maxPlayers;
         int to = from + maxPlayers;
-        return result.subList(from, min(to, result.size()));
+        return result.subList(from, min(to, result.size())).stream().sorted().collect(Collectors.toList());
+    }
+
+    private List<UserEvent> sortListByUserRole(List<UserEvent> current){
+        List<UserEvent> subMoreThanOneDayBefore = new ArrayList<>();
+        List<UserEvent> subLessThanOneDayBefore = new ArrayList<>();
+        for(UserEvent ue : current){
+            if(ue.getEvent().getDate().minus(24, ChronoUnit.HOURS).isAfter(ue.getRegistrationTime())){
+                subMoreThanOneDayBefore.add(ue);
+            } else {
+                subLessThanOneDayBefore.add(ue);
+            }
+        }
+        subMoreThanOneDayBefore = subMoreThanOneDayBefore.stream().sorted().collect(Collectors.toList());
+        subLessThanOneDayBefore = subLessThanOneDayBefore.stream().sorted().collect(Collectors.toList());
+
+        subMoreThanOneDayBefore.addAll(subLessThanOneDayBefore);
+        return subMoreThanOneDayBefore;
     }
 
     public boolean isTeamsSizeValid(int team1, int team2){
