@@ -10,6 +10,7 @@ public class PlayerDTO {
     public String name;
     public String surname;
     public String team;
+    public String role;
 
     public PlayerDTO() {
     }
@@ -18,6 +19,7 @@ public class PlayerDTO {
         this.username = player.getUser().getUsername();
         this.name = player.getUser().getName();
         this.surname = player.getUser().getSurname();
+        this.role = player.getUser().getRole().name();
         this.team = (player.getTeam() != null) ? player.getTeam().toString() : null;
     }
 

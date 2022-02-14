@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.elis.registrocalcio.enumPackage.Category.BASKET;
 import static com.elis.registrocalcio.enumPackage.Category.PALLAVOLO;
+import static java.util.Collections.emptyList;
 
 @Service
 public class UserEventHandler {

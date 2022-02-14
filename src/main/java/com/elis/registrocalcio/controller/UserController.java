@@ -91,6 +91,9 @@ public class UserController {
             ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, INVALID_REGISTRATION_FIELDS);
         if(userHandler.checkIfPresentByEmail(userToRegister.getEmail()))
             ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, EMAIL_ALREADY_EXIST);
+        if(userHandler.numberOfUsers() == 0){
+            userToRegister.role = Role.ADMIN.name();
+        }
         userHandler.createUserAndSave(userToRegister);
         return new ResponseEntity<>(OK);
     }
@@ -138,7 +141,7 @@ public class UserController {
     @PostMapping("/delete/{username}")
     public UserDTO deleteUser(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
         String tokenUsername = tokenHandler.checkToken(userToken, Role.ADMIN).getUsername(); //Users can only be deleted by admin
-        log.info("Removing user: {}", username);
+        log.info("{} is removing user: {}", tokenUsername, username);
         User userToDelete = userHandler.findUserByUsernameCheckOptional(username);
         userEventHandler.deleteByUser(userToDelete);
         userToDelete.setActive(false);
@@ -171,11 +174,11 @@ public class UserController {
         return "Created By Alessio Billeci and Paolo Ruggirello";
     }
 
-    @PostMapping("/changeRole/{username}")
-    public UserDTO changeRole(@PathVariable("username") String username, @RequestHeader("Authorization") Token userToken){
+    @PostMapping("/changeRole/{username}/{role}")
+    public UserDTO changeRole(@PathVariable("username") String username, @PathVariable("role") String role, @RequestHeader("Authorization") Token userToken){
         SecurityToken securityToken = tokenHandler.checkToken(userToken, Role.ADMIN);
         log.info("{} is changing role for user {}", securityToken.getUsername(), username);
-        User updatedUser = userHandler.changeUserRole(username);
+        User updatedUser = userHandler.changeUserRole(username, role);
         if(username.equals(securityToken.getUsername())){
             securityToken.setRole(updatedUser.getRole());
             tokenHandler.save(securityToken);

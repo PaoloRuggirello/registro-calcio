@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.repository.general;
 
 import com.elis.registrocalcio.enumPackage.Category;
+import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.general.UserEvent;

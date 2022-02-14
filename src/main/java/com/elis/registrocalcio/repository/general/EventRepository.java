@@ -18,7 +18,7 @@ public interface EventRepository extends JpaRepository <Event, Long> {
     @Query("select e from Event e where e.id not in :ids and e.date > :date order by e.date asc")
     List<Event> findByIdNotIn(List<Long> ids, Instant date);
 
-    @Query("select e from Event e where e.date < :now")
+    @Query("select e from Event e where e.date < :now order by e.date desc")
     List<Event> findAllByPlayedIsTrue(Instant now);
 
     @Query("select e from Event e where e.date > :date order by e.date asc")

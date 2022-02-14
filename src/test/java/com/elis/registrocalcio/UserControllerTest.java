@@ -347,11 +347,11 @@ public class UserControllerTest {
         assertThat(userRepository.findById(user.getId()).get().getRole(), equalTo(Role.USER));
 
         tokenToUse.token = adminToken.token;
-        userController.changeRole(user.getUsername(),tokenToUse);
+        userController.changeRole(user.getUsername(),"ADMIN", tokenToUse);
         assertThat(userRepository.findById(user.getId()).get().getRole(), equalTo(Role.ADMIN));
 
         tokenToUse.token = adminToken.token;
-        userController.changeRole(user.getUsername(),tokenToUse);
+        userController.changeRole(user.getUsername(), "USER", tokenToUse);
         assertThat(userRepository.findById(user.getId()).get().getRole(), equalTo(Role.USER));
     }
 }

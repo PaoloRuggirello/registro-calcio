@@ -2,6 +2,7 @@ package com.elis.registrocalcio.model.general;
 
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.dto.UserDTO;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.util.ObjectUtils;
 
@@ -80,6 +81,7 @@ public class User implements Serializable {
     public User(UserDTO toRegister) {
         this.username = toRegister.getUsername();
         this.name = toRegister.getName();
+        this.role = EnumUtils.isValidEnum(Role.class, toRegister.getRole()) ? Role.valueOf(toRegister.getRole()) : Role.USER;
         this.surname = toRegister.getSurname();
         this.email = toRegister.getEmail();
         this.password = toRegister.getPassword();
@@ -175,6 +177,9 @@ public class User implements Serializable {
         this.newsLetter = newsLetter;
     }
 
+    public String getNameAndSurname(){
+        return this.name + " " + this.surname;
+    }
     @Override
     public String toString() {
         return new ToStringBuilder(this)

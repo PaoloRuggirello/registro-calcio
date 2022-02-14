@@ -2,20 +2,26 @@ package com.elis.registrocalcio;
 
 import com.elis.registrocalcio.controller.EventController;
 import com.elis.registrocalcio.dto.EventDTO;
+import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.enumPackage.Role;
+import com.elis.registrocalcio.handler.EventHandler;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.UserHandler;
+import com.elis.registrocalcio.model.general.Event;
 import com.elis.registrocalcio.model.general.User;
 import com.elis.registrocalcio.model.security.SecurityToken;
 import com.elis.registrocalcio.other.EmailServiceImpl;
 import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.UserRepository;
 import com.elis.registrocalcio.repository.security.SecurityTokenRepository;
+import com.itextpdf.text.DocumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
@@ -40,6 +46,8 @@ class RegistroCalcioApplicationTests {
 	EmailServiceImpl emailService;
 	@Autowired
 	EventController eventController;
+	@Autowired
+	EventHandler eventHandler;
 	@Autowired
 	TokenHandler tokenHandler;
 
@@ -101,7 +109,14 @@ class RegistroCalcioApplicationTests {
 		Assertions.assertFalse(DateUtils.areInTheSameWeek(date2, date3));
 		Assertions.assertFalse(DateUtils.areInTheSameWeek(date2, date4));
 		Assertions.assertFalse(DateUtils.areInTheSameWeek(date3, date4));
+	}
 
+	@Test
+	public void testingExport() throws DocumentException, IOException {
+		User paolo = new User("test.user", "test", "user", "testuser@mail.it", "password");
+		paolo = userRepository.save(paolo);
+		Event event = new Event(Category.CALCIO_A_7, Instant.now(), paolo);
+		eventHandler.exportEvent(event, "hello.pdf");
 	}
 
 	@Test

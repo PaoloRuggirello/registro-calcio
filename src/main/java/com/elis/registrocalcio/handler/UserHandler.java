@@ -10,6 +10,7 @@ import com.elis.registrocalcio.other.ExceptionUtils;
 import com.elis.registrocalcio.other.PasswordHash;
 import com.elis.registrocalcio.other.DateUtils;
 import com.elis.registrocalcio.repository.general.UserRepository;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -159,12 +160,14 @@ public class UserHandler {
         return toSetUsername;
     }
 
-    public User changeUserRole(String username){
+    public User changeUserRole(String username, String role){
         Optional<User> user = userRepository.findByUsernameAndIsActiveIsTrue(username);
         if(user.isPresent()){
-            Role currentRole = user.get().getRole();
-            user.get().setRole(currentRole == Role.USER ? Role.ADMIN : Role.USER);
-            log.info("Role for user {} changed from {} to {}", username, currentRole, user.get().getRole());
+            if(EnumUtils.isValidEnum(Role.class, role)){
+                Role currentRole = user.get().getRole();
+                user.get().setRole(Role.valueOf(role));
+                log.info("Role for user {} changed from {} to {}", username, currentRole, user.get().getRole());
+            }
             return userRepository.save(user.get());
         }
         ExceptionUtils.throwResponseStatus(this.getClass(), BAD_REQUEST, CANNOT_CHANGE_USER_ROLE , "user " + username +" not found");
@@ -189,5 +192,10 @@ public class UserHandler {
                 .limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
+    }
+
+
+    public Long numberOfUsers(){
+        return userRepository.count();
     }
 }

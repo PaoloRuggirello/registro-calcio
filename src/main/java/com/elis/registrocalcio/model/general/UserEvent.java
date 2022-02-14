@@ -1,6 +1,7 @@
 package com.elis.registrocalcio.model.general;
 
 import com.elis.registrocalcio.dto.UserEventDTO;
+import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.enumPackage.Team;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.util.ObjectUtils;
@@ -12,9 +13,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Entity
-public class UserEvent implements Serializable {
+public class UserEvent implements Serializable, Comparable<UserEvent> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,5 +81,13 @@ public class UserEvent implements Serializable {
 
     public void setRegistrationTime(Instant registrationTime) {
         this.registrationTime = registrationTime;
+    }
+
+    @Override
+    public int compareTo(UserEvent userEvent) {
+        List<Role> premiumRoles = asList(Role.USER, Role.ADMIN);
+        int thisEntityScore = !premiumRoles.contains(this.user.getRole()) ? 1 : 0;
+        int userEventScore = !premiumRoles.contains(userEvent.user.getRole()) ? 1 : 0;
+        return thisEntityScore - userEventScore;
     }
 }
