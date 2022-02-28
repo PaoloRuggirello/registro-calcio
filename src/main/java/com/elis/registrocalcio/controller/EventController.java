@@ -142,10 +142,10 @@ public class EventController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/export/{eventId}")
-    public ResponseEntity<InputStreamResource> exportEvent(@PathVariable("eventId") Long eventId, @RequestHeader("Authorization") Token token) throws FileNotFoundException {
-        String username = tokenHandler.checkToken(token, Role.ADMIN).getUsername();
-        log.info("{} is exporting event {}", username, eventId);
+    @GetMapping("/export/{eventId}/{username}")
+    public ResponseEntity<InputStreamResource> exportEvent(@PathVariable("eventId") Long eventId, @PathVariable("username") String username) throws FileNotFoundException { //, @RequestHeader("Authorization") Token token
+//        String username = tokenHandler.checkToken(token, Role.ADMIN).getUsername();
+//        log.info("{} is exporting event {}", username, eventId);
         Event toExport = eventHandler.findEventByIdCheckOptional(eventId);
         if(!toExport.getPlayed()) ExceptionUtils.throwResponseStatus(this.getClass(), HttpStatus.FORBIDDEN, FootballRegisterException.EVENT_NOT_PLAYED_YET, username + " is trying to download not played event: " + toExport);
         String filePath = "";

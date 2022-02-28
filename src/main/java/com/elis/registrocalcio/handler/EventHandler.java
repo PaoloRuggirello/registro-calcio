@@ -189,7 +189,8 @@ public class EventHandler {
 
 
     public String exportEvent(Event event, String filename) throws IOException, DocumentException {
-        String file = "export/" + filename;
+        File file = new File("export/" + filename);
+        file.getParentFile().mkdirs();
         Document exportedMatch = new com.itextpdf.text.Document();
         PdfWriter.getInstance(exportedMatch, new FileOutputStream(file));
 
@@ -258,7 +259,7 @@ public class EventHandler {
         exportedMatch.close();
 
 
-        return file;
+        return file.getPath();
     }
 
 
