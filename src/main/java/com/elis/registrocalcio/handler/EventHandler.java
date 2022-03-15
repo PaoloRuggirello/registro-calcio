@@ -144,7 +144,6 @@ public class EventHandler {
             }
         }
         subMoreThanOneDayBefore = subMoreThanOneDayBefore.stream().sorted().collect(Collectors.toList());
-        subLessThanOneDayBefore = subLessThanOneDayBefore.stream().sorted().collect(Collectors.toList());
 
         subMoreThanOneDayBefore.addAll(subLessThanOneDayBefore);
         return subMoreThanOneDayBefore;
