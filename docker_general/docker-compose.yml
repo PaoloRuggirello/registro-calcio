@@ -29,13 +29,12 @@ services:
     depends_on:
       - database-dev
 
-#  registro-calcio-frontend-prime:
-#    build: ../../rc-fe-prime-ng
-#    container_name: registro-calcio-frontend-prime
-#    ports:
-#      - 80:4200
-#    depends_on:
-#      - registro-calcio-backend
-#    links:
-#      - registro-calcio-backend
-#    restar
+  registro-calcio-frontend-prime-dev:
+    build: ../../rc-fe-prime-ng-dev
+    container_name: registro-calcio-frontend-prime-dev
+    ports:
+      - 82:80
+    depends_on:
+      - registro-calcio-backend-dev
+    links:
+      - registro-calcio-backend-dev
