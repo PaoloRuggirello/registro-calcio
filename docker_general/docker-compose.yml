@@ -33,5 +33,5 @@ services:
     build: ../../rc-fe-prime-ng
     container_name: registro-calcio-frontend-prime
     ports:
-      - 81:4200
+      - 81:80
     restart: always
