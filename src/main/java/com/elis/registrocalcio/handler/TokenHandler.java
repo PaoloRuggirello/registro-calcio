@@ -71,7 +71,7 @@ public class TokenHandler {
         SecurityToken securityToken = checkToken(token);
         log.info("Needed [{}] - token info: {}", permissionLevel, securityToken);
         Role role = securityToken.getRole();
-        if(role == Role.USER && permissionLevel == Role.ADMIN)
+        if(role.getPermissionLevel() > permissionLevel.getPermissionLevel())
             ExceptionUtils.throwResponseStatus(this.getClass(), FORBIDDEN,PERMISSION_DENIED, securityToken.getUsername() +" is " + role +" but method needs " + permissionLevel);
         return securityToken;
     }
