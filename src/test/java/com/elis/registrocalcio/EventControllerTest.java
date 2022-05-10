@@ -1,6 +1,7 @@
 package com.elis.registrocalcio;
 
 import com.elis.registrocalcio.controller.EventController;
+import com.elis.registrocalcio.dto.CategoriesDTO;
 import com.elis.registrocalcio.dto.EventDTO;
 import com.elis.registrocalcio.dto.PlayerDTO;
 import com.elis.registrocalcio.dto.Token;
@@ -285,6 +286,16 @@ public class EventControllerTest {
         assertThat(allEvents.get(0).getCategory(), equalTo(Category.CALCIO_A_5));
         assertTrue(allEvents.get(0).getDate().isBefore(Instant.now()));
 
+    }
+
+    @Test
+    public void testGetCategories() throws InvalidKeySpecException, NoSuchAlgorithmException {
+        User admin = new User("admin.admin", "name", "surname", "admin@email.it", userHandler.passwordEncryption("password"));
+        admin.setRole(Role.ADMIN);
+        userRepository.save(admin);
+        Token token = tokenHandler.createToken(admin.getUsername());
+        CategoriesDTO categoriesDTO = eventController.getCategories(token);
+        assertNotNull(categoriesDTO);
     }
 
     private String convertDate(Date current){

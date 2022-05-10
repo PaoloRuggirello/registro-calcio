@@ -5,7 +5,8 @@ public enum Category {
     CALCIO_A_7,
     CALCIO_A_11,
     BASKET,
-    PALLAVOLO;
+    PALLAVOLO,
+    TORNEO;
 
     @Override
     public String toString() {
@@ -20,6 +21,8 @@ public enum Category {
                 return "Basket";
             case PALLAVOLO:
                 return "Pallavolo";
+            case TORNEO:
+                return "Torneo";
             default: throw new IllegalArgumentException();
         }
     }
@@ -35,6 +38,8 @@ public enum Category {
             case PALLAVOLO:
             case BASKET:
                 return 12;
+            case TORNEO:
+                return 100;
             default: throw new IllegalArgumentException();
         }
     }
@@ -50,6 +55,8 @@ public enum Category {
             return BASKET;
         else if(categoryString.equals(PALLAVOLO.toString()))
             return PALLAVOLO;
+        else if(categoryString.equals(TORNEO.toString()))
+            return TORNEO;
         else throw new IllegalArgumentException("CATEGORY_NOT_FOUND");
     }
 }

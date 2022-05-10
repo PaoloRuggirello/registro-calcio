@@ -1,7 +1,9 @@
 package com.elis.registrocalcio.controller;
 
+import com.elis.registrocalcio.dto.CategoriesDTO;
 import com.elis.registrocalcio.dto.PlayerDTO;
 import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.enumPackage.ChangeType;
 import com.elis.registrocalcio.enumPackage.Team;
 import com.elis.registrocalcio.handler.TokenHandler;
@@ -39,8 +41,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -169,5 +175,12 @@ public class EventController {
                 .contentLength(match.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @PostMapping("/categories")
+    public CategoriesDTO getCategories(@RequestHeader("Authorization") Token token){
+        tokenHandler.checkToken(token, Role.ADMIN);
+        List<String> categories = stream(Category.values()).map(Enum::toString).collect(Collectors.toList());
+        return new CategoriesDTO(categories);
     }
 }
