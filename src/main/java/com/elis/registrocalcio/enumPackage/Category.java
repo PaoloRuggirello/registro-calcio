@@ -22,7 +22,7 @@ public enum Category {
             case PALLAVOLO:
                 return "Pallavolo";
             case TORNEO:
-                return "Torneo";
+                return "Elis Football Championship";
             default: throw new IllegalArgumentException();
         }
     }
@@ -39,7 +39,7 @@ public enum Category {
             case BASKET:
                 return 12;
             case TORNEO:
-                return 100;
+                return 64;
             default: throw new IllegalArgumentException();
         }
     }
