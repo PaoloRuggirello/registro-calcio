@@ -1,5 +1,7 @@
 package com.elis.registrocalcio.enumPackage;
 
+import java.util.Arrays;
+
 public enum Category {
     CALCIO_A_5,
     CALCIO_A_7,
@@ -10,7 +12,7 @@ public enum Category {
 
     @Override
     public String toString() {
-        switch (this){
+        switch (this) {
             case CALCIO_A_5:
                 return "Calcio a 5";
             case CALCIO_A_7:
@@ -23,12 +25,13 @@ public enum Category {
                 return "Pallavolo";
             case TORNEO:
                 return "Elis Football Championship";
-            default: throw new IllegalArgumentException();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
     public int numberOfAllowedPlayers() {
-        switch (this){
+        switch (this) {
             case CALCIO_A_5:
                 return 10;
             case CALCIO_A_7:
@@ -40,23 +43,28 @@ public enum Category {
                 return 12;
             case TORNEO:
                 return 64;
-            default: throw new IllegalArgumentException();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
-    public static Category getCategoryFromString(String categoryString){
-        if(categoryString.equals(CALCIO_A_5.toString()))
-            return CALCIO_A_5;
-        else if(categoryString.equals(CALCIO_A_7.toString()))
-            return CALCIO_A_7;
-        else if(categoryString.equals(CALCIO_A_11.toString()))
-            return CALCIO_A_11;
-        else if(categoryString.equals(BASKET.toString()))
-            return BASKET;
-        else if(categoryString.equals(PALLAVOLO.toString()))
-            return PALLAVOLO;
-        else if(categoryString.equals(TORNEO.toString()))
-            return TORNEO;
-        else throw new IllegalArgumentException("CATEGORY_NOT_FOUND");
+    public static Category getCategoryFromString(String categoryString) {
+        return Arrays.stream(Category.values())
+                .filter(value -> value.toString().equals(categoryString))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("CATEGORY_NOT_FOUND"));
+//        if (categoryString.equals(CALCIO_A_5.toString()))
+//            return CALCIO_A_5;
+//        else if (categoryString.equals(CALCIO_A_7.toString()))
+//            return CALCIO_A_7;
+//        else if (categoryString.equals(CALCIO_A_11.toString()))
+//            return CALCIO_A_11;
+//        else if (categoryString.equals(BASKET.toString()))
+//            return BASKET;
+//        else if (categoryString.equals(PALLAVOLO.toString()))
+//            return PALLAVOLO;
+//        else if (categoryString.equals(TORNEO.toString()))
+//            return TORNEO;
+//        else throw new IllegalArgumentException("CATEGORY_NOT_FOUND"); TODO remove
     }
 }
