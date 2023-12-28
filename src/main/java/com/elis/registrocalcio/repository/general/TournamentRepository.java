@@ -11,4 +11,6 @@ import java.util.List;
 public interface TournamentRepository extends JpaRepository<Tournament, Long> {
 
     List<Tournament> findAllByDateGreaterThanOrderByDate(Instant now);
+
+    List<Tournament> findAllByDateLessThanOrderByDateDesc(Instant now);
 }

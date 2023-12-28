@@ -55,4 +55,13 @@ public class TournamentController {
         return new FindTournamentsDTO(TournamentMapper.INSTANCE.convert(tournaments));
     }
 
+    @GetMapping(path = "/past", produces = APPLICATION_JSON_VALUE)
+    public FindTournamentsDTO findPastTournaments(@RequestHeader("Authorization") Token userToken) {
+        log.info("Obtaining list of past tournaments");
+        tokenHandler.checkToken(userToken);
+        Instant today = Instant.now().truncatedTo(ChronoUnit.DAYS);
+        List<Tournament> tournaments = tournamentRepository.findAllByDateLessThanOrderByDateDesc(today);
+        return new FindTournamentsDTO(TournamentMapper.INSTANCE.convert(tournaments));
+    }
+
 }
