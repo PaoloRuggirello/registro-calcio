@@ -2,9 +2,9 @@ package com.elis.registrocalcio.controller;
 
 import com.elis.registrocalcio.dto.Token;
 import com.elis.registrocalcio.dto.tournament.CreateTournamentRequestDTO;
-import com.elis.registrocalcio.dto.tournament.CreateTournamentResponseDTO;
 import com.elis.registrocalcio.dto.tournament.FindTournamentsDTO;
 import com.elis.registrocalcio.dto.tournament.FullTournamentDTO;
+import com.elis.registrocalcio.dto.tournament.TournamentDTO;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.mapper.TournamentMapper;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -42,7 +42,7 @@ public class TournamentController {
     private TournamentRepository tournamentRepository;
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public CreateTournamentResponseDTO createTournament(@RequestBody CreateTournamentRequestDTO createTournamentRequestDTO, @RequestHeader("Authorization") Token userToken) {
+    public TournamentDTO createTournament(@RequestBody CreateTournamentRequestDTO createTournamentRequestDTO, @RequestHeader("Authorization") Token userToken) {
         SecurityToken token = tokenHandler.checkToken(userToken, Role.ADMIN);
         log.info("{} is creating a Tournament. Event info: {}", token.getUsername(), createTournamentRequestDTO);
         Tournament tournament = TournamentMapper.INSTANCE.convert(createTournamentRequestDTO);
@@ -56,7 +56,7 @@ public class TournamentController {
         tokenHandler.checkToken(userToken);
         Instant today = Instant.now().truncatedTo(ChronoUnit.DAYS);
         List<Tournament> tournaments = tournamentRepository.findAllByDateGreaterThanOrderByDate(today); // TODO add pagination
-        return new FindTournamentsDTO(TournamentMapper.INSTANCE.convert(tournaments));
+        return new FindTournamentsDTO(tournaments.stream().map(TournamentMapper.INSTANCE::convert).collect(Collectors.toList()));
     }
 
     @GetMapping(path = "/past", produces = APPLICATION_JSON_VALUE)
@@ -65,7 +65,8 @@ public class TournamentController {
         tokenHandler.checkToken(userToken);
         Instant today = Instant.now().truncatedTo(ChronoUnit.DAYS);
         List<Tournament> tournaments = tournamentRepository.findAllByDateLessThanOrderByDateDesc(today); // TODO: add pagination
-        return new FindTournamentsDTO(TournamentMapper.INSTANCE.convert(tournaments));
+        List<TournamentDTO> result = tournaments.stream().map(TournamentMapper.INSTANCE::convert).collect(Collectors.toList());
+        return new FindTournamentsDTO(result);
     }
 
     @GetMapping(path = "/{tournamentId}", produces = APPLICATION_JSON_VALUE)

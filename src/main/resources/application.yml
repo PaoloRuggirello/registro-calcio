@@ -34,7 +34,7 @@ server:
 logging:
   level:
     org.springframework: WARN
-    com.appicantion.name: INFO
+    com.appicantion.name: DEBUG
   file:
     name: logs/registro-calcio.log
     max-size: 10MB

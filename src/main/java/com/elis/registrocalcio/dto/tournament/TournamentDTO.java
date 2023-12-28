@@ -10,5 +10,5 @@ public class TournamentDTO {
     public Long id;
     public String name;
     public Instant date;
-    public Category category;
+    public String category;
 }
