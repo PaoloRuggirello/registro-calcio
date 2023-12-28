@@ -70,9 +70,10 @@ public class TournamentController {
 
     @GetMapping(path = "/{tournamentId}", produces = APPLICATION_JSON_VALUE)
     public FullTournamentDTO findById(@RequestHeader("Authorization") Token userToken, @PathVariable("tournamentId") Long tournamentId) {
-        log.info("Finding tournament with id: {}", tournamentId);
         tokenHandler.checkToken(userToken);
+        log.info("Finding tournament with id: {}", tournamentId);
         Tournament tournament = tournamentRepository.findWithTeamsById(tournamentId).orElseThrow(() -> new IllegalArgumentException(format("Tournament by id %s not found", tournamentId)));
+        log.debug("Found tournament: {}", tournament);
         return TournamentMapper.INSTANCE.convertToFull(tournament);
     }
 
