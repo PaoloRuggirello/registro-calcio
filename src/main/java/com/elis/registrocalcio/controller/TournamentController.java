@@ -1,7 +1,7 @@
 package com.elis.registrocalcio.controller;
 
-import com.elis.registrocalcio.dto.tournament.CreateTournamentRequestDTO;
 import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.dto.tournament.CreateTournamentRequestDTO;
 import com.elis.registrocalcio.dto.tournament.CreateTournamentResponseDTO;
 import com.elis.registrocalcio.dto.tournament.FindTournamentsDTO;
 import com.elis.registrocalcio.enumPackage.Role;
@@ -12,7 +12,6 @@ import com.elis.registrocalcio.model.security.SecurityToken;
 import com.elis.registrocalcio.repository.general.TournamentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -50,7 +50,8 @@ public class TournamentController {
     public FindTournamentsDTO findActiveTournaments(@RequestHeader("Authorization") Token userToken) {
         log.info("Obtaining list of active tournaments");
         tokenHandler.checkToken(userToken);
-        List<Tournament> tournaments = tournamentRepository.findAllByDateGreaterThanOrderByDate(Instant.now());
+        Instant today = Instant.now().truncatedTo(ChronoUnit.DAYS);
+        List<Tournament> tournaments = tournamentRepository.findAllByDateGreaterThanOrderByDate(today);
         return new FindTournamentsDTO(TournamentMapper.INSTANCE.convert(tournaments));
     }
 
