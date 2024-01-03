@@ -102,7 +102,7 @@ public class TournamentController {
         return TournamentMapper.INSTANCE.convertToPlayers(tournament);
     }
 
-    @PostMapping(value = "/team", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/teams", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public CreateTeamResponseDTO createTeam(@RequestHeader("Authorization") Token userToken, @RequestBody @NonNull CreateTeamRequestDTO createTeamRequestDTO) {
         tokenHandler.checkToken(userToken, Role.ADMIN);
         log.info("Creating team: {}", createTeamRequestDTO);
