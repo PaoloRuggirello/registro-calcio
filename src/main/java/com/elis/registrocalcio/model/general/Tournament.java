@@ -6,8 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import org.hibernate.annotations.CreationTimestamp;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -50,7 +52,9 @@ public class Tournament {
     @CreationTimestamp
     private Instant creationTime;
 
-    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY)
+    @Setter
+    @Singular
+    @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Team> teams;
 
     @Setter

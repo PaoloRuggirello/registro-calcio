@@ -1,6 +1,8 @@
 package com.elis.registrocalcio.controller;
 
 import com.elis.registrocalcio.dto.Token;
+import com.elis.registrocalcio.dto.tournament.CreateTeamRequestDTO;
+import com.elis.registrocalcio.dto.tournament.CreateTeamResponseDTO;
 import com.elis.registrocalcio.dto.tournament.CreateTournamentRequestDTO;
 import com.elis.registrocalcio.dto.tournament.FindTournamentsDTO;
 import com.elis.registrocalcio.dto.tournament.FullTournamentDTO;
@@ -9,10 +11,15 @@ import com.elis.registrocalcio.dto.tournament.TournamentPlayersDTO;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.TokenHandler;
 import com.elis.registrocalcio.handler.TournamentHandler;
+import com.elis.registrocalcio.mapper.TeamMapper;
 import com.elis.registrocalcio.mapper.TournamentMapper;
+import com.elis.registrocalcio.model.general.Team;
 import com.elis.registrocalcio.model.general.Tournament;
 import com.elis.registrocalcio.model.security.SecurityToken;
+import com.elis.registrocalcio.repository.general.TeamRepository;
 import com.elis.registrocalcio.repository.general.TournamentRepository;
+import com.google.common.base.Preconditions;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,6 +37,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @CrossOrigin(origins = "*")
@@ -44,6 +52,8 @@ public class TournamentController {
     private TournamentRepository tournamentRepository;
     @Autowired
     private TournamentHandler tournamentHandler;
+    @Autowired
+    private TeamRepository teamRepository;
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public TournamentDTO createTournament(@RequestBody CreateTournamentRequestDTO createTournamentRequestDTO, @RequestHeader("Authorization") Token userToken) {
@@ -90,6 +100,22 @@ public class TournamentController {
         log.debug("Found tournament: {}", tournament);
         tournament.setPlayers(tournamentHandler.sortUsers(tournament.getPlayers()));
         return TournamentMapper.INSTANCE.convertToPlayers(tournament);
+    }
+
+    @PostMapping(value = "/team", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public CreateTeamResponseDTO createTeam(@RequestHeader("Authorization") Token userToken, @RequestBody @NonNull CreateTeamRequestDTO createTeamRequestDTO) {
+        tokenHandler.checkToken(userToken, Role.ADMIN);
+        log.info("Creating team: {}", createTeamRequestDTO);
+        Preconditions.checkArgument(nonNull(createTeamRequestDTO.tournamentId), "TournamentId cannot be null;");
+        Preconditions.checkArgument(nonNull(createTeamRequestDTO.name), "Team name cannot be null;");
+        Tournament tournament = tournamentRepository.findById(createTeamRequestDTO.tournamentId).orElseThrow(() -> new IllegalArgumentException(format("Tournament with id: %s not found.", createTeamRequestDTO.tournamentId)));
+        Team team = Team.builder()
+                .name(createTeamRequestDTO.name)
+                .jersey(createTeamRequestDTO.jersey)
+                .tournament(tournament)
+                .build();
+        log.info("Saved team: {}", team);
+        return TeamMapper.INSTANCE.convert(teamRepository.save(team));
     }
 
 }
