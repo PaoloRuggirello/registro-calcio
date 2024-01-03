@@ -3,6 +3,7 @@ package com.elis.registrocalcio.mapper;
 import com.elis.registrocalcio.dto.tournament.CreateTournamentRequestDTO;
 import com.elis.registrocalcio.dto.tournament.FullTournamentDTO;
 import com.elis.registrocalcio.dto.tournament.TournamentDTO;
+import com.elis.registrocalcio.dto.tournament.TournamentPlayersDTO;
 import com.elis.registrocalcio.enumPackage.Category;
 import com.elis.registrocalcio.model.general.Tournament;
 import org.mapstruct.Mapper;
@@ -20,6 +21,8 @@ public interface TournamentMapper {
     TournamentDTO convert(Tournament tournament);
     @Mapping(source = "category", target = "category", qualifiedByName = "convertCategoryToString")
     FullTournamentDTO convertToFull(Tournament tournament);
+
+    TournamentPlayersDTO convertToPlayers(Tournament tournament);
 
     @Named("convertCategory")
     static Category convertCategory(String category) {

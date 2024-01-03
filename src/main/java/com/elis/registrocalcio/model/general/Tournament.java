@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.jpa.repository.EntityGraph;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,6 +23,10 @@ import java.util.List;
 @NamedEntityGraph(
         name = "withTeams",
         attributeNodes = @NamedAttributeNode("teams")
+)
+@NamedEntityGraph(
+        name = "withPlayers",
+        attributeNodes = @NamedAttributeNode("players")
 )
 @Entity(name = "Tournament")
 @Getter
@@ -48,4 +52,8 @@ public class Tournament {
 
     @OneToMany(mappedBy = "tournament", fetch = FetchType.LAZY)
     private List<Team> teams;
+
+    @Setter
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<User> players;
 }

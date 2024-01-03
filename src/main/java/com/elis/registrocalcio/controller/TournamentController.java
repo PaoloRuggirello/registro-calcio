@@ -5,8 +5,10 @@ import com.elis.registrocalcio.dto.tournament.CreateTournamentRequestDTO;
 import com.elis.registrocalcio.dto.tournament.FindTournamentsDTO;
 import com.elis.registrocalcio.dto.tournament.FullTournamentDTO;
 import com.elis.registrocalcio.dto.tournament.TournamentDTO;
+import com.elis.registrocalcio.dto.tournament.TournamentPlayersDTO;
 import com.elis.registrocalcio.enumPackage.Role;
 import com.elis.registrocalcio.handler.TokenHandler;
+import com.elis.registrocalcio.handler.TournamentHandler;
 import com.elis.registrocalcio.mapper.TournamentMapper;
 import com.elis.registrocalcio.model.general.Tournament;
 import com.elis.registrocalcio.model.security.SecurityToken;
@@ -40,6 +42,8 @@ public class TournamentController {
     private TokenHandler tokenHandler;
     @Autowired
     private TournamentRepository tournamentRepository;
+    @Autowired
+    private TournamentHandler tournamentHandler;
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public TournamentDTO createTournament(@RequestBody CreateTournamentRequestDTO createTournamentRequestDTO, @RequestHeader("Authorization") Token userToken) {
@@ -76,6 +80,16 @@ public class TournamentController {
         Tournament tournament = tournamentRepository.findWithTeamsById(tournamentId).orElseThrow(() -> new IllegalArgumentException(format("Tournament by id %s not found", tournamentId)));
         log.debug("Found tournament: {}", tournament);
         return TournamentMapper.INSTANCE.convertToFull(tournament);
+    }
+
+    @GetMapping(path = "/players/{tournamentId}", produces = APPLICATION_JSON_VALUE)
+    public TournamentPlayersDTO findTournamentPlayers(@RequestHeader("Authorization") Token userToken, @PathVariable("tournamentId") Long tournamentId) {
+        tokenHandler.checkToken(userToken, Role.ADMIN);
+        log.info("Finding tournament players with id: {}", tournamentId);
+        Tournament tournament = tournamentRepository.findWithPlayersById(tournamentId).orElseThrow(() -> new IllegalArgumentException(format("Tournament by id %s not found", tournamentId)));
+        log.debug("Found tournament: {}", tournament);
+        tournament.setPlayers(tournamentHandler.sortUsers(tournament.getPlayers()));
+        return TournamentMapper.INSTANCE.convertToPlayers(tournament);
     }
 
 }

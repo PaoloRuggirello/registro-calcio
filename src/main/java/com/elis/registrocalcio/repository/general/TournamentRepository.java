@@ -18,4 +18,7 @@ public interface TournamentRepository extends JpaRepository<Tournament, Long> {
 
     @EntityGraph(value = "withTeams")
     Optional<Tournament> findWithTeamsById(Long id);
+
+    @EntityGraph(value = "withTeams")
+    Optional<Tournament> findWithPlayersById(Long id);
 }
