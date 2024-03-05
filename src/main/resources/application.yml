@@ -24,7 +24,7 @@ spring:
       starttls.enable: true
     host: smtp.yandex.com
     port: 465
-    password: regCal2021Pass
+    password: ckuootdujblrjrxa
     username: registro.calcio.elis@yandex.com
 
 server:
